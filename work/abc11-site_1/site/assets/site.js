@@ -71,7 +71,7 @@ function setQty(id,v){ const c=cart(); v=parseInt(v)||0; if(v<=0) delete c[id]; 
 
 function mountPaypal(total){
   const cfg = window.PATZCOM_CONFIG||{}, el = document.getElementById('paypal-button-container');
-  if(!cfg.paypalClientId){ el.innerHTML = '<div class="muted" style="border:1px dashed var(--line);padding:14px;border-radius:8px">PayPal is not configured yet. Add your client ID in <code>assets/config.js</code> and the live checkout button appears here automatically.</div>'; return; }
+  if(!cfg.paypalClientId){ el.innerHTML = '<div class="muted" style="border:1px dashed var(--line);padding:14px;border-radius:8px">PayPal is the primary checkout option and is not configured yet. Add your PayPal live client ID in <code>assets/config.js</code>. Stripe card checkout is planned as the secondary option through the PATZCOM U.S. Stripe Atlas setup.</div>'; return; }
   if(window.paypal){ return draw(); }
   const s=document.createElement('script');
   s.src=`https://www.paypal.com/sdk/js?client-id=${cfg.paypalClientId}&currency=${cfg.currency||'USD'}`;
