@@ -114,7 +114,14 @@ img{max-width:100%;display:block}
 .admin-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;border-radius:12px;border:1px solid #cfd8e3;background:#fff;color:#1f2937;font-weight:700;font-size:14px;cursor:pointer}
 .admin-btn:hover{border-color:#3665f3;color:#3665f3}
 .admin-btn.primary{background:#3665f3;border-color:#3665f3;color:#fff}
+.admin-overview-card{display:flex;justify-content:space-between;gap:18px;align-items:flex-end;padding:24px 26px;border-radius:24px;background:linear-gradient(135deg,#15358b 0%,#3665f3 48%,#6b8cff 100%);color:#fff;box-shadow:0 22px 50px rgba(26,58,146,.22)}
+.admin-overview-copy h2{margin:10px 0 8px;font-size:30px;line-height:1.05;letter-spacing:-1.1px}
+.admin-overview-copy p{margin:0;max-width:720px;color:rgba(255,255,255,.82)}
+.admin-overview-label{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.14);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.admin-overview-pills{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end}
+.admin-overview-pills span{display:inline-flex;align-items:center;padding:10px 12px;border-radius:999px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.18);font-size:13px;font-weight:700;white-space:nowrap}
 .admin-grid{display:grid;grid-template-columns:2fr 1fr;gap:20px}
+.admin-main-stack,.admin-side-stack{display:grid;gap:20px}
 .admin-panel{background:#fff;border:1px solid #d9e0ea;border-radius:20px;padding:22px;box-shadow:0 12px 30px rgba(25,40,72,.06)}
 .admin-panel h2,.admin-panel h3{margin:0 0 10px;color:#111827}
 .admin-panel p{color:#5f6f84}
@@ -130,10 +137,22 @@ img{max-width:100%;display:block}
 .admin-row span{color:#607186;font-size:13px}
 .admin-row code{background:#eef3ff;padding:4px 8px;border-radius:999px;color:#2753d7}
 .admin-badge{display:inline-flex;align-items:center;padding:5px 9px;border-radius:999px;background:#eef3ff;color:#2753d7;font-size:12px;font-weight:800}
+.admin-queue{display:grid;gap:12px}
+.admin-queue-item{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;padding:16px;border:1px solid #dce5f0;border-radius:16px;background:linear-gradient(180deg,#fcfdff,#f6f9fe)}
+.admin-queue-item strong{display:block;margin-bottom:6px;color:#111827}
+.admin-queue-item p{margin:0;color:#607186;font-size:13px}
+.admin-status-chip{display:inline-flex;align-items:center;justify-content:center;padding:7px 10px;border-radius:999px;background:#eef2f7;color:#526276;font-size:12px;font-weight:800;white-space:nowrap}
+.admin-status-chip.info{background:#eef3ff;color:#2753d7}
+.admin-status-chip.ok{background:#e9fbef;color:#16784d}
+.admin-status-chip.warn{background:#fff4dd;color:#9a6500}
 .admin-side-list{display:grid;gap:12px}
 .admin-side-item{padding:14px;border-radius:14px;background:#f8faff;border:1px solid #dce5f0}
 .admin-side-item strong{display:block;margin-bottom:5px;color:#111827}
 .admin-side-item p{margin:0;color:#607186;font-size:13px}
+.admin-integrations{display:grid;gap:12px}
+.admin-integration-item{display:grid;gap:4px;padding:14px;border-radius:14px;background:#f8faff;border:1px solid #dce5f0}
+.admin-integration-item strong{color:#111827}
+.admin-integration-item span{color:#607186;font-size:13px}
 .admin-login-body{background:linear-gradient(180deg,#eef3f9 0%,#f7f9fc 100%);color:#1f2937}
 .admin-login-body .hdr{background:#fff;border-bottom:1px solid #d9e0ea;backdrop-filter:none}
 .admin-login-shell{min-height:calc(100vh - 68px);display:grid;place-items:center;padding:48px 20px}
@@ -154,7 +173,7 @@ img{max-width:100%;display:block}
 .admin-login-card label{display:grid;gap:6px;color:#607186;font-size:13px;font-weight:700}
 .admin-login-card input{background:#fff;border:1px solid #c9d3e0;color:#111827;padding:13px 14px;border-radius:12px;font:inherit}
 .admin-login-card input:focus{outline:none;border-color:#3665f3;box-shadow:0 0 0 4px rgba(54,101,243,.12)}
-@media(max-width:900px){.admin-grid,.admin-login-grid,.admin-stats{grid-template-columns:1fr}.admin-row{grid-template-columns:1fr}.admin-topbar{flex-direction:column}}
+@media(max-width:900px){.admin-grid,.admin-login-grid,.admin-stats{grid-template-columns:1fr}.admin-row{grid-template-columns:1fr}.admin-topbar,.admin-overview-card{flex-direction:column;align-items:flex-start}.admin-overview-pills{justify-content:flex-start}}
 /* pdp */
 .pdp{display:grid;grid-template-columns:1.1fr 1fr;gap:44px;padding-top:28px}
 .mainimg{background:#fff;border-radius:12px;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;overflow:hidden}

@@ -17,7 +17,106 @@
  <button class="admin-btn primary" id="admin-logout-btn" type="button">Log out</button>
 </div></div>
 <div id="results" class="results"></div></header>
-<section class="admin-shell"><div class="wrap"><div class="admin-topbar"><div><span class="admin-kicker">seller operations preview</span><h1 class="admin-title">PATZCOM Admin Hub</h1><p class="admin-sub">A protected operations workspace for product control, order review, shipping updates, payout reporting, and upcoming eBay API-connected workflows.</p></div><div class="admin-util"><a class="admin-btn" href="/api/admin/dashboard">View JSON</a><a class="admin-btn" href="/api/products">Product feed</a></div></div><div class="admin-actions"><p class="muted" id="admin-session-label">Checking admin session...</p><span class="admin-badge">Protected session</span></div><div class="admin-stats" id="admin-stat-grid"><div class="admin-stat"><strong>--</strong><span>Catalog products</span></div><div class="admin-stat"><strong>--</strong><span>Brands</span></div><div class="admin-stat"><strong>--</strong><span>Categories</span></div><div class="admin-stat"><strong>--</strong><span>In stock</span></div></div><div class="admin-grid"><div class="admin-panel"><div class="admin-section-label"><h2>Operations overview</h2><span class="muted">Live scaffold from the admin API</span></div><div class="admin-list" id="admin-dashboard-list"><div class="admin-row"><strong>Catalog size</strong><span>Loading...</span><span>Loading...</span><span><code>/api/admin/dashboard</code></span></div></div><p class="api-note">Use this protected area as the foundation for eBay OAuth, inventory sync, order handling, and PayPal production workflows.</p></div><div class="admin-panel"><h3>Workflow shortcuts</h3><div class="admin-side-list"><div class="admin-side-item"><strong>Catalog control</strong><p>Prepare product registration, stock edits, and price updates for direct PATZCOM selling.</p></div><div class="admin-side-item"><strong>Order desk</strong><p>Keep buyer communication, fulfillment progress, and internal order notes in one place.</p></div><div class="admin-side-item"><strong>Shipping desk</strong><p>Extend this panel with tracking sync and shipment status updates after API connection.</p></div><div class="admin-side-item"><strong>Payout reporting</strong><p>Surface eBay and PATZCOM sales performance once tokens and payment keys are connected.</p></div></div><p class="api-note" id="admin-api-note">Current storefront UI sells products displayed on PATZCOM. This admin hub is the next step toward a real API-backed operations system.</p></div></div></div></section>
+<section class="admin-shell"><div class="wrap">
+<div class="admin-topbar">
+  <div>
+    <span class="admin-kicker">seller hub style operations</span>
+    <h1 class="admin-title">PATZCOM Seller Operations</h1>
+    <p class="admin-sub">A protected admin workspace for catalog control, buyer communication, shipping updates, payout visibility, and future eBay API-connected workflows.</p>
+  </div>
+  <div class="admin-util">
+    <a class="admin-btn" href="/api/admin/dashboard">Admin API</a>
+    <a class="admin-btn" href="/api/products">Product feed</a>
+  </div>
+</div>
+
+<div class="admin-actions">
+  <p class="muted" id="admin-session-label">Checking admin session...</p>
+  <span class="admin-badge">Protected session</span>
+</div>
+
+<div class="admin-overview-card">
+  <div class="admin-overview-copy">
+    <span class="admin-overview-label">today's focus</span>
+    <h2>Run PATZCOM with one operations view.</h2>
+    <p>Monitor the live catalog, review readiness for PayPal and eBay-linked workflows, and keep customer-facing storefront sales aligned with back-office actions.</p>
+  </div>
+  <div class="admin-overview-pills">
+    <span>Catalog updates</span>
+    <span>Order handling</span>
+    <span>Shipping sync</span>
+    <span>Finance review</span>
+  </div>
+</div>
+
+<div class="admin-stats" id="admin-stat-grid">
+  <div class="admin-stat"><strong>--</strong><span>Catalog products</span></div>
+  <div class="admin-stat"><strong>--</strong><span>Brands</span></div>
+  <div class="admin-stat"><strong>--</strong><span>Categories</span></div>
+  <div class="admin-stat"><strong>--</strong><span>In stock</span></div>
+</div>
+
+<div class="admin-grid">
+  <div class="admin-main-stack">
+    <div class="admin-panel">
+      <div class="admin-section-label">
+        <h2>Operations overview</h2>
+        <span class="muted">Live scaffold from the admin API</span>
+      </div>
+      <div class="admin-list" id="admin-dashboard-list">
+        <div class="admin-row"><strong>Catalog size</strong><span>Loading...</span><span>Loading...</span><span><code>/api/admin/dashboard</code></span></div>
+      </div>
+      <p class="api-note">Use this protected area as the foundation for eBay OAuth, inventory sync, order handling, and PayPal production workflows.</p>
+    </div>
+
+    <div class="admin-panel">
+      <div class="admin-section-label">
+        <h2>Action queue</h2>
+        <span class="muted">Operator checklist</span>
+      </div>
+      <div class="admin-queue" id="admin-action-queue">
+        <div class="admin-queue-item">
+          <div>
+            <strong>Loading workflow plan</strong>
+            <p>Preparing API-driven priorities from the live admin snapshot.</p>
+          </div>
+          <span class="admin-status-chip">Loading</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-side-stack">
+    <div class="admin-panel">
+      <h3>Workflow shortcuts</h3>
+      <div class="admin-side-list">
+        <div class="admin-side-item"><strong>Catalog control</strong><p>Prepare product registration, stock edits, and price updates for direct PATZCOM selling.</p></div>
+        <div class="admin-side-item"><strong>Order desk</strong><p>Keep buyer communication, fulfillment progress, and internal order notes in one place.</p></div>
+        <div class="admin-side-item"><strong>Shipping desk</strong><p>Extend this panel with tracking sync and shipment status updates after API connection.</p></div>
+        <div class="admin-side-item"><strong>Payout reporting</strong><p>Surface eBay and PATZCOM sales performance once tokens and payment keys are connected.</p></div>
+      </div>
+      <p class="api-note" id="admin-api-note">Current storefront UI sells products displayed on PATZCOM. This admin hub is the next step toward a real API-backed operations system.</p>
+    </div>
+
+    <div class="admin-panel">
+      <div class="admin-section-label">
+        <h3>Integration status</h3>
+        <span class="muted">Live readiness</span>
+      </div>
+      <div class="admin-integrations" id="admin-integrations">
+        <div class="admin-integration-item">
+          <strong>eBay API</strong>
+          <span>Checking status...</span>
+        </div>
+        <div class="admin-integration-item">
+          <strong>PayPal</strong>
+          <span>Checking status...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div></section>
 <script defer src="assets/config.js"></script>
 <script defer src="assets/site.js"></script>
 <script>
@@ -25,6 +124,8 @@ const sessionLabel = document.getElementById('admin-session-label');
 const statGrid = document.getElementById('admin-stat-grid');
 const dashboardList = document.getElementById('admin-dashboard-list');
 const apiNote = document.getElementById('admin-api-note');
+const actionQueue = document.getElementById('admin-action-queue');
+const integrations = document.getElementById('admin-integrations');
 const logoutBtn = document.getElementById('admin-logout-btn');
 
 async function loadAdmin() {
@@ -57,6 +158,43 @@ async function loadAdmin() {
     <div class="admin-row"><strong>Order desk</strong><span>${dashboard.operations.orderDesk}</span><span>customer flow ready</span><span><code>orders</code></span></div>
     <div class="admin-row"><strong>Shipping desk</strong><span>${dashboard.operations.shippingDesk}</span><span>tracking extension pending</span><span><code>shipping</code></span></div>
     <div class="admin-row"><strong>Payout reporting</strong><span>${dashboard.operations.payoutReporting}</span><span>${dashboard.integrations.paypal.environment}</span><span><code>finance</code></span></div>
+  `;
+  actionQueue.innerHTML = `
+    <div class="admin-queue-item">
+      <div>
+        <strong>Sync product catalog</strong>
+        <p>${dashboard.catalog.productCount} listed products are ready for pricing, stock, and merchandising review.</p>
+      </div>
+      <span class="admin-status-chip info">Ready</span>
+    </div>
+    <div class="admin-queue-item">
+      <div>
+        <strong>Review eBay connection</strong>
+        <p>Inventory sync is currently marked as ${dashboard.operations.inventorySync}. Connect production keys to automate the workflow.</p>
+      </div>
+      <span class="admin-status-chip ${dashboard.integrations.ebay.ready ? 'ok' : 'warn'}">${dashboard.integrations.ebay.ready ? 'Connected' : 'Action needed'}</span>
+    </div>
+    <div class="admin-queue-item">
+      <div>
+        <strong>Prepare payment rollout</strong>
+        <p>PayPal environment is ${dashboard.integrations.paypal.environment}. Keep checkout messaging aligned with gateway readiness.</p>
+      </div>
+      <span class="admin-status-chip ${dashboard.integrations.paypal.ready ? 'ok' : 'warn'}">${dashboard.integrations.paypal.ready ? 'Ready' : 'Pending'}</span>
+    </div>
+  `;
+  integrations.innerHTML = `
+    <div class="admin-integration-item">
+      <strong>eBay API</strong>
+      <span>${dashboard.integrations.ebay.ready ? 'Connected and ready for sync' : 'Awaiting production credentials'}</span>
+    </div>
+    <div class="admin-integration-item">
+      <strong>PayPal</strong>
+      <span>${dashboard.integrations.paypal.ready ? 'Configured for checkout flows' : 'Approval or live credentials still pending'}</span>
+    </div>
+    <div class="admin-integration-item">
+      <strong>Storefront data API</strong>
+      <span>Protected admin API is live and serving catalog metrics.</span>
+    </div>
   `;
   apiNote.textContent = 'This admin area is now protected by login and ready for future eBay OAuth plus PayPal production credentials.';
 }
