@@ -1,0 +1,49 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Login | patzcom</title>
+<meta name="description" content="PATZCOM admin login.">
+<link rel="stylesheet" href="assets/site.css">
+<script>window.ROOT="";</script>
+</head><body><header class="hdr"><div class="wrap">
+<a class="logo" href="index.html">PATZCOM</a>
+<nav class="mainnav">
+ <a href="index.html">Home</a>
+ <a href="about.html">About Us</a>
+ <a href="contact.html">Contact Us</a>
+</nav>
+</div></header>
+<section class="login-shell"><div class="login-card"><h1>Admin Login</h1><p>Sign in to the PATZCOM admin preview with the assigned administrator account.</p><form id="admin-login-form"><label>Admin email<input type="email" name="email" autocomplete="username" required></label><label>Password<input type="password" name="password" autocomplete="current-password" required></label><button class="btn" type="submit">Sign In</button><p id="admin-login-msg" class="login-help">This login protects the admin preview and admin API routes.</p></form></div></section>
+<script>
+const form = document.getElementById('admin-login-form');
+const msg = document.getElementById('admin-login-msg');
+
+fetch('/api/admin/session').then(r => r.json()).then(data => {
+  if (data.authenticated) window.location.href = '/admin.html';
+});
+
+form.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  msg.textContent = 'Signing in...';
+  msg.className = 'login-help';
+  const fd = new FormData(form);
+  const payload = {
+    email: fd.get('email'),
+    password: fd.get('password'),
+  };
+  const response = await fetch('/api/admin/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    msg.textContent = data.message || 'Login failed.';
+    msg.className = 'login-help status-err';
+    return;
+  }
+  msg.textContent = 'Login successful. Redirecting to admin preview...';
+  msg.className = 'login-help status-ok';
+  window.location.href = '/admin.html';
+});
+</script>
+</body></html>

@@ -83,6 +83,18 @@ img{max-width:100%;display:block}
 .order-lookup label{display:grid;gap:6px;color:var(--mut);font-size:13px}
 .order-lookup input{background:#11151a;border:1px solid var(--line);color:var(--txt);padding:12px;border-radius:10px;font:inherit}
 .api-note{margin-top:12px;color:var(--mut);font-size:13px}
+.login-shell{min-height:calc(100vh - 68px);display:grid;place-items:center;padding:40px 20px}
+.login-card{width:min(100%,480px);background:linear-gradient(180deg,#171b21,#11151a);border:1px solid var(--line);border-radius:18px;padding:28px}
+.login-card h1{margin:0 0 10px;font-size:34px;letter-spacing:-1px}
+.login-card p{margin:0 0 18px;color:var(--mut)}
+.login-card form{display:grid;gap:14px}
+.login-card label{display:grid;gap:6px;color:var(--mut);font-size:14px}
+.login-card input{background:#11151a;border:1px solid var(--line);color:var(--txt);padding:12px;border-radius:10px;font:inherit}
+.login-help{margin-top:14px;font-size:13px;color:var(--mut)}
+.status-ok{color:#5fd38d}
+.status-err{color:#ff8b72}
+.admin-actions{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:18px}
+.admin-actions .muted{margin:0}
 /* pdp */
 .pdp{display:grid;grid-template-columns:1.1fr 1fr;gap:44px;padding-top:28px}
 .mainimg{background:#fff;border-radius:12px;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;overflow:hidden}

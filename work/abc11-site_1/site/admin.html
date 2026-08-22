@@ -3,8 +3,6 @@
 <title>Admin Preview | patzcom</title>
 <meta name="description" content="PATZCOM API-connected admin preview.">
 <link rel="stylesheet" href="assets/site.css">
-<script defer src="assets/config.js"></script>
-<script defer src="assets/site.js"></script>
 <script>window.ROOT="";</script>
 </head><body><header class="hdr"><div class="wrap">
 <a class="logo" href="index.html">PATZCOM</a>
@@ -16,12 +14,56 @@
 </nav>
 <div class="hdr-r">
  <input id="q" class="search" type="search" placeholder="Search parts...">
- <a class="cartbtn" href="cart.html">Cart <span id="cartcount">0</span></a>
+ <button class="cartbtn" id="admin-logout-btn" type="button">Log Out</button>
 </div></div>
 <div id="results" class="results"></div></header>
-<section class="sec"><div class="wrap"><div class="sec-h"><h1>Admin Preview</h1><span class="count">API-connected operations scaffold</span></div><div class="ops-grid"><div class="ops-card"><h3>Dashboard endpoint</h3><p>This preview reads from the PATZCOM backend scaffold so inventory, orders, payouts, and integration readiness can be centralized before the live eBay token exchange is connected.</p><div class="portal-list"><div class="portal-item"><strong>Endpoint</strong><span><code>/api/admin/dashboard</code></span></div><div class="portal-item"><strong>Products endpoint</strong><span><code>/api/products</code></span></div><div class="portal-item"><strong>Order lookup endpoint</strong><span><code>/api/orders/lookup?query=...</code></span></div><div class="portal-item"><strong>Integration status</strong><span><code>/api/integrations/status</code></span></div></div><p class="api-note">Use these routes to power a future secure admin panel after eBay OAuth and PayPal keys are connected.</p></div><div class="ops-card"><h3>Operations focus</h3><div class="pillrow"><span class="pill">Inventory sync</span><span class="pill">Price updates</span><span class="pill">Order desk</span><span class="pill">Shipping updates</span><span class="pill">Payout reporting</span></div><p class="api-note">Current storefront UI sells products displayed on PATZCOM. This admin preview is the next step toward a real API-backed operations system.</p></div></div></div></section><footer class="ftr"><div class="wrap ftr-grid">
+<section class="sec"><div class="wrap"><div class="sec-h"><h1>Admin Preview</h1><span class="count">Protected admin area</span></div><div class="admin-actions"><p class="muted" id="admin-session-label">Checking admin session...</p><a class="more" href="/api/admin/dashboard">Open dashboard JSON →</a></div><div class="ops-grid"><div class="ops-card"><h3>Dashboard endpoint</h3><p>This preview reads from the PATZCOM backend scaffold so inventory, orders, payouts, and integration readiness can be centralized before the live eBay token exchange is connected.</p><div class="portal-list" id="admin-dashboard-list"><div class="portal-item"><strong>Endpoint</strong><span><code>/api/admin/dashboard</code></span></div><div class="portal-item"><strong>Products endpoint</strong><span><code>/api/products</code></span></div><div class="portal-item"><strong>Order lookup endpoint</strong><span><code>/api/orders/lookup?query=...</code></span></div><div class="portal-item"><strong>Integration status</strong><span><code>/api/integrations/status</code></span></div></div><p class="api-note">Use these routes to power a future secure admin panel after eBay OAuth and PayPal keys are connected.</p></div><div class="ops-card"><h3>Operations focus</h3><div class="pillrow"><span class="pill">Inventory sync</span><span class="pill">Price updates</span><span class="pill">Order desk</span><span class="pill">Shipping updates</span><span class="pill">Payout reporting</span></div><p class="api-note" id="admin-api-note">Current storefront UI sells products displayed on PATZCOM. This admin preview is the next step toward a real API-backed operations system.</p></div></div></div></section><footer class="ftr"><div class="wrap ftr-grid">
 <div><div class="logo">PATZCOM</div><p>Your trusted source for premium automotive parts and performance upgrades.</p><p class="pay">Checkout: PayPal first · Stripe cards planned</p></div>
 <div><h4>Categories</h4><ul><li><a href="collections/brake-pads.html">Brake Pads</a></li><li><a href="collections/big-brake-kit.html">Big Brake Kits</a></li><li><a href="collections/heavy-duty-durability.html">Heavy-Duty Durability</a></li><li><a href="collections/lift-coilover-suspension-kit.html">Lift Coilover Suspension Kit</a></li><li><a href="collections/lowering-spring.html">Lowering Springs</a></li><li><a href="collections/rear-anti-roll-bar.html">Rear Sway Bar</a></li><li><a href="collections/strut-tower-bar-under-bars.html">Strut Tower Bars</a></li></ul></div>
 <div><h4>Info</h4><ul><li><a href="about.html">About Us</a></li><li><a href="contact.html">Contact Us</a></li><li><a href="policies.html">Privacy Policy</a></li><li><a href="policies.html#shipping">Shipping &amp; Returns</a></li></ul></div>
 <div><h4>Contact Us</h4><ul><li>support@patzcom.com</li><li>Mon–Fri 09:00–18:00 (ET)</li></ul></div>
-</div><div class="wrap copy">© 2026 patzcom.com. All rights reserved.</div></footer></body></html>
+</div><div class="wrap copy">© 2026 patzcom.com. All rights reserved.</div></footer>
+<script defer src="assets/config.js"></script>
+<script defer src="assets/site.js"></script>
+<script>
+const sessionLabel = document.getElementById('admin-session-label');
+const dashboardList = document.getElementById('admin-dashboard-list');
+const apiNote = document.getElementById('admin-api-note');
+const logoutBtn = document.getElementById('admin-logout-btn');
+
+async function loadAdmin() {
+  const sessionResponse = await fetch('/api/admin/session');
+  const session = await sessionResponse.json();
+  if (!session.authenticated) {
+    window.location.href = '/admin-login.html';
+    return;
+  }
+
+  sessionLabel.textContent = 'Signed in as ' + session.user.email;
+
+  const dashboardResponse = await fetch('/api/admin/dashboard');
+  if (!dashboardResponse.ok) {
+    apiNote.textContent = 'Admin dashboard is protected and could not be loaded.';
+    return;
+  }
+
+  const dashboard = await dashboardResponse.json();
+  dashboardList.innerHTML = `
+    <div class="portal-item"><strong>Catalog size</strong><span>${dashboard.catalog.productCount} products / ${dashboard.catalog.inStockCount} in stock</span></div>
+    <div class="portal-item"><strong>Catalog coverage</strong><span>${dashboard.catalog.vendorCount} brands / ${dashboard.catalog.categoryCount} categories</span></div>
+    <div class="portal-item"><strong>Inventory sync</strong><span>${dashboard.operations.inventorySync}</span></div>
+    <div class="portal-item"><strong>Order desk</strong><span>${dashboard.operations.orderDesk}</span></div>
+    <div class="portal-item"><strong>Shipping desk</strong><span>${dashboard.operations.shippingDesk}</span></div>
+    <div class="portal-item"><strong>Payout reporting</strong><span>${dashboard.operations.payoutReporting}</span></div>
+  `;
+  apiNote.textContent = 'This admin area is now protected by login and ready for future eBay OAuth plus PayPal production credentials.';
+}
+
+logoutBtn.addEventListener('click', async () => {
+  await fetch('/api/admin/logout', { method: 'POST' });
+  window.location.href = '/admin-login.html';
+});
+
+loadAdmin();
+</script>
+</body></html>
