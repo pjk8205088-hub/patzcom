@@ -4,7 +4,7 @@
 <meta name="description" content="PATZCOM API-connected admin preview.">
 <link rel="stylesheet" href="assets/site.css">
 <script>window.ROOT="";</script>
-</head><body><header class="hdr"><div class="wrap">
+</head><body class="admin-body"><header class="hdr"><div class="wrap">
 <a class="logo" href="index.html">PATZCOM</a>
 <nav class="mainnav">
  <a href="index.html">Home</a>
@@ -14,19 +14,15 @@
 </nav>
 <div class="hdr-r">
  <input id="q" class="search" type="search" placeholder="Search parts...">
- <button class="cartbtn" id="admin-logout-btn" type="button">Log Out</button>
+ <button class="admin-btn primary" id="admin-logout-btn" type="button">Log out</button>
 </div></div>
 <div id="results" class="results"></div></header>
-<section class="sec"><div class="wrap"><div class="sec-h"><h1>Admin Preview</h1><span class="count">Protected admin area</span></div><div class="admin-actions"><p class="muted" id="admin-session-label">Checking admin session...</p><a class="more" href="/api/admin/dashboard">Open dashboard JSON →</a></div><div class="ops-grid"><div class="ops-card"><h3>Dashboard endpoint</h3><p>This preview reads from the PATZCOM backend scaffold so inventory, orders, payouts, and integration readiness can be centralized before the live eBay token exchange is connected.</p><div class="portal-list" id="admin-dashboard-list"><div class="portal-item"><strong>Endpoint</strong><span><code>/api/admin/dashboard</code></span></div><div class="portal-item"><strong>Products endpoint</strong><span><code>/api/products</code></span></div><div class="portal-item"><strong>Order lookup endpoint</strong><span><code>/api/orders/lookup?query=...</code></span></div><div class="portal-item"><strong>Integration status</strong><span><code>/api/integrations/status</code></span></div></div><p class="api-note">Use these routes to power a future secure admin panel after eBay OAuth and PayPal keys are connected.</p></div><div class="ops-card"><h3>Operations focus</h3><div class="pillrow"><span class="pill">Inventory sync</span><span class="pill">Price updates</span><span class="pill">Order desk</span><span class="pill">Shipping updates</span><span class="pill">Payout reporting</span></div><p class="api-note" id="admin-api-note">Current storefront UI sells products displayed on PATZCOM. This admin preview is the next step toward a real API-backed operations system.</p></div></div></div></section><footer class="ftr"><div class="wrap ftr-grid">
-<div><div class="logo">PATZCOM</div><p>Your trusted source for premium automotive parts and performance upgrades.</p><p class="pay">Checkout: PayPal first · Stripe cards planned</p></div>
-<div><h4>Categories</h4><ul><li><a href="collections/brake-pads.html">Brake Pads</a></li><li><a href="collections/big-brake-kit.html">Big Brake Kits</a></li><li><a href="collections/heavy-duty-durability.html">Heavy-Duty Durability</a></li><li><a href="collections/lift-coilover-suspension-kit.html">Lift Coilover Suspension Kit</a></li><li><a href="collections/lowering-spring.html">Lowering Springs</a></li><li><a href="collections/rear-anti-roll-bar.html">Rear Sway Bar</a></li><li><a href="collections/strut-tower-bar-under-bars.html">Strut Tower Bars</a></li></ul></div>
-<div><h4>Info</h4><ul><li><a href="about.html">About Us</a></li><li><a href="contact.html">Contact Us</a></li><li><a href="policies.html">Privacy Policy</a></li><li><a href="policies.html#shipping">Shipping &amp; Returns</a></li></ul></div>
-<div><h4>Contact Us</h4><ul><li>support@patzcom.com</li><li>Mon–Fri 09:00–18:00 (ET)</li></ul></div>
-</div><div class="wrap copy">© 2026 patzcom.com. All rights reserved.</div></footer>
+<section class="admin-shell"><div class="wrap"><div class="admin-topbar"><div><span class="admin-kicker">seller operations preview</span><h1 class="admin-title">PATZCOM Admin Hub</h1><p class="admin-sub">A protected operations workspace for product control, order review, shipping updates, payout reporting, and upcoming eBay API-connected workflows.</p></div><div class="admin-util"><a class="admin-btn" href="/api/admin/dashboard">View JSON</a><a class="admin-btn" href="/api/products">Product feed</a></div></div><div class="admin-actions"><p class="muted" id="admin-session-label">Checking admin session...</p><span class="admin-badge">Protected session</span></div><div class="admin-stats" id="admin-stat-grid"><div class="admin-stat"><strong>--</strong><span>Catalog products</span></div><div class="admin-stat"><strong>--</strong><span>Brands</span></div><div class="admin-stat"><strong>--</strong><span>Categories</span></div><div class="admin-stat"><strong>--</strong><span>In stock</span></div></div><div class="admin-grid"><div class="admin-panel"><div class="admin-section-label"><h2>Operations overview</h2><span class="muted">Live scaffold from the admin API</span></div><div class="admin-list" id="admin-dashboard-list"><div class="admin-row"><strong>Catalog size</strong><span>Loading...</span><span>Loading...</span><span><code>/api/admin/dashboard</code></span></div></div><p class="api-note">Use this protected area as the foundation for eBay OAuth, inventory sync, order handling, and PayPal production workflows.</p></div><div class="admin-panel"><h3>Workflow shortcuts</h3><div class="admin-side-list"><div class="admin-side-item"><strong>Catalog control</strong><p>Prepare product registration, stock edits, and price updates for direct PATZCOM selling.</p></div><div class="admin-side-item"><strong>Order desk</strong><p>Keep buyer communication, fulfillment progress, and internal order notes in one place.</p></div><div class="admin-side-item"><strong>Shipping desk</strong><p>Extend this panel with tracking sync and shipment status updates after API connection.</p></div><div class="admin-side-item"><strong>Payout reporting</strong><p>Surface eBay and PATZCOM sales performance once tokens and payment keys are connected.</p></div></div><p class="api-note" id="admin-api-note">Current storefront UI sells products displayed on PATZCOM. This admin hub is the next step toward a real API-backed operations system.</p></div></div></div></section>
 <script defer src="assets/config.js"></script>
 <script defer src="assets/site.js"></script>
 <script>
 const sessionLabel = document.getElementById('admin-session-label');
+const statGrid = document.getElementById('admin-stat-grid');
 const dashboardList = document.getElementById('admin-dashboard-list');
 const apiNote = document.getElementById('admin-api-note');
 const logoutBtn = document.getElementById('admin-logout-btn');
@@ -48,13 +44,19 @@ async function loadAdmin() {
   }
 
   const dashboard = await dashboardResponse.json();
+  statGrid.innerHTML = `
+    <div class="admin-stat"><strong>${dashboard.catalog.productCount}</strong><span>Catalog products</span></div>
+    <div class="admin-stat"><strong>${dashboard.catalog.vendorCount}</strong><span>Brands</span></div>
+    <div class="admin-stat"><strong>${dashboard.catalog.categoryCount}</strong><span>Categories</span></div>
+    <div class="admin-stat"><strong>${dashboard.catalog.inStockCount}</strong><span>In stock</span></div>
+  `;
   dashboardList.innerHTML = `
-    <div class="portal-item"><strong>Catalog size</strong><span>${dashboard.catalog.productCount} products / ${dashboard.catalog.inStockCount} in stock</span></div>
-    <div class="portal-item"><strong>Catalog coverage</strong><span>${dashboard.catalog.vendorCount} brands / ${dashboard.catalog.categoryCount} categories</span></div>
-    <div class="portal-item"><strong>Inventory sync</strong><span>${dashboard.operations.inventorySync}</span></div>
-    <div class="portal-item"><strong>Order desk</strong><span>${dashboard.operations.orderDesk}</span></div>
-    <div class="portal-item"><strong>Shipping desk</strong><span>${dashboard.operations.shippingDesk}</span></div>
-    <div class="portal-item"><strong>Payout reporting</strong><span>${dashboard.operations.payoutReporting}</span></div>
+    <div class="admin-row"><strong>Catalog size</strong><span>${dashboard.catalog.productCount} products</span><span>${dashboard.catalog.inStockCount} in stock</span><span><code>catalog</code></span></div>
+    <div class="admin-row"><strong>Catalog coverage</strong><span>${dashboard.catalog.vendorCount} brands</span><span>${dashboard.catalog.categoryCount} categories</span><span><code>taxonomy</code></span></div>
+    <div class="admin-row"><strong>Inventory sync</strong><span>${dashboard.operations.inventorySync}</span><span>${dashboard.integrations.ebay.ready ? 'keys ready' : 'keys missing'}</span><span><code>inventory</code></span></div>
+    <div class="admin-row"><strong>Order desk</strong><span>${dashboard.operations.orderDesk}</span><span>customer flow ready</span><span><code>orders</code></span></div>
+    <div class="admin-row"><strong>Shipping desk</strong><span>${dashboard.operations.shippingDesk}</span><span>tracking extension pending</span><span><code>shipping</code></span></div>
+    <div class="admin-row"><strong>Payout reporting</strong><span>${dashboard.operations.payoutReporting}</span><span>${dashboard.integrations.paypal.environment}</span><span><code>finance</code></span></div>
   `;
   apiNote.textContent = 'This admin area is now protected by login and ready for future eBay OAuth plus PayPal production credentials.';
 }
