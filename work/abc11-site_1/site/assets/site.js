@@ -34,6 +34,7 @@ initQandA();
 installImageFallbacks();
 initProductPurchaseUI();
 initVideoPlaceholders();
+initCollectionWhiteUI();
 
 function initSearch(){
   const q = document.getElementById('q'), box = document.getElementById('results');
@@ -299,6 +300,12 @@ function initVideoPlaceholders(){
     `;
     wrapper.replaceWith(placeholder);
   });
+}
+
+function initCollectionWhiteUI(){
+  const isCollectionPage = Boolean(document.querySelector('.grid') && document.querySelector('.crumbs'));
+  if(!isCollectionPage) return;
+  document.body.classList.add('collection-white-body');
 }
 
 function initQandA(){
