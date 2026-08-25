@@ -33,6 +33,7 @@ paintCount();
 initQandA();
 installImageFallbacks();
 initProductPurchaseUI();
+initVideoPlaceholders();
 
 function initSearch(){
   const q = document.getElementById('q'), box = document.getElementById('results');
@@ -278,6 +279,26 @@ function initProductPurchaseUI(){
     `;
     tags ? tags.insertAdjacentHTML('beforebegin', panel) : buy.insertAdjacentHTML('beforeend', panel);
   }
+}
+
+function initVideoPlaceholders(){
+  document.querySelectorAll('.desc video, .fr-video video').forEach(video => {
+    const src = video.querySelector('source')?.getAttribute('src') || video.getAttribute('src') || '';
+    const sourceLooksInvalid = !src || /\.(jpe?g|png|webp|gif|avif)(\?.*)?$/i.test(src);
+    if(!sourceLooksInvalid) return;
+
+    const wrapper = video.closest('.fr-video') || video;
+    const placeholder = document.createElement('div');
+    placeholder.className = 'video-slot';
+    placeholder.innerHTML = `
+      <div class="video-frame">
+        <div class="video-icon">▶</div>
+        <div class="video-copy">Video unavailable</div>
+        <div class="video-subcopy">This product video is not embedded in the current catalog build.</div>
+      </div>
+    `;
+    wrapper.replaceWith(placeholder);
+  });
 }
 
 function initQandA(){
