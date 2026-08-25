@@ -288,3 +288,76 @@ img{max-width:100%;display:block}
 .qa-q{font-size:15px;line-height:1.5}
 .qa-empty{padding:16px;border:1px dashed #33404d;border-radius:14px;color:#91a1b5}
 @media(max-width:720px){.qa-grid{grid-template-columns:1fr}.qa-product-title{flex-direction:column}}
+
+/* eBay-like skins */
+.ebay-home-body{background:#fff;color:#111}
+.ebay-shell{background:#fff;border-bottom:1px solid #d9e0ea}
+.hdr-top{display:flex;justify-content:space-between;gap:18px;align-items:center;padding:8px 20px 0;font-size:12px;color:#5f6f84}
+.top-links{display:flex;gap:16px;flex-wrap:wrap}
+.top-links a:hover,.ebay-subnav a:hover{color:#3665f3}
+.hdr-main{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;gap:14px;align-items:center;padding:12px 20px 14px}
+.ebay-logo{display:inline-flex;align-items:baseline;gap:4px;color:#111827!important}
+.ebay-logo .e{color:#e53238}.ebay-logo .b{color:#0064d2}.ebay-logo .a{color:#f5af02}.ebay-logo .y{color:#86b817}
+.ebay-logo em{margin-left:10px;font-style:normal;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#607186}
+.cat-toggle,.search-btn,.search-select{border-radius:999px;border:1px solid #cfd8e3;background:#fff;color:#111827;font:inherit}
+.cat-toggle{padding:12px 14px;font-weight:700}
+.search-shell{display:grid;grid-template-columns:1fr 170px 110px;gap:10px;align-items:center}
+.search-shell .search{width:100%;height:48px;padding:0 18px;border-radius:999px;border:2px solid #111827;background:#fff;color:#111827}
+.search-select{height:48px;padding:0 14px;background:#fff}
+.search-btn{height:48px;background:#3665f3;border-color:#3665f3;color:#fff;font-weight:800}
+.hdr-actions{display:flex;align-items:center;gap:12px;justify-content:flex-end}
+.mini-link{color:#607186;font-weight:700}
+.ebay-cart{background:#3665f3;border-radius:999px;padding:10px 16px}
+.ebay-subnav{display:flex;gap:20px;align-items:center;padding:0 20px 12px;font-size:14px;font-weight:700;color:#607186}
+.ebay-subnav a{padding:0 0 12px;border-bottom:3px solid transparent}
+.ebay-subnav a.on{color:#111827;border-bottom-color:#111827}
+.ebay-banner{background:linear-gradient(90deg,#f6f8fd,#eef4ff);border-top:1px solid #e3eaf6;border-bottom:1px solid #d9e0ea}
+.ebay-hero{padding:36px 0 28px;background:#fff}
+.hero-grid{display:grid;grid-template-columns:1.5fr .9fr;gap:24px;align-items:stretch}
+.hero-grid > div:first-child{min-height:420px;display:flex;flex-direction:column;justify-content:center}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+.hero-card{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-self:stretch}
+.hero-stat{display:grid;place-items:center;gap:6px;padding:18px;border-radius:20px;background:#f8faff;border:1px solid #dce5f0;text-align:center}
+.hero-stat strong{font-size:30px;line-height:1;color:#111827}
+.hero-stat span{font-size:13px;color:#607186;font-weight:700}
+.ebay-hero .kick{color:#3665f3;letter-spacing:.18em}
+.ebay-hero h1{font-size:56px;max-width:780px;color:#111827}
+.ebay-hero .sub{max-width:760px;color:#526276}
+.ebay-strip{background:#fff;border-top:1px solid #e6edf6;border-bottom:1px solid #e6edf6}
+.ebay-strip .wrap div{color:#344150;font-weight:700}
+.ebay-home-body .sec{padding:42px 0}
+.ebay-home-body .sec-h h2{font-size:26px}
+.ebay-home-body .card{border-radius:18px;border-color:#dde4ee;box-shadow:0 10px 24px rgba(20,30,50,.05)}
+.ebay-home-body .card:hover{border-color:#3665f3}
+.ebay-home-body .card-b{padding:16px 16px 18px}
+.ebay-home-body .price{font-size:18px}
+.ebay-home-body .ftr{background:#f7f9fc;color:#607186;border-top:1px solid #dce5f0}
+.ebay-home-body .ftr h4,.ebay-home-body .logo{color:#111827}
+.ebay-home-body .ftr a{color:#344150}
+
+.ebay-admin-body{background:#f5f7fb;color:#111827}
+.ebay-header{box-shadow:0 4px 14px rgba(25,40,72,.04)}
+.ebay-admin-search{display:grid;grid-template-columns:minmax(280px,1fr) auto;gap:10px;align-items:center;flex:1 1 420px;max-width:640px}
+.ebay-admin-search input{height:44px;padding:0 16px;border-radius:999px;border:1px solid #cdd7e5;background:#fff;color:#111827}
+.ebay-admin-search button{height:44px;padding:0 18px;border-radius:999px;border:1px solid #3665f3;background:#3665f3;color:#fff;font-weight:800}
+.ebay-admin-body .app-sidebar{background:#fff!important;color:#1f2937!important;border-right:1px solid #dce5f0}
+.ebay-admin-body .sidebar-brand,.ebay-admin-body .nav-link,.ebay-admin-body .nav-header{color:#1f2937!important}
+.ebay-admin-body .nav-link:hover{color:#3665f3!important}
+.ebay-admin-body .app-main{background:#f5f7fb}
+.ebay-admin-body .app-content-header{background:#fff!important}
+.ebay-admin-body .small-box{border-radius:18px;box-shadow:0 10px 24px rgba(20,30,50,.06)}
+.ebay-admin-body .card{border-radius:18px;border-color:#dce5f0;box-shadow:0 10px 24px rgba(20,30,50,.05)}
+.ebay-admin-body .card-header{background:#fff}
+.ebay-admin-body .btn-primary,.ebay-admin-body .text-bg-primary{background:#3665f3!important;border-color:#3665f3!important}
+.ebay-admin-body .btn-outline-primary{color:#3665f3;border-color:#3665f3}
+.ebay-admin-body .btn-outline-primary:hover{background:#3665f3;color:#fff}
+.ebay-admin-body .btn-outline-secondary{border-color:#cdd7e5;color:#344150}
+.ebay-admin-body .btn-outline-secondary:hover{background:#eef3ff;color:#3665f3}
+.ebay-admin-body .badge.text-bg-light{background:#eef3ff!important;color:#3665f3!important}
+.ebay-admin-body table{color:#111827}
+.ebay-admin-body .app-content-header h1{font-size:34px;letter-spacing:-1px}
+.ebay-admin-body .admin-topbar{align-items:flex-start}
+.ebay-admin-body .admin-topbar p{max-width:920px}
+.ebay-admin-body .sidebar-menu .nav-item .nav-link{border-radius:10px;margin:2px 8px}
+.ebay-admin-body .sidebar-menu .nav-item .nav-link.active,.ebay-admin-body .sidebar-menu .nav-item .nav-link:hover{background:#eef3ff;color:#3665f3!important}
+.ebay-admin-body .brand-link{padding:14px 20px}

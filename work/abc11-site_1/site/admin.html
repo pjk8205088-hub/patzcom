@@ -11,32 +11,32 @@
 <link rel="stylesheet" href="assets/site.css">
 <script>window.ROOT="";</script>
 </head>
-<body class="layout-fixed sidebar-expand-lg bg-body-tertiary adminlte-body">
+<body class="layout-fixed sidebar-expand-lg bg-body-tertiary adminlte-body ebay-admin-body">
 <div class="app-wrapper">
-  <nav class="app-header navbar navbar-expand bg-body border-bottom">
-    <div class="container-fluid">
-      <ul class="navbar-nav">
+  <nav class="app-header navbar navbar-expand bg-white border-bottom ebay-header">
+    <div class="container-fluid gap-3">
+      <ul class="navbar-nav align-items-center gap-2">
         <li class="nav-item">
           <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button"><i class="bi bi-list"></i></a>
         </li>
-        <li class="nav-item d-none d-md-block">
-          <a class="nav-link fw-semibold" href="index.html">PATZCOM</a>
+        <li class="nav-item">
+          <a class="nav-link fw-semibold ebay-logo" href="index.html"><span class="e">e</span><span class="b">b</span><span class="a">a</span><span class="y">y</span><em>PATZCOM</em></a>
+        </li>
+        <li class="nav-item d-none d-lg-block">
+          <a class="nav-link text-primary fw-semibold" href="https://www.ebay.com/sellercenter" target="_blank" rel="noreferrer">Seller Center reference</a>
         </li>
       </ul>
-
-      <ul class="navbar-nav ms-auto align-items-center gap-2">
-        <li class="nav-item d-none d-lg-block">
-          <a class="nav-link text-body-secondary" href="https://www.ebay.com/itm/126539647015" target="_blank" rel="noreferrer">eBay reference</a>
-        </li>
-        <li class="nav-item">
-          <a class="btn btn-sm btn-outline-primary" id="ebay-connect-btn" href="/api/ebay/connect">Connect to eBay</a>
-        </li>
-        <li class="nav-item">
-          <button class="btn btn-sm btn-primary" id="ebay-refresh-btn" type="button">Refresh token</button>
-        </li>
-        <li class="nav-item">
-          <button class="btn btn-sm btn-outline-secondary" id="admin-logout-btn" type="button">Log out</button>
-        </li>
+      <div class="ebay-admin-search">
+        <input type="search" placeholder="Search products, orders, buyers...">
+        <button type="button">Search</button>
+      </div>
+      <ul class="navbar-nav align-items-center gap-2 ms-auto">
+        <li class="nav-item d-none d-md-block"><a class="nav-link" href="index.html">Storefront</a></li>
+        <li class="nav-item"><a class="nav-link" href="#integrations">Integrations</a></li>
+        <li class="nav-item"><a class="nav-link" href="#orders">Orders</a></li>
+        <li class="nav-item"><button class="btn btn-sm btn-outline-primary" id="ebay-connect-btn" type="button">Connect to eBay</button></li>
+        <li class="nav-item"><button class="btn btn-sm btn-primary" id="ebay-refresh-btn" type="button">Refresh token</button></li>
+        <li class="nav-item"><button class="btn btn-sm btn-outline-secondary" id="admin-logout-btn" type="button">Log out</button></li>
       </ul>
     </div>
   </nav>
@@ -44,18 +44,18 @@
   <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
     <div class="sidebar-brand">
       <a class="brand-link" href="admin.html">
-        <span class="brand-text fw-semibold">PATZCOM</span>
+        <span class="brand-text fw-semibold">Seller Hub</span>
       </a>
     </div>
 
     <div class="sidebar-wrapper">
       <nav class="mt-2">
         <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview">
-          <li class="nav-header">Seller Center</li>
-          <li class="nav-item"><a href="#overview" class="nav-link"><i class="nav-icon bi bi-speedometer2"></i><p>Overview</p></a></li>
+          <li class="nav-header">Operations</li>
+          <li class="nav-item"><a href="#overview" class="nav-link"><i class="nav-icon bi bi-speedometer2"></i><p>Summary</p></a></li>
           <li class="nav-item"><a href="#inventory" class="nav-link"><i class="nav-icon bi bi-box-seam"></i><p>Inventory</p></a></li>
           <li class="nav-item"><a href="#orders" class="nav-link"><i class="nav-icon bi bi-receipt"></i><p>Orders</p></a></li>
-          <li class="nav-item"><a href="#ebay-api" class="nav-link"><i class="nav-icon bi bi-diagram-3"></i><p>eBay API</p></a></li>
+          <li class="nav-item"><a href="#ebay-api" class="nav-link"><i class="nav-icon bi bi-diagram-3"></i><p>API tools</p></a></li>
           <li class="nav-item"><a href="#integrations" class="nav-link"><i class="nav-icon bi bi-plug"></i><p>Integrations</p></a></li>
           <li class="nav-item"><a href="index.html" class="nav-link"><i class="nav-icon bi bi-shop"></i><p>Storefront</p></a></li>
         </ul>
@@ -64,13 +64,13 @@
   </aside>
 
   <main class="app-main">
-    <div class="app-content-header border-bottom bg-white">
+    <div class="app-content-header border-bottom bg-white ebay-admin-top">
       <div class="container-fluid py-3">
-        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+        <div class="admin-topbar">
           <div>
-            <div class="text-uppercase text-primary fw-semibold small">Seller operations preview</div>
-            <h1 class="mb-1">PATZCOM Seller Center</h1>
-            <p class="text-secondary mb-0">An AdminLTE dashboard mapped to eBay Sell API workflows for the U.S. marketplace.</p>
+            <div class="text-uppercase text-primary fw-semibold small">My eBay style admin workspace</div>
+            <h1 class="mb-1">PATZCOM Seller Hub</h1>
+            <p class="text-secondary mb-0">A seller-console experience modeled after eBay account and seller pages for catalog control, order review, shipping updates, and reporting.</p>
           </div>
           <div class="d-flex flex-wrap gap-2">
             <span class="badge text-bg-light border" id="admin-session-badge">Checking session...</span>
