@@ -6,7 +6,9 @@
 <script defer src="assets/config.js"></script>
 <script defer src="assets/site.js"></script>
 <script>window.ROOT="";</script>
-</head><body class="ebay-home-body"><header class="hdr ebay-shell"><div class="hdr-top wrap">
+</head><body class="ebay-home-body">
+<header class="hdr ebay-shell">
+<div class="hdr-top wrap">
 <div class="top-links">
  <a href="#">Hi! Sign in</a>
  <a href="#">Daily Deals</a>
@@ -15,16 +17,16 @@
 <div class="top-links right">
  <a href="#">Ship to</a>
  <a href="#">Saved</a>
- <a href="#">My eBay</a>
+ <a href="admin.html">Seller Hub</a>
 </div>
 </div>
 <div class="wrap hdr-main">
-<a class="logo ebay-logo" href="index.html"><span class="e">e</span><span class="b">b</span><span class="a">a</span><span class="y">y</span><em>PATZCOM</em></a>
-<button class="cat-toggle" type="button" onclick="location.href='collections/all.html'">Categories ▾</button>
+<a class="logo ebay-logo" href="index.html"><em>PATZCOM</em></a>
+<button class="cat-toggle" type="button" onclick="location.href='collections/all.html'">Shop by category ▾</button>
 <div class="search-shell">
- <input id="q" class="search" type="search" placeholder="Search parts, brands, or fitment">
+ <input id="q" class="search" type="search" placeholder="Search for anything">
  <select class="search-select" aria-label="Category">
-  <option>All Categories</option>
+  <option>All categories</option>
   <option>Brake Pads</option>
   <option>Big Brake Kits</option>
   <option>Lift Coilover Suspension Kit</option>
@@ -33,34 +35,71 @@
  <button class="search-btn" type="button">Search</button>
 </div>
 <div class="hdr-actions">
- <a class="mini-link" href="admin.html">Seller Hub</a>
+ <a class="mini-link" href="admin.html">My Seller Hub</a>
  <a class="cartbtn ebay-cart" href="cart.html">Cart <span id="cartcount">0</span></a>
-</div></div>
+</div>
+</div>
 <div class="wrap ebay-subnav">
- <a class="on" href="index.html">Home</a>
- <a href="collections/all.html">Categories</a>
+ <a class="on" href="index.html">Shop</a>
  <a href="about.html">About</a>
  <a href="contact.html">Contact</a>
- <a href="admin.html">Admin</a>
+ <a href="admin.html">Feedback</a>
 </div>
-<div id="results" class="results"></div></header>
-<section class="api-band ebay-banner"><div class="wrap"><strong>PATZCOM on eBay-style commerce</strong><span>Guest browsing, direct catalog selling, PayPal-first checkout, and API-ready seller operations for inventory, orders, shipping, and reporting.</span></div></section>
-<section class="hero ebay-hero" style="--heroimg:url('assets/img/74d9a35b8442.jpg?v=1782838428')"><div class="wrap hero-grid">
-<div>
-<p class="kick">PATZCOM PERFORMANCE PARTS</p>
-<h1>Browse premium automotive parts with an eBay-like shopping flow.</h1>
-<p class="sub">Patzcom displays its own catalog on patzcom.com, with PayPal-first checkout and seller workflows prepared for eBay API-backed inventory, order, and shipping operations.</p>
-<div class="hero-actions"><a class="btn" href="collections/all.html">Shop Products</a> <a class="btn ghost" href="contact.html">Request Fitment Help</a></div>
-</div>
-<div class="hero-card">
- <div class="hero-stat"><strong>39</strong><span>Catalog products</span></div>
- <div class="hero-stat"><strong>7</strong><span>Core categories</span></div>
- <div class="hero-stat"><strong>PayPal</strong><span>Checkout first</span></div>
- <div class="hero-stat"><strong>eBay API</strong><span>Seller-ready ops</span></div>
-</div>
-</div></section>
-<section class="strip ebay-strip"><div class="wrap"><div>✔ Buy without login</div><div>✔ Seller-center style operations</div><div>✔ PayPal-first checkout</div><div>✔ eBay API sync ready</div></div></section>
-<section class="sec"><div class="wrap"><div class="sec-h"><h2>Platform Experience</h2><span class="count">Independent storefront UI</span></div><div class="feature-grid"><article class="feature-card"><h3>Browse without login</h3><p>Shoppers can discover parts, compare products, and build a cart on patzcom.com before any account decision is made.</p><ul><li>Fast category navigation</li><li>Search-driven product lookup</li><li>Vehicle-focused product presentation</li></ul></article><article class="feature-card"><h3>PayPal-first checkout</h3><p>The storefront is being prepared to sell the exact products already displayed on PATZCOM with PayPal as the primary payment gateway.</p><ul><li>Cart and total review</li><li>Policy-linked checkout flow</li><li>Stripe expansion planned later</li></ul></article><article class="feature-card"><h3>API-driven operations</h3><p>The UI is positioned for eBay API-connected back-office management so price, quantity, order, shipping, and settlement workflows can be operated from one system.</p><ul><li>Catalog sync foundation</li><li>Order and shipment tracking UI</li><li>Scalable admin extension path</li></ul></article></div></div></section>
+<div id="results" class="results"></div>
+</header>
+<section class="api-band ebay-banner">
+  <div class="wrap">
+    <strong>PATZCOM storefront</strong>
+    <span>Browse guest-friendly product listings, compare fitment, and checkout with PayPal-first payment while seller workflows stay API-ready.</span>
+  </div>
+</section>
+<section class="store-hero">
+  <div class="wrap store-shell">
+    <aside class="store-side">
+      <div class="store-side-card store-brand-card">
+        <div class="store-brand-mark">P</div>
+        <div>
+          <div class="store-title">PATZCOM</div>
+          <div class="store-subtitle">100% positive feedback style storefront</div>
+        </div>
+      </div>
+      <div class="store-side-card">
+        <div class="store-side-label">Categories</div>
+        <a href="collections/all.html">All Products</a>
+        <a href="collections/brake-pads.html">Brake Pads</a>
+        <a href="collections/big-brake-kit.html">Big Brake Kits</a>
+        <a href="collections/heavy-duty-durability.html">Heavy-Duty Durability</a>
+        <a href="collections/lift-coilover-suspension-kit.html">Lift Coilover Suspension Kit</a>
+        <a href="collections/lowering-spring.html">Lowering Springs</a>
+        <a href="collections/rear-anti-roll-bar.html">Rear Sway Bar</a>
+        <a href="collections/strut-tower-bar-under-bars.html">Strut Tower Bars</a>
+      </div>
+    </aside>
+    <div class="store-main">
+      <div class="store-hero-card">
+        <div class="store-hero-copy">
+          <p class="kick">PATZCOM PERFORMANCE PARTS</p>
+          <h1>Premium automotive parts, organized like a top-tier marketplace store.</h1>
+          <p class="sub">The home page is tuned to feel like a marketplace storefront: store header, category rail, search-first navigation, and curated product modules built around the exact catalog displayed on patzcom.com.</p>
+          <div class="hero-actions"><a class="btn" href="collections/all.html">Shop products</a> <a class="btn ghost" href="contact.html">Request fitment help</a></div>
+        </div>
+        <div class="store-hero-metrics">
+          <div class="store-metric"><strong>3.4K</strong><span>items sold style</span></div>
+          <div class="store-metric"><strong>587</strong><span>followers style</span></div>
+          <div class="store-metric"><strong>PayPal</strong><span>checkout first</span></div>
+          <div class="store-metric"><strong>API</strong><span>seller-ready ops</span></div>
+        </div>
+      </div>
+      <div class="store-strip">
+        <span>✔ Guest browsing</span>
+        <span>✔ Curated product categories</span>
+        <span>✔ PayPal-first checkout</span>
+        <span>✔ Seller Hub access</span>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="sec"><div class="wrap"><div class="sec-h"><h2>Platform Experience</h2><span class="count">Independent storefront UI</span></div><div class="feature-grid"><article class="feature-card"><h3>Browse without login</h3><p>Shoppers can discover parts, compare products, and build a cart on patzcom.com before any account decision is made.</p><ul><li>Fast category navigation</li><li>Search-driven product lookup</li><li>Vehicle-focused product presentation</li></ul></article><article class="feature-card"><h3>PayPal-first checkout</h3><p>The storefront is being prepared to sell the exact products already displayed on PATZCOM with PayPal as the primary payment gateway.</p><ul><li>Cart and total review</li><li>Policy-linked checkout flow</li><li>Stripe expansion planned later</li></ul></article><article class="feature-card"><h3>API-driven operations</h3><p>The UI is positioned for marketplace-connected back-office management so price, quantity, order, shipping, and settlement workflows can be operated from one system.</p><ul><li>Catalog sync foundation</li><li>Order and shipment tracking UI</li><li>Scalable admin extension path</li></ul></article></div></div></section>
 <section class="sec"><div class="wrap"><div class="sec-h"><h2>Buyer & Admin Flow</h2><a class="more" href="admin.html">Open admin preview →</a></div><div class="ops-grid"><div class="ops-card"><h3>PATZCOM customer flow</h3><p>Customers browse products displayed on patzcom.com, add items to cart, check policies, and complete payment through the PATZCOM checkout experience.</p><div class="pillrow"><span class="pill">Guest browsing</span><span class="pill">Product Q&amp;A</span><span class="pill">PayPal checkout</span><span class="pill">Order updates</span></div><form class="order-lookup" onsubmit="event.preventDefault();this.querySelector('.api-note').textContent='Order lookup UI reserved for the upcoming API-connected customer portal.'"><label>Order lookup preview<input type="text" placeholder="Enter order number or email"></label><button class="btn">Check Status</button><p class="api-note">Customer portal UI can be connected to future API-based order lookups.</p></form></div><div class="ops-card"><h3>Admin system targets</h3><div class="portal-list"><div class="portal-item"><strong>Catalog control</strong><span>Register products, update pricing, and sync stock levels.</span></div><div class="portal-item"><strong>Order desk</strong><span>Review orders, shipping progress, and buyer messages.</span></div><div class="portal-item"><strong>Settlement view</strong><span>Track payout records, performance, and sales reporting.</span></div><div class="portal-item"><strong>Expansion ready</strong><span>Add membership, seller roles, and custom dashboards later.</span></div></div></div></div></div></section>
 <section class="sec"><div class="wrap"><div class="sec-h"><h2>Shop by Category</h2></div><div class="cats"><a class="cat" href="collections/brake-pads.html"><img loading="lazy" src="assets/img/4030e7687189.jpg?v=1782821806" alt=""><span>Brake Pads</span></a><a class="cat" href="collections/big-brake-kit.html"><img loading="lazy" src="assets/img/b3c09b4fd793.jpg?v=1782468989" alt=""><span>Big Brake Kits</span></a><a class="cat" href="collections/heavy-duty-durability.html"><img loading="lazy" src="assets/img/59af96cb81bc.jpg?v=1781401752" alt=""><span>Heavy-Duty Durability</span></a><a class="cat" href="collections/lift-coilover-suspension-kit.html"><img loading="lazy" src="assets/img/c0545526a7c2.jpg?v=1781514470" alt=""><span>Lift Coilover Suspension Kit</span></a><a class="cat" href="collections/lowering-spring.html"><img loading="lazy" src="assets/img/b92d0ea91a3d.jpg?v=1781405626" alt=""><span>Lowering Springs</span></a><a class="cat" href="collections/rear-anti-roll-bar.html"><img loading="lazy" src="assets/img/d974667111bc.jpg?v=1782822564" alt=""><span>Rear Sway Bar</span></a><a class="cat" href="collections/strut-tower-bar-under-bars.html"><img loading="lazy" src="assets/img/74d9a35b8442.jpg?v=1782838428" alt=""><span>Strut Tower Bars</span></a></div></div></section>
 <section class="sec"><div class="wrap"><div class="sec-h"><h2>Brake Pads</h2><a class="more" href="collections/brake-pads.html">View All →</a></div><div class="grid"><a class="card" href="products/sangsin-hardron-zr-brake-pads-for-kia-stinger-genesis-g70-3-3t-brembo-front-rear.html">
