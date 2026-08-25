@@ -32,6 +32,7 @@ fetch(R+'assets/products.json').then(r=>r.json()).then(p=>{ PRODUCTS=p; initSear
 paintCount();
 initQandA();
 installImageFallbacks();
+initProductPurchaseUI();
 
 function initSearch(){
   const q = document.getElementById('q'), box = document.getElementById('results');
@@ -205,6 +206,78 @@ function installImageFallbacks(){
     img.alt = img.alt || 'Image unavailable';
     img.style.objectFit = 'cover';
   }, true);
+}
+
+function initProductPurchaseUI(){
+  const pdp = document.querySelector('.pdp');
+  const buy = document.querySelector('.pdp .buy');
+  if(!pdp || !buy) return;
+
+  document.body.classList.add('detail-white-page');
+
+  if(!document.querySelector('.detail-banner')){
+    const heading = buy.querySelector('h1')?.textContent?.trim() || 'PATZCOM product detail';
+    const banner = document.createElement('div');
+    banner.className = 'detail-banner wrap';
+    banner.innerHTML = `<h1>Product details</h1><p>${escapeHtml(heading)}</p>`;
+    document.querySelector('.crumbs')?.insertAdjacentElement('beforebegin', banner);
+  }
+
+  if(!buy.querySelector('.fit-card')){
+    buy.insertAdjacentHTML('afterbegin', `
+      <div class="fit-card">
+        <div class="fit-icon">VIN</div>
+        <div>
+          <div class="fit-title">Check if this fits your vehicle</div>
+          <div class="fit-sub">Add your vehicle for a faster compatibility check.</div>
+        </div>
+      </div>
+      <div class="fit-grid">
+        <input type="text" placeholder="Year">
+        <input type="text" placeholder="Make">
+        <input type="text" placeholder="Model">
+        <input type="text" placeholder="Trim">
+        <input type="text" placeholder="Engine">
+        <button type="button" class="fit-btn">Add vehicle</button>
+      </div>
+    `);
+  }
+
+  if(!buy.querySelector('.store-line')){
+    const vendor = buy.querySelector('.vendor')?.textContent?.trim() || 'PATZCOM';
+    const title = buy.querySelector('h1');
+    title?.insertAdjacentHTML('afterend', `
+      <div class="store-line">
+        <div class="store-mark">P</div>
+        <div>
+          <strong>PATZCOM</strong> <span>(1220)</span>
+          <div class="store-note">100% positive · ${escapeHtml(vendor)} parts · message seller</div>
+        </div>
+      </div>
+    `);
+  }
+
+  const price = buy.querySelector('.price.big');
+  if(price && !buy.querySelector('.tax-note')){
+    price.insertAdjacentHTML('afterend', '<div class="tax-note">Taxes may apply. Final total is shown at checkout.</div>');
+  }
+
+  if(!buy.querySelector('.pay-panel')){
+    const tags = buy.querySelector('.tags');
+    const panel = `
+      <div class="pay-panel">
+        <div class="pay-title">Payments</div>
+        <div class="pay-row"><span>PayPal</span><strong>Primary checkout</strong></div>
+        <div class="pay-row"><span>Stripe</span><strong>Card checkout ready</strong></div>
+        <div class="pay-row"><span>Secure checkout</span><strong>Buyer protected</strong></div>
+      </div>
+      <div class="policy-box">
+        <div class="policy-title">Shipping, returns and payments</div>
+        <div class="policy-copy">Free FedEx shipping, 30-day returns, and secure payment flow are shown before checkout.</div>
+      </div>
+    `;
+    tags ? tags.insertAdjacentHTML('beforebegin', panel) : buy.insertAdjacentHTML('beforeend', panel);
+  }
 }
 
 function initQandA(){
