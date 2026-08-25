@@ -434,6 +434,7 @@ img{max-width:100%;display:block}
 .detail-white-page .desc > div{max-width:820px;margin:0 auto}
 .detail-white-page .desc h1,.detail-white-page .desc h2{color:#333}
 .detail-white-page .desc img{display:block;max-width:100%;height:auto}
+.detail-white-page .desc video,.product-video{display:block;width:min(100%,640px);height:auto;margin:12px auto;border:1px solid #d7d7d7;padding:5px;background:#000}
 .detail-white-page .desc p,.detail-white-page .desc li{font-size:15px;line-height:1.6;color:#333}
 .detail-white-page .sec{padding:24px 0}
 .detail-white-page .ftr{margin-top:0}
