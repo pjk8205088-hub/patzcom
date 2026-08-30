@@ -16,7 +16,12 @@ import {
   getIntegrationStatus,
   getProductsSummary,
   lookupOrder,
+  clearProductCache,
 } from './lib/store-api.mjs';
+import {
+  normalizeCatalogPayload,
+  saveCatalogSnapshot,
+} from './lib/catalog-pages.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const siteRoot = path.join(__dirname, 'work', 'abc11-site_1', 'site');
@@ -259,6 +264,25 @@ const server = http.createServer(async (req, res) => {
     try {
       const tokens = await refreshUserAccessToken();
       return json(res, 200, { ok: true, updatedAt: tokens.updatedAt, accessTokenExpiresAt: tokens.accessTokenExpiresAt });
+    } catch (error) {
+      return json(res, 400, { ok: false, message: error.message });
+    }
+  }
+
+  if (pathname === '/api/admin/catalog/import' && req.method === 'POST') {
+    if (!adminSession) {
+      return json(res, 401, { error: 'Admin login required' });
+    }
+    try {
+      const raw = await readBody(req);
+      const payload = JSON.parse(raw || '{}');
+      const items = normalizeCatalogPayload(payload);
+      if (!items.length) {
+        return json(res, 400, { ok: false, message: 'No catalog items found in the import payload.' });
+      }
+      await saveCatalogSnapshot(items);
+      clearProductCache();
+      return json(res, 200, { ok: true, count: items.length });
     } catch (error) {
       return json(res, 400, { ok: false, message: error.message });
     }

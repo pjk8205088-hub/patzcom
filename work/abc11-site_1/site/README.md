@@ -34,6 +34,20 @@ Upload the entire folder to any static host.
 - Traditional web hosting: upload to `public_html` via FTP
 - Local preview: run `python3 -m http.server 8000` and open `http://localhost:8000`
 
+## 4. eBay catalog import workflow
+When you export your own eBay listings or feed them through an API/SDK payload, paste the normalized JSON into the admin page or send it to:
+
+```http
+POST /api/admin/catalog/import
+```
+
+Supported shapes:
+- `{ "items": [...] }`
+- `{ "products": [...] }`
+- a raw array of listing objects
+
+After import, the server rewrites `assets/products.json` and regenerates every product detail page from the shared marketplace template.
+
 ## Notes
 - The original spreadsheet had one-column offset issues in the Handle/URL fields, so links were regenerated from product names.
 - For adding or editing products, it is safer to update the source spreadsheet and regenerate `assets/products.json`.

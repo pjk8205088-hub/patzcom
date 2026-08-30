@@ -290,6 +290,18 @@
                 <a class="btn btn-outline-secondary" href="admin-login.html">Login screen</a>
               </div>
             </div>
+
+            <div class="card card-outline card-info mt-3" id="catalog-import">
+              <div class="card-header">
+                <h3 class="card-title">Catalog import</h3>
+              </div>
+              <div class="card-body d-grid gap-2">
+                <p class="text-secondary small mb-1">Paste an eBay API export or your normalized listing JSON here. The server will rebuild <code>assets/products.json</code> and regenerate all product detail pages.</p>
+                <textarea id="catalog-import-json" class="form-control" rows="7" placeholder='{"items":[{"title":"Sample listing","handle":"sample-listing","price":199.99,"images":["https://..."]}]}'></textarea>
+                <button class="btn btn-info text-white" id="catalog-import-btn" type="button">Import and rebuild pages</button>
+                <div class="small text-secondary" id="catalog-import-state">Ready for JSON import.</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -314,6 +326,9 @@ const logoutBtn = document.getElementById('admin-logout-btn');
 const connectBtn = document.getElementById('ebay-connect-btn');
 const refreshBtn = document.getElementById('ebay-refresh-btn');
 const refreshBtnSide = document.getElementById('ebay-refresh-btn-side');
+const catalogImportBtn = document.getElementById('catalog-import-btn');
+const catalogImportState = document.getElementById('catalog-import-state');
+const catalogImportJson = document.getElementById('catalog-import-json');
 
 connectBtn?.addEventListener('click', () => {
   window.location.href = '/api/ebay/connect';
@@ -438,6 +453,40 @@ refreshBtnSide.addEventListener('click', async () => {
   } finally {
     refreshBtnSide.disabled = false;
     refreshBtnSide.textContent = 'Refresh token';
+  }
+});
+
+catalogImportBtn?.addEventListener('click', async () => {
+  let payload;
+  try {
+    payload = JSON.parse(catalogImportJson.value || '{}');
+  } catch (error) {
+    alert(`Invalid JSON: ${error.message}`);
+    return;
+  }
+
+  catalogImportBtn.disabled = true;
+  catalogImportBtn.textContent = 'Importing...';
+  catalogImportState.textContent = 'Uploading catalog payload...';
+  try {
+    const response = await fetch('/api/admin/catalog/import', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.message || 'Import failed.');
+    }
+    catalogImportState.textContent = `Imported ${result.count} products and rebuilt detail pages.`;
+    await loadDashboard();
+    alert(`Catalog import complete: ${result.count} products.`);
+  } catch (error) {
+    catalogImportState.textContent = `Import failed: ${error.message}`;
+    alert(error.message);
+  } finally {
+    catalogImportBtn.disabled = false;
+    catalogImportBtn.textContent = 'Import and rebuild pages';
   }
 });
 
