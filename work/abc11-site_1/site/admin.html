@@ -269,6 +269,28 @@
               </div>
             </div>
 
+            <div class="card card-outline card-info mt-3" id="ebay-setup">
+              <div class="card-header">
+                <h3 class="card-title">eBay API setup</h3>
+              </div>
+              <div class="card-body d-grid gap-2">
+                <div class="small text-secondary">Use the official eBay Developer Program to finish OAuth and API access.</div>
+                <a class="btn btn-outline-primary" href="https://developer.ebay.com/" target="_blank" rel="noreferrer">Developer Program</a>
+                <a class="btn btn-outline-primary" href="https://developer.ebay.com/develop/apis" target="_blank" rel="noreferrer">API Reference</a>
+                <a class="btn btn-outline-primary" href="https://developer.ebay.com/develop/tools/sandbox" target="_blank" rel="noreferrer">Sandbox / API Explorer</a>
+                <div class="border rounded-3 p-3 bg-body-tertiary">
+                  <div class="fw-semibold mb-1">Required values</div>
+                  <ul class="small text-secondary mb-0 ps-3">
+                    <li>Production App ID</li>
+                    <li>Cert ID / Client Secret</li>
+                    <li>OAuth Redirect URI</li>
+                    <li>Refresh token after consent</li>
+                  </ul>
+                </div>
+                <div class="small text-secondary">Once these are set, use <code>Connect account</code> to finish authorization and store the refresh token.</div>
+              </div>
+            </div>
+
             <div class="card card-outline card-primary mt-3" id="ebay-api">
               <div class="card-header">
                 <h3 class="card-title">OAuth control</h3>
