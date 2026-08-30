@@ -403,6 +403,10 @@ img{max-width:100%;display:block}
 .detail-white-page .buy{background:#fff;border:1px solid #e4e4e4;border-radius:14px;padding:18px;box-shadow:0 2px 12px rgba(0,0,0,.04);position:sticky;top:18px}
 .detail-white-page .buy .vendor{color:#555}
 .detail-white-page .buy h1{font-size:26px}
+.detail-white-page .buy .store-line{display:flex;align-items:center;gap:12px;padding:10px 0 14px;border-bottom:1px solid #eee;margin-bottom:14px}
+.detail-white-page .buy .store-mark{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:#f4f4f4;border:1px solid #dedede;font-weight:900}
+.detail-white-page .buy .store-note{font-size:13px;color:#444}
+.detail-white-page .buy .tax-note{font-size:12px;color:#666;margin:2px 0 12px}
 .detail-white-page .mainimg,.detail-white-page .card,.detail-white-page .desc{border:1px solid #e2e2e2}
 .detail-white-page .mainimg{border-radius:14px;background:#fff}
 .detail-white-page .thumbs{display:flex;gap:10px;overflow:auto;padding:4px 2px 2px}
@@ -415,17 +419,16 @@ img{max-width:100%;display:block}
 .detail-white-page .buy .btn.ghost{background:#fff;color:#3665f3;border:1px solid #3665f3}
 .detail-white-page .buy .btn.ghost.outline{margin-bottom:10px}
 .detail-white-page .fit-card{display:flex;gap:12px;align-items:flex-start;background:#f7f7f7;border:1px solid #ececec;border-radius:12px;padding:14px;margin-bottom:14px}
+.detail-white-page .fit-card--hero{margin-top:8px}
 .detail-white-page .fit-icon{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#fff;border:1px solid #ddd;font-size:11px;font-weight:900}
 .detail-white-page .fit-title{font-size:20px;font-weight:800;line-height:1.2;color:#111}
 .detail-white-page .fit-sub{margin-top:4px;color:#555;font-size:13px}
 .detail-white-page .fit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:18px}
 .detail-white-page .fit-grid input,.detail-white-page .fit-grid .fit-btn{height:40px;border-radius:10px;border:1px solid #cfcfcf;background:#fff;padding:0 12px}
 .detail-white-page .fit-grid .fit-btn{background:#cfcfcf;border-color:#cfcfcf;font-weight:700;grid-column:span 2}
-.detail-white-page .store-line{display:flex;align-items:center;gap:12px;padding:10px 0 14px;border-bottom:1px solid #eee;margin-bottom:14px}
-.detail-white-page .store-mark{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:#f4f4f4;border:1px solid #dedede;font-weight:900}
-.detail-white-page .store-note{font-size:13px;color:#444}
 .detail-white-page .price.big{margin-top:6px}
-.detail-white-page .tax-note{font-size:12px;color:#666;margin:2px 0 12px}
+.detail-white-page .trust-row{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.detail-white-page .trust-row span{display:inline-flex;align-items:center;padding:7px 11px;border-radius:999px;background:#f4f6fb;border:1px solid #e2e8f0;color:#344150;font-size:12px;font-weight:700}
 .detail-white-page .pay-panel,.detail-white-page .policy-box{background:#f8f8f8;border:1px solid #ececec;border-radius:12px;padding:14px;margin-top:14px}
 .detail-white-page .pay-title,.detail-white-page .policy-title{font-weight:800;margin-bottom:10px}
 .detail-white-page .pay-row{display:flex;justify-content:space-between;gap:12px;padding:6px 0;font-size:14px}
@@ -436,8 +439,13 @@ img{max-width:100%;display:block}
 .detail-white-page .desc img{display:block;max-width:100%;height:auto}
 .detail-white-page .desc video,.product-video{display:block;width:min(100%,640px);height:auto;margin:12px auto;border:1px solid #d7d7d7;padding:5px;background:#000}
 .detail-white-page .desc p,.detail-white-page .desc li{font-size:15px;line-height:1.6;color:#333}
+.detail-white-page .market-summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.detail-white-page .market-summary-card{background:#fff;border:1px solid #e4e4e4;border-radius:14px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.03)}
+.detail-white-page .market-summary-card h3{margin:4px 0 8px;font-size:18px;line-height:1.2;color:#111}
+.detail-white-page .market-summary-card .muted{margin:0;color:#555;font-size:14px}
 .detail-white-page .sec{padding:24px 0}
 .detail-white-page .ftr{margin-top:0}
+.detail-white-page .qa-mount{margin-top:8px;margin-bottom:8px}
 .collection-white-body{background:#fff;color:#111827}
 .collection-white-body .hdr{background:#fff;border-bottom:1px solid #e7edf4;box-shadow:none}
 .collection-white-body .logo,.collection-white-body .mainnav a{color:#111827}
