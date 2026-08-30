@@ -30,6 +30,14 @@ const adminEmail = process.env.PATZCOM_ADMIN_EMAIL || 'partscombined@gmail.com';
 const adminPassword = process.env.PATZCOM_ADMIN_PASSWORD || '1111';
 const adminSessions = new Map();
 const pendingEbayStates = new Map();
+const REMOTE_SOURCE_HOSTS = new Set([
+  'raw.githubusercontent.com',
+  'api.github.com',
+  'github.com',
+  'gist.githubusercontent.com',
+  'api.ebay.com',
+  'api.sandbox.ebay.com',
+]);
 
 const types = {
   '.css': 'text/css; charset=utf-8',
@@ -121,6 +129,56 @@ function safePath(urlPath) {
   const requested = decoded === '/' ? '/index.html' : decoded;
   const resolved = path.normalize(path.join(siteRoot, requested));
   return resolved.startsWith(siteRoot) ? resolved : path.join(siteRoot, 'index.html');
+}
+
+function isAllowedRemoteSource(url) {
+  return url?.protocol === 'https:' && REMOTE_SOURCE_HOSTS.has(url.hostname);
+}
+
+async function readJsonResponse(response, label) {
+  const text = await response.text();
+  try {
+    return JSON.parse(text);
+  } catch (error) {
+    throw new Error(`Unable to parse ${label} JSON payload: ${error.message}`);
+  }
+}
+
+async function loadRemoteCatalogPayload(sourceUrl) {
+  const url = new URL(sourceUrl);
+  if (!isAllowedRemoteSource(url)) {
+    throw new Error('Only GitHub and eBay source URLs are allowed.');
+  }
+
+  const ebayConfig = getEbayConfig();
+  const headers = {
+    Accept: 'application/vnd.github.raw+json, application/json',
+    'User-Agent': 'PATZCOM-Catalog-Sync/1.0',
+  };
+
+  if (url.hostname.includes('ebay.com')) {
+    const storedTokens = await readStoredEbayTokens();
+    let accessToken = storedTokens?.accessToken || process.env.EBAY_ACCESS_TOKEN || '';
+    const expiresAt = storedTokens?.accessTokenExpiresAt ? Date.parse(storedTokens.accessTokenExpiresAt) : 0;
+    if ((!accessToken || (expiresAt && Date.now() >= expiresAt)) && (storedTokens?.refreshToken || process.env.EBAY_REFRESH_TOKEN)) {
+      const refreshed = await refreshUserAccessToken();
+      accessToken = refreshed.accessToken;
+    }
+    if (!accessToken) {
+      throw new Error('No eBay access token available. Complete the OAuth consent flow first.');
+    }
+    headers.Authorization = `Bearer ${accessToken}`;
+    if (ebayConfig.environment === 'sandbox' && url.hostname === 'api.ebay.com') {
+      throw new Error('eBay environment is sandbox but the provided URL points to production. Use the sandbox API URL or switch EBAY_ENV.');
+    }
+  }
+
+  const response = await fetch(url.toString(), { headers });
+  if (!response.ok) {
+    throw new Error(`Remote source request failed with ${response.status} ${response.statusText}`);
+  }
+
+  return readJsonResponse(response, url.hostname);
 }
 
 const server = http.createServer(async (req, res) => {
@@ -283,6 +341,35 @@ const server = http.createServer(async (req, res) => {
       await saveCatalogSnapshot(items);
       clearProductCache();
       return json(res, 200, { ok: true, count: items.length });
+    } catch (error) {
+      return json(res, 400, { ok: false, message: error.message });
+    }
+  }
+
+  if (pathname === '/api/admin/catalog/import-source' && req.method === 'POST') {
+    if (!adminSession) {
+      return json(res, 401, { error: 'Admin login required' });
+    }
+    try {
+      const raw = await readBody(req);
+      const body = JSON.parse(raw || '{}');
+      const sourceUrl = String(body.sourceUrl || '').trim();
+      if (!sourceUrl) {
+        return json(res, 400, { ok: false, message: 'Please provide a GitHub raw URL or eBay API URL.' });
+      }
+      const payload = await loadRemoteCatalogPayload(sourceUrl);
+      const items = normalizeCatalogPayload(payload);
+      if (!items.length) {
+        return json(res, 400, { ok: false, message: 'No catalog items found in the remote payload.' });
+      }
+      await saveCatalogSnapshot(items);
+      clearProductCache();
+      return json(res, 200, {
+        ok: true,
+        count: items.length,
+        sourceUrl,
+        sourceHost: new URL(sourceUrl).hostname,
+      });
     } catch (error) {
       return json(res, 400, { ok: false, message: error.message });
     }

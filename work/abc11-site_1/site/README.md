@@ -2,8 +2,8 @@
 
 ## Folder structure
 - `index.html` - Home page with hero, categories, and featured products
-- `collections/*.html` - Category listings (`all.html` includes all 39 products)
-- `products/*.html` - 39 product detail pages with the original HTML content preserved
+- `collections/*.html` - Category listings (`all.html` includes the full imported catalog)
+- `products/*.html` - Product detail pages generated from the imported catalog snapshot
 - `cart.html` - Cart and PayPal checkout
 - `about.html`, `contact.html`, `policies.html`
 - `assets/site.css`, `assets/site.js`, `assets/config.js`, `assets/products.json`
@@ -41,12 +41,20 @@ When you export your own eBay listings or feed them through an API/SDK payload, 
 POST /api/admin/catalog/import
 ```
 
+You can also import from a GitHub-hosted raw JSON file or a live eBay API URL:
+
+```http
+POST /api/admin/catalog/import-source
+```
+
 Supported shapes:
 - `{ "items": [...] }`
 - `{ "products": [...] }`
 - a raw array of listing objects
+- eBay Browse/API item summary payloads
+- GitHub raw JSON files and GitHub API contents responses
 
-After import, the server rewrites `assets/products.json` and regenerates every product detail page from the shared marketplace template.
+After import, the server rewrites `assets/products.json` and regenerates every product detail page and collection page from the shared marketplace template.
 
 ## Notes
 - The original spreadsheet had one-column offset issues in the Handle/URL fields, so links were regenerated from product names.
