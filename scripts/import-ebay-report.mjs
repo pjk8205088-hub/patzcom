@@ -170,11 +170,6 @@ function readCsvReport(filePath) {
   })).filter((row) => row.itemNumber && row.title);
 }
 
-function findLatestSource(files) {
-  const candidates = files.length ? files : [DEFAULT_REPORT];
-  return candidates.sort().slice(-1)[0];
-}
-
 function buildExistingImageMap() {
   const map = new Map();
   try {
@@ -193,16 +188,22 @@ function buildExistingImageMap() {
 }
 
 async function main() {
-  const source = findLatestSource(sourceFiles);
+  const sources = sourceFiles.length ? sourceFiles : [DEFAULT_REPORT];
   const existingMap = buildExistingImageMap();
-  const rows = readCsvReport(source);
+  const mergedRows = new Map();
+  for (const source of sources) {
+    for (const row of readCsvReport(source)) {
+      mergedRows.set(row.itemNumber, row);
+    }
+  }
+  const rows = Array.from(mergedRows.values());
 
   const products = rows.map((row) => {
     const titleKey = normalizeKey(row.title);
     const existing = existingMap.get(titleKey);
     const category = inferCategory(row.title, row.category);
     const itemNumber = row.itemNumber;
-    const handle = `${slugify(row.title).slice(0, 110)}-${itemNumber}`;
+    const handle = `${itemNumber}`;
     const descHtml = existing?.desc_html || PLACEHOLDER_DESC(row.title, itemNumber, category, row.qty);
     const images = Array.isArray(existing?.images) ? existing.images : [];
 
@@ -239,14 +240,14 @@ async function main() {
 
   fs.mkdirSync(outputsDir, { recursive: true });
   fs.writeFileSync(path.join(outputsDir, 'ebay-active-listings-patzcom.json'), JSON.stringify({
-    source,
+    source: sources,
     generatedAt: new Date().toISOString(),
     count: products.length,
     items: products,
   }, null, 2), 'utf8');
 
   await saveCatalogSnapshot(products);
-  console.log(`Imported ${products.length} eBay listings from ${source}`);
+  console.log(`Imported ${products.length} eBay listings from ${sources.length} source file(s).`);
 }
 
 await main();
