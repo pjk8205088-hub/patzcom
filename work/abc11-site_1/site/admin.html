@@ -3,347 +3,349 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PATZCOM Seller Center</title>
-<meta name="description" content="PATZCOM seller center built on AdminLTE and aligned to marketplace Sell API workflows.">
-<link rel="preconnect" href="https://cdn.jsdelivr.net">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@4.4.1/dist/css/adminlte.min.css">
+<title>PATZCOM Seller Hub</title>
+<meta name="description" content="PATZCOM seller hub styled like eBay with catalog, order, payout, and API workflows.">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 <link rel="stylesheet" href="assets/site.css">
 <script>window.ROOT="";</script>
 </head>
-<body class="layout-fixed sidebar-expand-lg bg-body-tertiary adminlte-body ebay-admin-body">
-<div class="app-wrapper">
-  <nav class="app-header navbar navbar-expand bg-white border-bottom ebay-header">
-    <div class="container-fluid gap-3">
-      <ul class="navbar-nav align-items-center gap-2">
-        <li class="nav-item">
-          <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button"><i class="bi bi-list"></i></a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link fw-semibold ebay-logo" href="index.html"><em>PATZCOM</em></a>
-        </li>
-        <li class="nav-item d-none d-lg-block">
-          <a class="nav-link text-primary fw-semibold" href="https://www.ebay.com/sellercenter" target="_blank" rel="noreferrer">Marketplace reference</a>
-        </li>
-      </ul>
-      <div class="ebay-admin-search">
-        <input type="search" placeholder="Search products, orders, buyers...">
-        <button type="button">Search</button>
+<body class="admin-dashboard-body">
+<div class="admin-app">
+  <header class="admin-shell-top">
+    <div class="wrap admin-topbar-row">
+      <div class="admin-greeting">Hi, <span id="admin-user-email">seller</span></div>
+      <div class="admin-top-links">
+        <a href="#summary">Daily tasks</a>
+        <a href="#ebay-api">Help &amp; contact</a>
+        <a href="#orders">Selling</a>
+        <a href="#quick-links">My eBay</a>
       </div>
-      <ul class="navbar-nav align-items-center gap-2 ms-auto">
-        <li class="nav-item d-none d-md-block"><a class="nav-link" href="index.html">Storefront</a></li>
-        <li class="nav-item"><a class="nav-link" href="#integrations">Integrations</a></li>
-        <li class="nav-item"><a class="nav-link" href="#orders">Orders</a></li>
-        <li class="nav-item"><button class="btn btn-sm btn-outline-primary" id="ebay-connect-btn" type="button">Connect account</button></li>
-        <li class="nav-item"><button class="btn btn-sm btn-primary" id="ebay-refresh-btn" type="button">Refresh token</button></li>
-        <li class="nav-item"><button class="btn btn-sm btn-outline-secondary" id="admin-logout-btn" type="button">Log out</button></li>
-      </ul>
+    </div>
+  </header>
+
+  <header class="admin-shell-main">
+    <div class="wrap admin-mainbar-row">
+      <a class="admin-brand" href="index.html" aria-label="PATZCOM storefront">
+        <span class="admin-mark">P</span>
+        <span class="admin-brand-copy">
+          <strong>PATZCOM</strong>
+          <small>Seller Hub</small>
+        </span>
+      </a>
+
+      <button class="admin-category-toggle" type="button">
+        <i class="bi bi-grid-3x3-gap"></i>
+        <span>Category</span>
+      </button>
+
+      <div class="admin-search-shell" role="search">
+        <i class="bi bi-search"></i>
+        <input id="admin-search-input" type="search" placeholder="Search products, orders, buyers..." aria-label="Search admin data">
+        <button id="admin-search-btn" type="button">Search</button>
+      </div>
+
+      <div class="admin-main-actions">
+        <a class="admin-btn" href="index.html">Storefront</a>
+        <button class="admin-btn" id="ebay-connect-btn" type="button">Connect account</button>
+        <button class="admin-btn" id="ebay-refresh-btn" type="button">Refresh token</button>
+        <button class="admin-btn" id="admin-logout-btn" type="button">Log out</button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="admin-tabs">
+    <div class="wrap admin-tabs-row">
+      <a class="on" href="#summary">Summary</a>
+      <a href="#messages">Messages</a>
+      <a href="#orders">Orders</a>
+      <a href="#selling">Selling</a>
+      <a href="#payouts">Payments</a>
+      <a href="#reports">Reports</a>
+      <a href="#ebay-api">API tools</a>
+      <a href="#settings">Settings</a>
     </div>
   </nav>
 
-  <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
-    <div class="sidebar-brand">
-      <a class="brand-link" href="admin.html">
-        <span class="brand-text fw-semibold">Seller Hub</span>
-      </a>
-    </div>
+  <main class="wrap admin-layout">
+    <aside class="admin-rail">
+      <section class="rail-card rail-profile">
+        <div class="rail-avatar">P</div>
+        <div class="rail-profile-copy">
+          <div class="rail-name">PATZCOM</div>
+          <div class="rail-sub">100% positive feedback style storefront</div>
+          <div class="rail-badges">
+            <span>Direct checkout</span>
+            <span>PayPal first</span>
+          </div>
+        </div>
+      </section>
 
-    <div class="sidebar-wrapper">
-      <nav class="mt-2">
-        <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview">
-          <li class="nav-header">Operations</li>
-          <li class="nav-item"><a href="#overview" class="nav-link"><i class="nav-icon bi bi-speedometer2"></i><p>Summary</p></a></li>
-          <li class="nav-item"><a href="#inventory" class="nav-link"><i class="nav-icon bi bi-box-seam"></i><p>Inventory</p></a></li>
-          <li class="nav-item"><a href="#orders" class="nav-link"><i class="nav-icon bi bi-receipt"></i><p>Orders</p></a></li>
-          <li class="nav-item"><a href="#ebay-api" class="nav-link"><i class="nav-icon bi bi-diagram-3"></i><p>API tools</p></a></li>
-          <li class="nav-item"><a href="#integrations" class="nav-link"><i class="nav-icon bi bi-plug"></i><p>Integrations</p></a></li>
-          <li class="nav-item"><a href="index.html" class="nav-link"><i class="nav-icon bi bi-shop"></i><p>Storefront</p></a></li>
-        </ul>
-      </nav>
-    </div>
-  </aside>
+      <section class="rail-card">
+        <div class="rail-title">Summary</div>
+        <a class="rail-link on" href="#summary">Overview</a>
+        <a class="rail-link" href="#inventory">Inventory</a>
+        <a class="rail-link" href="#orders">Orders</a>
+        <a class="rail-link" href="#messages">Messages</a>
+        <a class="rail-link" href="#returns">Returns</a>
+        <a class="rail-link" href="#payouts">Payments</a>
+        <a class="rail-link" href="#reports">Reports</a>
+      </section>
 
-  <main class="app-main">
-    <div class="app-content-header border-bottom bg-white ebay-admin-top">
-      <div class="container-fluid py-3">
-        <div class="admin-topbar">
+      <section class="rail-card">
+        <div class="rail-title">Categories</div>
+        <a class="rail-link" href="collections/all.html">All Products</a>
+        <a class="rail-link" href="collections/brake-pads.html">Brake Pads</a>
+        <a class="rail-link" href="collections/big-brake-kit.html">Big Brake Kits</a>
+        <a class="rail-link" href="collections/heavy-duty-durability.html">Heavy-Duty Durability</a>
+        <a class="rail-link" href="collections/lift-coilover-suspension-kit.html">Lift Coilover Suspension Kit</a>
+        <a class="rail-link" href="collections/lowering-spring.html">Lowering Springs</a>
+        <a class="rail-link" href="collections/rear-anti-roll-bar.html">Rear Sway Bar</a>
+        <a class="rail-link" href="collections/strut-tower-bar-under-bars.html">Strut Tower Bars</a>
+      </section>
+
+      <section class="rail-card">
+        <div class="rail-title">Quick status</div>
+        <div class="rail-status-list">
           <div>
-            <div class="text-uppercase text-primary fw-semibold small">PATZCOM marketplace workspace</div>
-            <h1 class="mb-1">PATZCOM Seller Hub</h1>
-            <p class="text-secondary mb-0">A white-marketplace style admin and storefront control room for catalog curation, order review, shipping updates, and reporting.</p>
+            <strong id="admin-session-badge">Checking session...</strong>
+            <span>Admin authentication</span>
           </div>
-          <div class="d-flex flex-wrap gap-2">
-            <span class="badge text-bg-light border" id="admin-session-badge">Checking session...</span>
-            <span class="badge text-bg-primary" id="admin-ebay-badge">Marketplace readiness</span>
+          <div>
+            <strong id="admin-status-badge">Marketplace readiness</strong>
+            <span>Seller operations</span>
           </div>
         </div>
-      </div>
-    </div>
+      </section>
+    </aside>
 
-    <div class="app-content">
-      <div class="container-fluid py-4">
-        <section class="admin-market-shell mb-4">
-          <div class="market-left">
-            <div class="market-card market-brand">
-              <div class="market-logo">P</div>
+    <section class="admin-content">
+      <div id="admin-flash" class="flash-banner" hidden></div>
+
+      <section class="seller-banner" id="summary">
+        <div class="seller-banner-copy">
+          <span class="seller-kicker">seller operations preview</span>
+          <h1>PATZCOM Admin Hub</h1>
+          <p>A protected marketplace control room for product curation, buyer support, shipping updates, payout reporting, and eBay API-connected workflows.</p>
+          <div class="seller-mini-stats">
+            <span>Catalog management</span>
+            <span>Order and shipping desk</span>
+            <span>PayPal-first checkout</span>
+          </div>
+        </div>
+        <div class="seller-banner-actions">
+          <span class="status-chip info" id="store-domain-chip">patzcom.com</span>
+          <span class="status-chip" id="storeflow-chip">Loading marketplace snapshot...</span>
+        </div>
+      </section>
+
+      <section class="summary-grid" aria-label="Dashboard summary">
+        <article class="summary-tile">
+          <strong id="kpi-products">--</strong>
+          <span>Catalog products</span>
+        </article>
+        <article class="summary-tile">
+          <strong id="kpi-stock">--</strong>
+          <span>In stock</span>
+        </article>
+        <article class="summary-tile">
+          <strong id="kpi-brands">--</strong>
+          <span>Brands</span>
+        </article>
+        <article class="summary-tile">
+          <strong id="kpi-categories">--</strong>
+          <span>Categories</span>
+        </article>
+      </section>
+
+      <section class="admin-workbench">
+        <div class="workbench-main">
+          <article class="panel" id="overview">
+            <div class="panel-head">
               <div>
-                <div class="market-name">PATZCOM</div>
-                <div class="market-meta">100% positive feedback style storefront</div>
+                <h2>Marketplace API workflow map</h2>
+                <p class="panel-note">Official Sell API structure, mapped to PATZCOM operations.</p>
               </div>
+              <span class="status-chip info">Official workflow</span>
             </div>
-            <div class="market-card market-cats">
-              <div class="market-card-title">All categories</div>
-              <a href="collections/all.html">All Products</a>
-              <a href="collections/brake-pads.html">Brake Pads</a>
-              <a href="collections/big-brake-kit.html">Big Brake Kits</a>
-              <a href="collections/heavy-duty-durability.html">Heavy-Duty Durability</a>
-              <a href="collections/lift-coilover-suspension-kit.html">Lift Coilover Suspension Kit</a>
-              <a href="collections/lowering-spring.html">Lowering Springs</a>
-              <a href="collections/rear-anti-roll-bar.html">Rear Sway Bar</a>
-              <a href="collections/strut-tower-bar-under-bars.html">Strut Tower Bars</a>
-            </div>
-          </div>
-          <div class="market-right">
-            <div class="market-feature">
-              <div class="market-feature-head">
-                <div>
-                  <div class="market-kicker">SHOP</div>
-                  <h2>Recommended categories</h2>
-                </div>
-                <div class="market-search">
-                  <input type="search" placeholder="Search products...">
-                  <button type="button">Search</button>
-                </div>
-              </div>
-              <div class="market-category-grid">
-                <a class="market-tile" href="collections/lowering-spring.html">
-                  <img src="assets/img/partscombined/SANTAFEMX5STORMLOWERINGSPRING_a-min_61adf30a-77c0-484b-b-3f79e5c5-1.jpg" alt="">
-                  <span>SANTA FE 5G / MX5</span>
-                </a>
-                <a class="market-tile" href="collections/heavy-duty-durability.html">
-                  <img src="assets/img/partscombined/PV5CARGOR1-5UP_d1_e8bc0bcc-3392-499f-8dc3-c5770e07532e-82f3e231-1.jpg" alt="">
-                  <span>GENESIS GV80</span>
-                </a>
-                <a class="market-tile" href="collections/big-brake-kit.html">
-                  <img src="assets/img/partscombined/YUKON5GFEXSILVERF8P405R4P380EPB_d3-min-a2fb4956-1.jpg" alt="">
-                  <span>GENESIS G70 (~ 2021)</span>
-                </a>
-              </div>
-            </div>
-            <div class="market-feature mt-4">
-              <div class="market-feature-head">
-                <div>
-                  <div class="market-kicker">FEATURED</div>
-                  <h2>Recommended products</h2>
-                </div>
-              </div>
-              <div class="market-product-grid">
-                <a class="market-product" href="products/sangsin-hardron-zr-brake-pads-for-kia-stinger-genesis-g70-3-3t-brembo-front-rear.html">
-                  <div class="market-product-img"><img src="assets/img/partscombined/HARDRONZRF_RSTINGER_G70_aa-min-d1bd826d-1.jpg" alt=""></div>
-                  <div class="market-product-body"><div class="vendor">HARDRON ZR</div><h3>Stinger / G70 Brake Pads</h3></div>
-                </a>
-                <a class="market-product" href="products/kia-telluride-2g-lq2-2027-performance-big-brake-kit-front-8-pot-405mm-rear-4-pot.html">
-                  <div class="market-product-img"><img src="assets/img/partscombined/YUKON5GFEXSILVERF8P405R4P380EPB_d3-min-a2fb4956-1.jpg" alt=""></div>
-                  <div class="market-product-body"><div class="vendor">STOLZ BRAKE</div><h3>Telluride Big Brake Kit</h3></div>
-                </a>
-                <a class="market-product" href="products/fits-19-20-21-22-23-24-25-kia-telluride-1g-on-lift-up-bigfoot-contour-coilover-s.html">
-                  <div class="market-product-img"><img src="assets/img/partscombined/BigfootContourCoiloverKit_a-0c563464-1.jpg" alt=""></div>
-                  <div class="market-product-body"><div class="vendor">BIGFOOT</div><h3>Lift Coilover Kit</h3></div>
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>API</th>
+                  <th>Purpose</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="ebay-api-table">
+                <tr><td colspan="3" class="table-empty">Loading API map...</td></tr>
+              </tbody>
+            </table>
+          </article>
 
-        <div class="row g-3 mb-3">
-          <div class="col-12 col-md-6 col-xl-3">
-            <div class="small-box text-bg-primary">
-              <div class="inner">
-                <h3 id="kpi-products">--</h3>
-                <p>Catalog products</p>
+          <article class="panel" id="inventory">
+            <div class="panel-head">
+              <div>
+                <h2>Live inventory snapshot</h2>
+                <p class="panel-note">Products loaded from the PATZCOM catalog feed and filtered in-browser.</p>
               </div>
-              <i class="bi bi-box-seam small-box-icon"></i>
+              <span class="panel-note" id="product-count-label">Loading products...</span>
             </div>
-          </div>
-          <div class="col-12 col-md-6 col-xl-3">
-            <div class="small-box text-bg-success">
-              <div class="inner">
-                <h3 id="kpi-stock">--</h3>
-                <p>In stock</p>
+            <table class="admin-table admin-inventory-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Vendor</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="inventory-table">
+                <tr><td colspan="5" class="table-empty">Loading products...</td></tr>
+              </tbody>
+            </table>
+          </article>
+
+          <article class="panel" id="orders">
+            <div class="panel-head">
+              <div>
+                <h2>Action queue</h2>
+                <p class="panel-note">Seller tasks that mirror the eBay workflow: inventory, consent, and checkout alignment.</p>
               </div>
-              <i class="bi bi-check2-circle small-box-icon"></i>
+              <span class="status-chip">Workflow queue</span>
             </div>
-          </div>
-          <div class="col-12 col-md-6 col-xl-3">
-            <div class="small-box text-bg-warning">
-              <div class="inner">
-                <h3 id="kpi-brands">--</h3>
-                <p>Brands</p>
+            <div id="action-queue" class="queue-grid">
+              <div class="queue-card">
+                <strong>Loading queue...</strong>
+                <p>Preparing the current seller actions.</p>
               </div>
-              <i class="bi bi-diagram-3 small-box-icon"></i>
             </div>
-          </div>
-          <div class="col-12 col-md-6 col-xl-3">
-            <div class="small-box text-bg-danger">
-              <div class="inner">
-                <h3 id="kpi-categories">--</h3>
-                <p>Categories</p>
+          </article>
+
+          <article class="panel" id="selling">
+            <div class="panel-head">
+              <div>
+                <h2>Catalog import</h2>
+                <p class="panel-note">Paste an eBay export, a normalized JSON payload, or a GitHub raw JSON URL.</p>
               </div>
-              <i class="bi bi-tags small-box-icon"></i>
+              <span class="status-chip info">Dedupes before rebuild</span>
             </div>
-          </div>
+            <div class="catalog-tools">
+              <textarea id="catalog-import-json" rows="9" placeholder='{"items":[{"title":"Sample listing","handle":"sample-listing","price":199.99,"images":["https://..."]}]}'></textarea>
+              <div class="catalog-source-row">
+                <span>Source URL</span>
+                <input id="catalog-source-url" type="url" placeholder="https://raw.githubusercontent.com/.../catalog.json">
+              </div>
+              <div class="catalog-button-row">
+                <button class="admin-btn" id="catalog-source-btn" type="button">Import from URL</button>
+                <button class="admin-btn primary" id="catalog-import-btn" type="button">Import pasted JSON</button>
+                <button class="admin-btn" id="catalog-enrich-btn" type="button">Enrich images from eBay API</button>
+              </div>
+              <div class="catalog-state" id="catalog-import-state">Ready for JSON import or remote source URL. Duplicate items are collapsed automatically.</div>
+            </div>
+          </article>
+
+          <article class="panel" id="reports">
+            <div class="panel-head">
+              <div>
+                <h2>Catalog performance</h2>
+                <p class="panel-note">Current operational status derived from the marketplace snapshot.</p>
+              </div>
+            </div>
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Metric</th>
+                  <th>Value</th>
+                  <th>Meaning</th>
+                </tr>
+              </thead>
+              <tbody id="operations-table">
+                <tr><td colspan="3" class="table-empty">Loading dashboard...</td></tr>
+              </tbody>
+            </table>
+          </article>
         </div>
 
-        <div class="row g-3" id="overview">
-          <div class="col-12 col-xl-8">
-            <div class="card card-primary card-outline">
-              <div class="card-header">
-                <h3 class="card-title">Marketplace API workflow map</h3>
-                <div class="card-tools">
-                  <span class="badge text-bg-light border">Official Sell API structure</span>
-                </div>
-              </div>
-              <div class="card-body p-0">
-                <table class="table table-striped mb-0 align-middle">
-                  <thead>
-                    <tr>
-                      <th>API</th>
-                      <th>Purpose</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody id="ebay-api-table">
-                    <tr><td colspan="3" class="text-secondary">Loading API map...</td></tr>
-                  </tbody>
-                </table>
+        <aside class="workbench-side">
+          <article class="panel" id="messages">
+            <div class="panel-head">
+              <div>
+                <h2>Integration status</h2>
+                <p class="panel-note">Current readiness across eBay, PayPal, and storefront flows.</p>
               </div>
             </div>
+            <div class="integration-list" id="integration-list">
+              <div class="integration-card">
+                <strong>Marketplace API</strong>
+                <span>Checking readiness...</span>
+              </div>
+            </div>
+          </article>
 
-            <div class="card card-outline card-info mt-3" id="inventory">
-              <div class="card-header">
-                <h3 class="card-title">Catalog performance</h3>
-              </div>
-              <div class="card-body p-0">
-                <table class="table table-hover mb-0 align-middle">
-                  <thead>
-                    <tr>
-                      <th>Metric</th>
-                      <th>Value</th>
-                      <th>Meaning</th>
-                    </tr>
-                  </thead>
-                  <tbody id="operations-table">
-                    <tr><td colspan="3" class="text-secondary">Loading dashboard...</td></tr>
-                  </tbody>
-                </table>
+          <article class="panel" id="ebay-api">
+            <div class="panel-head">
+              <div>
+                <h2>eBay API setup</h2>
+                <p class="panel-note">Finish OAuth and API access with the official eBay Developer Program.</p>
               </div>
             </div>
+            <div class="side-stack">
+              <a class="admin-btn" href="https://developer.ebay.com/" target="_blank" rel="noreferrer">Developer Program</a>
+              <a class="admin-btn" href="https://developer.ebay.com/develop/apis" target="_blank" rel="noreferrer">API Reference</a>
+              <a class="admin-btn" href="https://developer.ebay.com/develop/tools/sandbox" target="_blank" rel="noreferrer">Sandbox / API Explorer</a>
+              <div class="info-card">
+                <strong>Required values</strong>
+                <ul>
+                  <li>Production App ID</li>
+                  <li>Cert ID / Client Secret</li>
+                  <li>OAuth Redirect URI</li>
+                  <li>Refresh token after consent</li>
+                  <li>Browse API app token for image enrichment</li>
+                </ul>
+              </div>
+              <p class="side-copy">When these are set, use <strong>Connect account</strong> to complete authorization and store the refresh token.</p>
+            </div>
+          </article>
 
-            <div class="card card-outline card-success mt-3" id="orders">
-              <div class="card-header">
-                <h3 class="card-title">Action queue</h3>
-              </div>
-              <div class="card-body">
-                <div class="row g-3" id="action-queue">
-                  <div class="col-12">
-                    <div class="p-3 border rounded-3 bg-body-tertiary">
-                      <strong>Loading queue...</strong>
-                      <div class="text-secondary small mt-1">Preparing the current seller actions.</div>
-                    </div>
-                  </div>
-                </div>
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>OAuth control</h2>
+                <p class="panel-note">Connect the account and refresh the token when needed.</p>
               </div>
             </div>
-          </div>
+            <div class="side-stack">
+              <a class="admin-btn primary" href="/api/ebay/connect">Connect account</a>
+              <button class="admin-btn" id="ebay-refresh-btn-side" type="button">Refresh token</button>
+              <div class="side-copy" id="token-state">Token state loading...</div>
+            </div>
+          </article>
 
-          <div class="col-12 col-xl-4">
-            <div class="card card-outline card-warning" id="integration-status">
-              <div class="card-header">
-                <h3 class="card-title">Integration status</h3>
-              </div>
-              <div class="card-body d-grid gap-3" id="integration-list">
-                <div class="p-3 border rounded-3 bg-body-tertiary">
-                  <strong>Marketplace API</strong>
-                  <div class="text-secondary small">Checking readiness...</div>
-                </div>
+          <article class="panel" id="quick-links">
+            <div class="panel-head">
+              <div>
+                <h2>Quick links</h2>
+                <p class="panel-note">Fast access to raw feed, JSON, and login preview.</p>
               </div>
             </div>
-
-            <div class="card card-outline card-info mt-3" id="ebay-setup">
-              <div class="card-header">
-                <h3 class="card-title">eBay API setup</h3>
-              </div>
-              <div class="card-body d-grid gap-2">
-                <div class="small text-secondary">Use the official eBay Developer Program to finish OAuth and API access.</div>
-                <a class="btn btn-outline-primary" href="https://developer.ebay.com/" target="_blank" rel="noreferrer">Developer Program</a>
-                <a class="btn btn-outline-primary" href="https://developer.ebay.com/develop/apis" target="_blank" rel="noreferrer">API Reference</a>
-                <a class="btn btn-outline-primary" href="https://developer.ebay.com/develop/tools/sandbox" target="_blank" rel="noreferrer">Sandbox / API Explorer</a>
-                <div class="border rounded-3 p-3 bg-body-tertiary">
-                  <div class="fw-semibold mb-1">Required values</div>
-                  <ul class="small text-secondary mb-0 ps-3">
-                    <li>Production App ID</li>
-                    <li>Cert ID / Client Secret</li>
-                    <li>OAuth Redirect URI</li>
-                    <li>Refresh token after consent</li>
-                    <li>Browse API app token for image enrichment</li>
-                  </ul>
-                </div>
-                <div class="small text-secondary">Once these are set, use <code>Connect account</code> to finish authorization and store the refresh token.</div>
-              </div>
+            <div class="side-stack">
+              <a class="admin-btn" href="/api/products">Product feed</a>
+              <a class="admin-btn" href="/api/admin/dashboard">Admin JSON</a>
+              <a class="admin-btn" href="admin-login.html">Login screen</a>
             </div>
-
-            <div class="card card-outline card-primary mt-3" id="ebay-api">
-              <div class="card-header">
-                <h3 class="card-title">OAuth control</h3>
-              </div>
-              <div class="card-body d-grid gap-2">
-                <a class="btn btn-primary" href="/api/ebay/connect">Connect account</a>
-                <button class="btn btn-outline-primary" id="ebay-refresh-btn-side" type="button">Refresh token</button>
-                <div class="small text-secondary" id="token-state">Token state loading...</div>
-              </div>
-            </div>
-
-            <div class="card card-outline card-secondary mt-3" id="quick-links">
-              <div class="card-header">
-                <h3 class="card-title">Quick links</h3>
-              </div>
-              <div class="card-body d-grid gap-2">
-                <a class="btn btn-outline-secondary" href="/api/products">Product feed</a>
-                <a class="btn btn-outline-secondary" href="/api/admin/dashboard">Admin JSON</a>
-                <a class="btn btn-outline-secondary" href="admin-login.html">Login screen</a>
-              </div>
-            </div>
-
-            <div class="card card-outline card-info mt-3" id="catalog-import">
-              <div class="card-header">
-                <h3 class="card-title">Catalog import</h3>
-              </div>
-              <div class="card-body d-grid gap-2">
-                <p class="text-secondary small mb-1">Paste an eBay API export or your normalized listing JSON here. You can also import directly from a GitHub raw JSON URL or an eBay API endpoint. Duplicate listings are merged before <code>assets/products.json</code> and all collection/detail pages are rebuilt.</p>
-                <textarea id="catalog-import-json" class="form-control" rows="7" placeholder='{"items":[{"title":"Sample listing","handle":"sample-listing","price":199.99,"images":["https://..."]}]}'></textarea>
-                <div class="input-group">
-                  <span class="input-group-text">Source URL</span>
-                  <input id="catalog-source-url" type="url" class="form-control" placeholder="https://raw.githubusercontent.com/.../catalog.json">
-                </div>
-                <div class="d-flex flex-wrap gap-2">
-                  <button class="btn btn-outline-primary" id="catalog-source-btn" type="button">Import from URL</button>
-                  <button class="btn btn-info text-white" id="catalog-import-btn" type="button">Import pasted JSON</button>
-                  <button class="btn btn-warning text-white" id="catalog-enrich-btn" type="button">Enrich images from eBay API</button>
-                </div>
-                <div class="small text-secondary" id="catalog-import-state">Ready for JSON import or remote source URL. Duplicate items will be collapsed automatically.</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+          </article>
+        </aside>
+      </section>
+    </section>
   </main>
 </div>
 
-<script defer src="https://cdn.jsdelivr.net/npm/admin-lte@4.4.1/dist/js/adminlte.min.js"></script>
 <script>
 const sessionBadge = document.getElementById('admin-session-badge');
-const ebayBadge = document.getElementById('admin-ebay-badge');
+const statusBadge = document.getElementById('admin-status-badge');
+const userEmail = document.getElementById('admin-user-email');
+const storeflowChip = document.getElementById('storeflow-chip');
+const flash = document.getElementById('admin-flash');
 const kpiProducts = document.getElementById('kpi-products');
 const kpiStock = document.getElementById('kpi-stock');
 const kpiBrands = document.getElementById('kpi-brands');
@@ -353,7 +355,10 @@ const apiTable = document.getElementById('ebay-api-table');
 const queue = document.getElementById('action-queue');
 const integrationList = document.getElementById('integration-list');
 const tokenState = document.getElementById('token-state');
-const marketSearchInput = document.querySelector('.market-search input');
+const inventoryTable = document.getElementById('inventory-table');
+const productCountLabel = document.getElementById('product-count-label');
+const searchInput = document.getElementById('admin-search-input');
+const searchBtn = document.getElementById('admin-search-btn');
 const logoutBtn = document.getElementById('admin-logout-btn');
 const connectBtn = document.getElementById('ebay-connect-btn');
 const refreshBtn = document.getElementById('ebay-refresh-btn');
@@ -364,10 +369,124 @@ const catalogEnrichBtn = document.getElementById('catalog-enrich-btn');
 const catalogImportState = document.getElementById('catalog-import-state');
 const catalogImportJson = document.getElementById('catalog-import-json');
 const catalogSourceUrl = document.getElementById('catalog-source-url');
+const flashMessages = {
+  connected: 'eBay account connected. Refresh the token when you need updated consent.',
+  invalid-state: 'OAuth state did not match. Open the developer portal again and start a fresh consent flow.',
+  missing-code: 'OAuth callback was missing an authorization code.',
+  'token-exchange-failed': 'Token exchange failed. Check the Client ID, Secret, and Redirect URI.',
+  'api-ready': 'API permissions are ready for catalog and fulfillment workflows.',
+};
+let allProducts = [];
 
-connectBtn?.addEventListener('click', () => {
-  window.location.href = '/api/ebay/connect';
-});
+function statusClass(status) {
+  const value = String(status || '').toLowerCase();
+  if (value.includes('ready') || value.includes('success') || value.includes('positive')) return 'ok';
+  if (value.includes('await') || value.includes('needs') || value.includes('locked') || value.includes('missing')) return 'warn';
+  return 'info';
+}
+
+function renderQueue(dashboard) {
+  queue.innerHTML = `
+    <div class="queue-card">
+      <strong>Map inventory items to offers</strong>
+      <p>Inventory API uses inventory items, locations, and offers before listings are published on eBay marketplaces.</p>
+    </div>
+    <div class="queue-card">
+      <strong>Prepare OAuth consent</strong>
+      <p>Official eBay REST guides require OAuth scopes and user token setup before seller-side workflows can run.</p>
+    </div>
+    <div class="queue-card">
+      <strong>Align PayPal-first checkout</strong>
+      <p>Keep the public buying flow simple while seller-side reporting and fulfillment integrations continue to mature.</p>
+    </div>
+  `;
+}
+
+function renderIntegrations(dashboard) {
+  integrationList.innerHTML = `
+    <div class="integration-card">
+      <strong>eBay OAuth readiness</strong>
+      <span>${dashboard.integrations.ebay.ready ? 'Client credentials detected. Continue with refresh-token authorization.' : 'Awaiting production credentials.'}</span>
+    </div>
+    <div class="integration-card">
+      <strong>PayPal checkout readiness</strong>
+      <span>${dashboard.integrations.paypal.ready ? 'Configured for storefront checkout flows.' : 'Approval or live client ID still pending.'}</span>
+    </div>
+    <div class="integration-card">
+      <strong>Public storefront feed</strong>
+      <span>PATZCOM product cards are loaded from the same internal product feed.</span>
+    </div>
+    <div class="integration-card">
+      <strong>Stored token state</strong>
+      <span>${dashboard.integrations.ebay.tokenStorePresent ? `Refresh token stored. Last updated ${dashboard.integrations.ebay.storedTokenUpdatedAt}.` : 'No stored token yet. Use Connect account to complete authorization.'}</span>
+    </div>
+  `;
+}
+
+function renderOperations(dashboard) {
+  operationsTable.innerHTML = `
+    <tr><td>Inventory sync</td><td>${dashboard.operations.inventorySync}</td><td>SKU and offer prep</td></tr>
+    <tr><td>Policy center</td><td>${dashboard.operations.policyCenter}</td><td>Account and business rules</td></tr>
+    <tr><td>Order desk</td><td>${dashboard.operations.orderDesk}</td><td>Fulfillment workflow</td></tr>
+    <tr><td>Shipping desk</td><td>${dashboard.operations.shippingDesk}</td><td>Tracking readiness</td></tr>
+    <tr><td>Payout reporting</td><td>${dashboard.operations.payoutReporting}</td><td>Settlement visibility</td></tr>
+  `;
+}
+
+function renderApiPlan(dashboard) {
+  apiTable.innerHTML = dashboard.ebayApiPlan.map((api) => `
+    <tr>
+      <td class="cell-strong">${api.name}</td>
+      <td class="cell-muted">${api.purpose}</td>
+      <td><span class="status-chip ${statusClass(api.status)}">${api.status}</span></td>
+    </tr>
+  `).join('');
+}
+
+function renderInventory(products) {
+  const query = (searchInput?.value || '').trim().toLowerCase();
+  const filtered = query
+    ? products.filter((item) =>
+        [item.title, item.vendor, item.category, item.handle]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(query)))
+    : products;
+
+  productCountLabel.textContent = `${filtered.length} of ${products.length} products shown`;
+  if (!filtered.length) {
+    inventoryTable.innerHTML = `<tr><td colspan="5" class="table-empty">No matching products found.</td></tr>`;
+    return;
+  }
+
+  inventoryTable.innerHTML = filtered.map((item) => `
+    <tr>
+      <td>
+        <div class="inventory-product">
+          <div class="inventory-thumb">${item.image ? `<img src="${item.image}" alt="">` : 'P'}</div>
+          <div>
+            <strong>${item.title}</strong>
+            <span>${item.handle}</span>
+          </div>
+        </div>
+      </td>
+      <td class="cell-muted">${item.vendor || 'PATZCOM'}</td>
+      <td class="cell-muted">${item.category || 'Uncategorized'}</td>
+      <td class="cell-strong">${item.price ? `$${item.price}` : '—'}${item.compareAt ? `<div class="cell-strike">$${item.compareAt}</div>` : ''}</td>
+      <td><span class="status-chip ${item.available ? 'ok' : 'warn'}">${item.available ? 'In stock' : 'Out of stock'}</span></td>
+    </tr>
+  `).join('');
+}
+
+function flashFromQuery() {
+  const params = new URLSearchParams(window.location.search);
+  const ebay = params.get('ebay');
+  const message = params.get('message');
+  if (!ebay && !message) return;
+  const base = flashMessages[ebay] || 'Marketplace notice';
+  flash.textContent = message ? `${base} ${message}` : base;
+  flash.hidden = false;
+  flash.className = `flash-banner ${statusClass(ebay || 'info')}`;
+}
 
 async function loadDashboard() {
   const sessionResponse = await fetch('/api/admin/session');
@@ -376,83 +495,47 @@ async function loadDashboard() {
     window.location.href = '/admin-login.html';
     return;
   }
+
+  userEmail.textContent = session.user.email;
   sessionBadge.textContent = `Signed in as ${session.user.email}`;
 
-  const dashboardResponse = await fetch('/api/admin/dashboard');
+  const [dashboardResponse, productsResponse] = await Promise.all([
+    fetch('/api/admin/dashboard'),
+    fetch('/api/products'),
+  ]);
+
   if (!dashboardResponse.ok) {
     window.location.href = '/admin-login.html';
     return;
   }
+
   const dashboard = await dashboardResponse.json();
+  const productsPayload = await productsResponse.json().catch(() => ({ items: [] }));
+  allProducts = Array.isArray(productsPayload.items) ? productsPayload.items : [];
 
   kpiProducts.textContent = dashboard.catalog.productCount;
   kpiStock.textContent = dashboard.catalog.inStockCount;
   kpiBrands.textContent = dashboard.catalog.vendorCount;
   kpiCategories.textContent = dashboard.catalog.categoryCount;
-  if (marketSearchInput) {
-    marketSearchInput.placeholder = `Search ${dashboard.catalog.productCount} products`;
-  }
-  ebayBadge.textContent = dashboard.integrations.ebay.ready ? 'eBay ready' : 'eBay setup needed';
+
+  statusBadge.textContent = dashboard.integrations.ebay.ready ? 'eBay ready' : 'eBay setup needed';
+  statusBadge.className = `status-chip ${dashboard.integrations.ebay.ready ? 'ok' : 'warn'}`;
+  storeflowChip.textContent = dashboard.integrations.paypal.ready ? 'PayPal ready · Stripe planned' : 'PayPal approval pending';
+  storeflowChip.className = `status-chip ${dashboard.integrations.paypal.ready ? 'ok' : 'warn'}`;
   tokenState.textContent = dashboard.integrations.ebay.tokenStorePresent
     ? `Stored token updated ${dashboard.integrations.ebay.storedTokenUpdatedAt}`
     : 'No stored eBay token yet.';
 
-  operationsTable.innerHTML = `
-    <tr><td>Inventory sync</td><td>${dashboard.operations.inventorySync}</td><td>SKU and offer prep</td></tr>
-    <tr><td>Policy center</td><td>${dashboard.operations.policyCenter}</td><td>Account and business rules</td></tr>
-    <tr><td>Order desk</td><td>${dashboard.operations.orderDesk}</td><td>Fulfillment workflow</td></tr>
-    <tr><td>Shipping desk</td><td>${dashboard.operations.shippingDesk}</td><td>Tracking readiness</td></tr>
-    <tr><td>Payout reporting</td><td>${dashboard.operations.payoutReporting}</td><td>Settlement visibility</td></tr>
-  `;
-
-  apiTable.innerHTML = dashboard.ebayApiPlan.map((api) => `
-    <tr>
-      <td class="fw-semibold">${api.name}</td>
-      <td class="text-secondary">${api.purpose}</td>
-      <td><span class="badge ${api.status.includes('ready') ? 'text-bg-success' : api.status.includes('awaiting') || api.status.includes('needs') || api.status.includes('locked') ? 'text-bg-warning' : 'text-bg-info'}">${api.status}</span></td>
-    </tr>
-  `).join('');
-
-  queue.innerHTML = `
-    <div class="col-12 col-lg-4">
-      <div class="p-3 border rounded-3 bg-body-tertiary h-100">
-        <div class="fw-semibold">Map inventory items to offers</div>
-        <div class="text-secondary small mt-1">Inventory API uses inventory items, locations, and offers before listings are published on eBay marketplaces.</div>
-      </div>
-    </div>
-    <div class="col-12 col-lg-4">
-      <div class="p-3 border rounded-3 bg-body-tertiary h-100">
-        <div class="fw-semibold">Prepare OAuth consent</div>
-        <div class="text-secondary small mt-1">Official eBay REST guides require OAuth scopes and user token setup before seller-side sell workflows can run.</div>
-      </div>
-    </div>
-    <div class="col-12 col-lg-4">
-      <div class="p-3 border rounded-3 bg-body-tertiary h-100">
-        <div class="fw-semibold">Align PayPal-first checkout</div>
-        <div class="text-secondary small mt-1">Keep public buying flow simple while seller-side reporting and fulfillment integrations continue to mature.</div>
-      </div>
-    </div>
-  `;
-
-  integrationList.innerHTML = `
-    <div class="p-3 border rounded-3 bg-body-tertiary">
-      <div class="fw-semibold">eBay OAuth readiness</div>
-      <div class="text-secondary small mt-1">${dashboard.integrations.ebay.ready ? 'Client credentials detected. Continue with refresh-token authorization.' : 'Awaiting production credentials.'}</div>
-    </div>
-    <div class="p-3 border rounded-3 bg-body-tertiary">
-      <div class="fw-semibold">PayPal checkout readiness</div>
-      <div class="text-secondary small mt-1">${dashboard.integrations.paypal.ready ? 'Configured for storefront checkout flows.' : 'Approval or live client ID still pending.'}</div>
-    </div>
-    <div class="p-3 border rounded-3 bg-body-tertiary">
-      <div class="fw-semibold">Public storefront feed</div>
-      <div class="text-secondary small mt-1">PATZCOM product cards are loaded from the same internal product feed.</div>
-    </div>
-    <div class="p-3 border rounded-3 bg-body-tertiary">
-      <div class="fw-semibold">Stored token state</div>
-      <div class="text-secondary small mt-1">${dashboard.integrations.ebay.tokenStorePresent ? `Refresh token stored. Last updated ${dashboard.integrations.ebay.storedTokenUpdatedAt}.` : 'No stored token yet. Use Connect account to complete authorization.'}</div>
-    </div>
-  `;
+  renderOperations(dashboard);
+  renderApiPlan(dashboard);
+  renderQueue(dashboard);
+  renderIntegrations(dashboard);
+  renderInventory(allProducts);
 }
+
+connectBtn?.addEventListener('click', () => {
+  window.location.href = '/api/ebay/connect';
+});
 
 async function refreshToken() {
   const response = await fetch('/api/admin/ebay/refresh', { method: 'POST' });
@@ -468,31 +551,39 @@ logoutBtn.addEventListener('click', async () => {
   window.location.href = '/admin-login.html';
 });
 
+function setBusyState(button, busyLabel, idleLabel) {
+  button.disabled = true;
+  button.textContent = busyLabel;
+  return () => {
+    button.disabled = false;
+    button.textContent = idleLabel;
+  };
+}
+
 refreshBtn.addEventListener('click', async () => {
-  refreshBtn.disabled = true;
-  refreshBtn.textContent = 'Refreshing...';
+  const restore = setBusyState(refreshBtn, 'Refreshing...', 'Refresh token');
   try {
     await refreshToken();
   } catch (error) {
     alert(error.message);
   } finally {
-    refreshBtn.disabled = false;
-    refreshBtn.textContent = 'Refresh token';
+    restore();
   }
 });
 
 refreshBtnSide.addEventListener('click', async () => {
-  refreshBtnSide.disabled = true;
-  refreshBtnSide.textContent = 'Refreshing...';
+  const restore = setBusyState(refreshBtnSide, 'Refreshing...', 'Refresh token');
   try {
     await refreshToken();
   } catch (error) {
     alert(error.message);
   } finally {
-    refreshBtnSide.disabled = false;
-    refreshBtnSide.textContent = 'Refresh token';
+    restore();
   }
 });
+
+searchBtn.addEventListener('click', () => renderInventory(allProducts));
+searchInput.addEventListener('input', () => renderInventory(allProducts));
 
 catalogImportBtn?.addEventListener('click', async () => {
   let payload;
@@ -503,8 +594,7 @@ catalogImportBtn?.addEventListener('click', async () => {
     return;
   }
 
-  catalogImportBtn.disabled = true;
-  catalogImportBtn.textContent = 'Importing...';
+  const restore = setBusyState(catalogImportBtn, 'Importing...', 'Import pasted JSON');
   catalogImportState.textContent = 'Uploading catalog payload...';
   try {
     const response = await fetch('/api/admin/catalog/import', {
@@ -518,26 +608,21 @@ catalogImportBtn?.addEventListener('click', async () => {
     }
     catalogImportState.textContent = `Imported ${result.count} products and rebuilt detail pages.`;
     await loadDashboard();
-    alert(`Catalog import complete: ${result.count} products.`);
   } catch (error) {
-    catalogImportState.textContent = `Import failed: ${error.message}`;
-    alert(error.message);
+    catalogImportState.textContent = error.message;
   } finally {
-    catalogImportBtn.disabled = false;
-    catalogImportBtn.textContent = 'Import pasted JSON';
+    restore();
   }
 });
 
 catalogSourceBtn?.addEventListener('click', async () => {
-  const sourceUrl = catalogSourceUrl?.value?.trim();
+  const sourceUrl = catalogSourceUrl.value.trim();
   if (!sourceUrl) {
-    alert('Please paste a GitHub raw JSON URL or an eBay API URL.');
+    catalogImportState.textContent = 'Please enter a GitHub raw URL or eBay API URL first.';
     return;
   }
-
-  catalogSourceBtn.disabled = true;
-  catalogSourceBtn.textContent = 'Importing...';
-  catalogImportState.textContent = 'Fetching remote catalog source...';
+  const restore = setBusyState(catalogSourceBtn, 'Importing URL...', 'Import from URL');
+  catalogImportState.textContent = 'Fetching remote source...';
   try {
     const response = await fetch('/api/admin/catalog/import-source', {
       method: 'POST',
@@ -550,43 +635,42 @@ catalogSourceBtn?.addEventListener('click', async () => {
     }
     catalogImportState.textContent = `Imported ${result.count} products from ${result.sourceHost}.`;
     await loadDashboard();
-    alert(`Remote catalog import complete: ${result.count} products.`);
   } catch (error) {
-    catalogImportState.textContent = `Import failed: ${error.message}`;
-    alert(error.message);
+    catalogImportState.textContent = error.message;
   } finally {
-    catalogSourceBtn.disabled = false;
-    catalogSourceBtn.textContent = 'Import from URL';
+    restore();
   }
 });
 
 catalogEnrichBtn?.addEventListener('click', async () => {
-  catalogEnrichBtn.disabled = true;
-  catalogEnrichBtn.textContent = 'Enriching...';
-  catalogImportState.textContent = 'Looking up missing images with the eBay Browse API...';
+  const restore = setBusyState(catalogEnrichBtn, 'Enriching...', 'Enrich images from eBay API');
+  catalogImportState.textContent = 'Matching product images from the eBay Browse API...';
   try {
     const response = await fetch('/api/admin/catalog/enrich-images', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ limit: 0 }),
+      body: JSON.stringify({}),
     });
     const result = await response.json();
     if (!response.ok) {
       throw new Error(result.message || 'Image enrichment failed.');
     }
-    catalogImportState.textContent = `Updated ${result.updated || 0} products with eBay images.`;
+    catalogImportState.textContent = result.updated
+      ? `Updated ${result.updated} product images from eBay API.`
+      : result.message || 'No new images were found.';
     await loadDashboard();
-    alert(`Image enrichment complete: ${result.updated || 0} products updated.`);
   } catch (error) {
-    catalogImportState.textContent = `Image enrichment failed: ${error.message}`;
-    alert(error.message);
+    catalogImportState.textContent = error.message;
   } finally {
-    catalogEnrichBtn.disabled = false;
-    catalogEnrichBtn.textContent = 'Enrich images from eBay API';
+    restore();
   }
 });
 
-loadDashboard();
+flashFromQuery();
+loadDashboard().catch((error) => {
+  console.error(error);
+  alert(error.message);
+});
 </script>
 </body>
 </html>
