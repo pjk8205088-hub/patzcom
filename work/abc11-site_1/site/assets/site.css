@@ -203,13 +203,26 @@ img{max-width:100%;display:block}
 .store-metric strong{font-size:28px;line-height:1;color:#111827}
 .store-metric span{font-size:13px;color:#607186;font-weight:700}
 .store-strip{display:flex;flex-wrap:wrap;gap:18px;justify-content:space-between;align-items:center;padding:14px 18px;border-radius:16px;background:#fff;border:1px solid #e3eaf6;color:#344150;font-weight:700}
-.store-brand-row{display:grid;grid-template-columns:auto 1fr auto;gap:22px;align-items:end;padding:26px;border-radius:28px;background:#fff;border:1px solid #dde4ee;box-shadow:0 24px 50px rgba(26,33,52,.08)}
+.store-banner-shell{padding:16px 0 0;background:#000}
+.store-banner{position:relative;display:grid;grid-template-columns:44px minmax(0,1fr) 130px;gap:14px;align-items:center}
+.store-banner-stage{min-width:0;display:flex;justify-content:center}
+.store-banner-slide{position:relative;width:min(100%,980px);height:248px;overflow:hidden;background:#000}
+.store-banner-slide img{width:100%;height:100%;object-fit:cover;display:block}
+.store-banner-play{position:absolute;inset:50% auto auto 50%;transform:translate(-50%,-50%);padding:12px 18px;border:0;border-radius:999px;background:#fff;color:#111;font-weight:800;box-shadow:0 10px 24px rgba(0,0,0,.2);cursor:pointer}
+.store-banner-copy{position:absolute;left:24px;bottom:24px;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.24)}
+.store-banner-copy span{display:block;font-size:11px;letter-spacing:.26em;font-weight:800;opacity:.85}
+.store-banner-copy strong{display:block;font-size:34px;line-height:1;letter-spacing:-.04em}
+.store-banner-arrow,.store-banner-controls button{border:0;width:42px;height:42px;border-radius:50%;background:#fff;color:#111;font-size:24px;font-weight:700;display:grid;place-items:center;cursor:pointer;box-shadow:0 8px 16px rgba(0,0,0,.2)}
+.store-banner-controls{display:flex;justify-content:flex-end;gap:8px;align-self:end;padding-bottom:12px}
+.store-brand-row{display:grid;grid-template-columns:auto 1fr auto;gap:22px;align-items:center;padding:22px 26px;border-radius:28px;background:#fff;border:1px solid #dde4ee;box-shadow:0 24px 50px rgba(26,33,52,.08)}
 .store-avatar{width:108px;height:108px;border-radius:50%;display:grid;place-items:center;background:#0f172a;color:#fff;font-size:54px;font-weight:900}
-.store-brand-copy h1{margin:8px 0 10px;font-size:52px;line-height:1;letter-spacing:-2px}
+.store-brand-copy h1{margin:8px 0 10px;font-size:38px;line-height:1.04;letter-spacing:-1.5px}
 .store-brand-copy p{margin:0;color:#5f6f84;max-width:860px}
 .store-kicker{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:#eef3ff;color:#2753d7;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
 .store-stat-row{display:flex;flex-wrap:wrap;gap:18px;margin-top:16px;color:#1f2937;font-size:14px;font-weight:700}
 .store-actions{display:flex;flex-wrap:wrap;gap:12px;justify-content:flex-end}
+.store-actions .admin-btn{background:#fff;color:#1f2937;border-color:#d7deea;border-radius:999px;padding:10px 14px}
+.store-actions .admin-btn:hover{border-color:#3665f3;color:#3665f3}
 .store-nav-shell{padding:0 0 18px}
 .store-nav-row{display:flex;justify-content:space-between;gap:18px;align-items:center}
 .store-tabs{display:flex;gap:20px;align-items:center}
@@ -223,7 +236,7 @@ img{max-width:100%;display:block}
 .store-category-pills{display:flex;flex-wrap:wrap;gap:10px}
 .store-grid-shell{padding:10px 0 48px}
 .store-grid-head{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:20px}
-.store-grid-head h2{margin:0;font-size:34px;letter-spacing:-1px}
+.store-grid-head h2{margin:0;font-size:30px;letter-spacing:-1px}
 .store-count{color:#607186;font-size:14px;font-weight:700}
 .storefront-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px}
 .store-card{display:block;background:#fff;border:1px solid #dce5f0;border-radius:22px;overflow:hidden;box-shadow:0 14px 34px rgba(20,30,50,.06);transition:.18s}
@@ -242,9 +255,9 @@ img{max-width:100%;display:block}
 .ebay-hero{padding:36px 0 28px;background:#fff}
 .ebay-strip{background:#fff;border-top:1px solid #e6edf6;border-bottom:1px solid #e6edf6}
 .ebay-strip .wrap div{color:#344150;font-weight:700}
-@media(max-width:1100px){.store-shell,.store-hero-card{grid-template-columns:1fr}.store-side{order:2}.store-hero-copy h1{font-size:42px}}
-@media(max-width:980px){.store-brand-row{grid-template-columns:1fr}.store-actions{justify-content:flex-start}.store-search-box{min-width:0;flex:1 1 auto}.store-nav-row,.store-grid-head{flex-direction:column;align-items:flex-start}}
-@media(max-width:720px){.store-cover{height:180px}.store-brand-copy h1{font-size:38px}.storefront-grid{grid-template-columns:1fr}.store-tabs{gap:14px;flex-wrap:wrap}.store-strip{justify-content:flex-start}.store-hero-copy h1{font-size:34px}}
+@media(max-width:1100px){.store-shell,.store-hero-card{grid-template-columns:1fr}.store-side{order:2}.store-hero-copy h1{font-size:42px}.store-banner{grid-template-columns:1fr}.store-banner-controls{justify-content:flex-start;padding-bottom:0}.store-banner-slide{width:100%;height:220px}}
+@media(max-width:980px){.store-brand-row{grid-template-columns:1fr}.store-actions{justify-content:flex-start}.store-search-box{min-width:0;flex:1 1 auto}.store-nav-row,.store-grid-head{flex-direction:column;align-items:flex-start}.store-banner-copy strong{font-size:26px}}
+@media(max-width:720px){.store-cover{height:180px}.store-brand-copy h1{font-size:34px}.storefront-grid{grid-template-columns:1fr}.store-tabs{gap:14px;flex-wrap:wrap}.store-strip{justify-content:flex-start}.store-hero-copy h1{font-size:34px}.store-banner{grid-template-columns:1fr}.store-banner-copy{left:16px;bottom:16px}.store-banner-copy span{letter-spacing:.18em}.store-banner-slide{height:180px}}
 /* pdp */
 .pdp{display:grid;grid-template-columns:1.1fr 1fr;gap:44px;padding-top:28px}
 .mainimg{background:#fff;border-radius:12px;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;overflow:hidden}
