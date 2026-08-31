@@ -1,0 +1,14 @@
+{
+  "name": "patzcom-storefront",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.mjs",
+    "build": "node -e \"console.log('Static patzcom storefront ready')\"",
+    "preview": "node server.mjs",
+    "start": "node server.mjs"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

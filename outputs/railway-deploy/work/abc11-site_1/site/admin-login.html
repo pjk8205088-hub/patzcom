@@ -1,0 +1,49 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Login | patzcom</title>
+<meta name="description" content="PATZCOM admin login.">
+<link rel="stylesheet" href="assets/site.css">
+<script>window.ROOT="";</script>
+</head><body class="admin-login-body"><header class="hdr"><div class="wrap">
+<a class="logo" href="index.html">PATZCOM</a>
+<nav class="mainnav">
+ <a href="index.html">Home</a>
+ <a href="about.html">About Us</a>
+ <a href="contact.html">Contact Us</a>
+</nav>
+</div></header>
+<section class="admin-login-shell"><div class="admin-login-grid"><div class="admin-login-info"><span class="admin-login-band">seller hub style admin access</span><h1>Run PATZCOM like an independent marketplace operation.</h1><p>This admin entry point protects catalog controls, order workflows, shipping updates, payout reporting, and future eBay API-connected operations.</p><div class="admin-login-features"><div class="admin-login-feature"><strong>Catalog management</strong><span>Prepare product, price, and inventory controls for PATZCOM-first selling.</span></div><div class="admin-login-feature"><strong>Order and shipping desk</strong><span>Centralize buyer updates, fulfillment progress, and support workflows.</span></div><div class="admin-login-feature"><strong>PayPal-first operations</strong><span>Keep direct checkout on patzcom.com while expanding API-connected back-office tools.</span></div></div></div><div class="admin-login-card"><h1>Admin Login</h1><p>Sign in with the assigned administrator account to open the protected PATZCOM operations preview.</p><form id="admin-login-form"><label>Admin email<input type="email" name="email" autocomplete="username" required></label><label>Password<input type="password" name="password" autocomplete="current-password" required></label><button class="admin-btn primary" type="submit">Sign in to admin</button><p id="admin-login-msg" class="login-help">This login protects the admin preview and admin API routes.</p></form></div></div></section>
+<script>
+const form = document.getElementById('admin-login-form');
+const msg = document.getElementById('admin-login-msg');
+
+fetch('/api/admin/session').then(r => r.json()).then(data => {
+  if (data.authenticated) window.location.href = '/admin.html';
+});
+
+form.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  msg.textContent = 'Signing in...';
+  msg.className = 'login-help';
+  const fd = new FormData(form);
+  const payload = {
+    email: fd.get('email'),
+    password: fd.get('password'),
+  };
+  const response = await fetch('/api/admin/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    msg.textContent = data.message || 'Login failed.';
+    msg.className = 'login-help status-err';
+    return;
+  }
+  msg.textContent = 'Login successful. Redirecting to admin preview...';
+  msg.className = 'login-help status-ok';
+  window.location.href = '/admin.html';
+});
+</script>
+</body></html>
