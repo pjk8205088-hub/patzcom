@@ -289,6 +289,13 @@
                 <p class="panel-note">Finish OAuth and API access with the official eBay Developer Program.</p>
               </div>
             </div>
+            <div class="info-card" id="ebay-config-card">
+              <strong>Developer keys readiness</strong>
+              <ul id="ebay-config-checklist">
+                <li>Checking App ID / Cert ID...</li>
+              </ul>
+              <div class="side-copy" id="ebay-config-state">Loading eBay configuration status...</div>
+            </div>
             <div class="side-stack">
               <a class="admin-btn" href="https://developer.ebay.com/" target="_blank" rel="noreferrer">Developer Program</a>
               <a class="admin-btn" href="https://developer.ebay.com/develop/apis" target="_blank" rel="noreferrer">API Reference</a>
@@ -355,6 +362,8 @@ const apiTable = document.getElementById('ebay-api-table');
 const queue = document.getElementById('action-queue');
 const integrationList = document.getElementById('integration-list');
 const tokenState = document.getElementById('token-state');
+const ebayConfigState = document.getElementById('ebay-config-state');
+const ebayConfigChecklist = document.getElementById('ebay-config-checklist');
 const inventoryTable = document.getElementById('inventory-table');
 const productCountLabel = document.getElementById('product-count-label');
 const searchInput = document.getElementById('admin-search-input');
@@ -499,9 +508,10 @@ async function loadDashboard() {
   userEmail.textContent = session.user.email;
   sessionBadge.textContent = `Signed in as ${session.user.email}`;
 
-  const [dashboardResponse, productsResponse] = await Promise.all([
+  const [dashboardResponse, productsResponse, ebayConfigResponse] = await Promise.all([
     fetch('/api/admin/dashboard'),
     fetch('/api/products'),
+    fetch('/api/ebay/config'),
   ]);
 
   if (!dashboardResponse.ok) {
@@ -511,6 +521,7 @@ async function loadDashboard() {
 
   const dashboard = await dashboardResponse.json();
   const productsPayload = await productsResponse.json().catch(() => ({ items: [] }));
+  const ebayConfig = await ebayConfigResponse.json().catch(() => ({}));
   allProducts = Array.isArray(productsPayload.items) ? productsPayload.items : [];
 
   kpiProducts.textContent = dashboard.catalog.productCount;
@@ -525,6 +536,24 @@ async function loadDashboard() {
   tokenState.textContent = dashboard.integrations.ebay.tokenStorePresent
     ? `Stored token updated ${dashboard.integrations.ebay.storedTokenUpdatedAt}`
     : 'No stored eBay token yet.';
+
+  if (ebayConfigChecklist) {
+    const items = [
+      { label: 'Production App ID', ready: Boolean(ebayConfig.consentReady) },
+      { label: 'Cert ID / Client Secret', ready: Boolean(ebayConfig.consentReady) },
+      { label: 'Redirect URI approved', ready: Boolean(ebayConfig.redirectUri) },
+      { label: 'OAuth consent + refresh token', ready: Boolean(ebayConfig.tokenStorePresent) },
+      { label: 'Browse API image enrichment', ready: Boolean(ebayConfig.consentReady && dashboard.integrations.ebay.ready) },
+    ];
+    ebayConfigChecklist.innerHTML = items.map((item) => `
+      <li class="${item.ready ? 'ok' : 'warn'}">${item.label}${item.ready ? ' · ready' : ' · needs setup'}</li>
+    `).join('');
+  }
+  if (ebayConfigState) {
+    ebayConfigState.textContent = ebayConfig.consentReady
+      ? `Ready for OAuth consent on ${ebayConfig.environment}. Redirect URI: ${ebayConfig.redirectUri || 'not set'}`
+      : 'Set EBAY_CLIENT_ID, EBAY_CLIENT_SECRET, EBAY_REDIRECT_URI, and EBAY_SCOPES in Railway variables first.';
+  }
 
   renderOperations(dashboard);
   renderApiPlan(dashboard);
