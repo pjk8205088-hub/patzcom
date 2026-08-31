@@ -1,6 +1,6 @@
 import http from 'node:http';
 import { createReadStream } from 'node:fs';
-import { stat } from 'node:fs/promises';
+import { readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import crypto from 'node:crypto';
@@ -22,6 +22,12 @@ import {
   normalizeCatalogPayload,
   saveCatalogSnapshot,
 } from './lib/catalog-pages.mjs';
+import {
+  enrichProductsWithBrowseImages,
+  fetchBrowseApi,
+  hasEbayBrowseCredentials,
+  isBrowseApiUrl,
+} from './lib/ebay-browse.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const siteRoot = path.join(__dirname, 'work', 'abc11-site_1', 'site');
@@ -151,6 +157,13 @@ async function loadRemoteCatalogPayload(sourceUrl) {
   }
 
   const ebayConfig = getEbayConfig();
+  if (isBrowseApiUrl(url)) {
+    if (ebayConfig.environment === 'sandbox' && url.hostname === 'api.ebay.com') {
+      throw new Error('eBay environment is sandbox but the provided URL points to production. Use the sandbox API URL or switch EBAY_ENV.');
+    }
+    return fetchBrowseApi(url);
+  }
+
   const headers = {
     Accept: 'application/vnd.github.raw+json, application/json',
     'User-Agent': 'PATZCOM-Catalog-Sync/1.0',
@@ -168,9 +181,6 @@ async function loadRemoteCatalogPayload(sourceUrl) {
       throw new Error('No eBay access token available. Complete the OAuth consent flow first.');
     }
     headers.Authorization = `Bearer ${accessToken}`;
-    if (ebayConfig.environment === 'sandbox' && url.hostname === 'api.ebay.com') {
-      throw new Error('eBay environment is sandbox but the provided URL points to production. Use the sandbox API URL or switch EBAY_ENV.');
-    }
   }
 
   const response = await fetch(url.toString(), { headers });
@@ -369,6 +379,45 @@ const server = http.createServer(async (req, res) => {
         count: items.length,
         sourceUrl,
         sourceHost: new URL(sourceUrl).hostname,
+      });
+    } catch (error) {
+      return json(res, 400, { ok: false, message: error.message });
+    }
+  }
+
+  if (pathname === '/api/admin/catalog/enrich-images' && req.method === 'POST') {
+    if (!adminSession) {
+      return json(res, 401, { error: 'Admin login required' });
+    }
+    try {
+      if (!hasEbayBrowseCredentials()) {
+        return json(res, 400, {
+          ok: false,
+          message: 'Set EBAY_CLIENT_ID and EBAY_CLIENT_SECRET before enriching images from the eBay Browse API.',
+        });
+      }
+
+      const productsPath = path.join(siteRoot, 'assets', 'products.json');
+      const raw = await readFile(productsPath, 'utf8');
+      const products = JSON.parse(raw || '[]');
+      if (!Array.isArray(products) || !products.length) {
+        return json(res, 400, { ok: false, message: 'No products found in assets/products.json.' });
+      }
+
+      const body = JSON.parse(await readBody(req).catch(() => '{}') || '{}');
+      const limit = Number(body.limit || process.env.EBAY_IMAGE_ENRICH_LIMIT || 0);
+      const enrichment = await enrichProductsWithBrowseImages(products, {
+        maxItems: Number.isFinite(limit) && limit > 0 ? limit : Infinity,
+      });
+      if (!enrichment.updated) {
+        return json(res, 200, { ok: true, updated: 0, processed: enrichment.processed, message: 'No new images were found.' });
+      }
+      await saveCatalogSnapshot(products);
+      clearProductCache();
+      return json(res, 200, {
+        ok: true,
+        updated: enrichment.updated,
+        processed: enrichment.processed,
       });
     } catch (error) {
       return json(res, 400, { ok: false, message: error.message });

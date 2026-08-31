@@ -285,6 +285,7 @@
                     <li>Cert ID / Client Secret</li>
                     <li>OAuth Redirect URI</li>
                     <li>Refresh token after consent</li>
+                    <li>Browse API app token for image enrichment</li>
                   </ul>
                 </div>
                 <div class="small text-secondary">Once these are set, use <code>Connect account</code> to finish authorization and store the refresh token.</div>
@@ -327,6 +328,7 @@
                 <div class="d-flex flex-wrap gap-2">
                   <button class="btn btn-outline-primary" id="catalog-source-btn" type="button">Import from URL</button>
                   <button class="btn btn-info text-white" id="catalog-import-btn" type="button">Import pasted JSON</button>
+                  <button class="btn btn-warning text-white" id="catalog-enrich-btn" type="button">Enrich images from eBay API</button>
                 </div>
                 <div class="small text-secondary" id="catalog-import-state">Ready for JSON import or remote source URL. Duplicate items will be collapsed automatically.</div>
               </div>
@@ -358,6 +360,7 @@ const refreshBtn = document.getElementById('ebay-refresh-btn');
 const refreshBtnSide = document.getElementById('ebay-refresh-btn-side');
 const catalogImportBtn = document.getElementById('catalog-import-btn');
 const catalogSourceBtn = document.getElementById('catalog-source-btn');
+const catalogEnrichBtn = document.getElementById('catalog-enrich-btn');
 const catalogImportState = document.getElementById('catalog-import-state');
 const catalogImportJson = document.getElementById('catalog-import-json');
 const catalogSourceUrl = document.getElementById('catalog-source-url');
@@ -554,6 +557,32 @@ catalogSourceBtn?.addEventListener('click', async () => {
   } finally {
     catalogSourceBtn.disabled = false;
     catalogSourceBtn.textContent = 'Import from URL';
+  }
+});
+
+catalogEnrichBtn?.addEventListener('click', async () => {
+  catalogEnrichBtn.disabled = true;
+  catalogEnrichBtn.textContent = 'Enriching...';
+  catalogImportState.textContent = 'Looking up missing images with the eBay Browse API...';
+  try {
+    const response = await fetch('/api/admin/catalog/enrich-images', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ limit: 0 }),
+    });
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.message || 'Image enrichment failed.');
+    }
+    catalogImportState.textContent = `Updated ${result.updated || 0} products with eBay images.`;
+    await loadDashboard();
+    alert(`Image enrichment complete: ${result.updated || 0} products updated.`);
+  } catch (error) {
+    catalogImportState.textContent = `Image enrichment failed: ${error.message}`;
+    alert(error.message);
+  } finally {
+    catalogEnrichBtn.disabled = false;
+    catalogEnrichBtn.textContent = 'Enrich images from eBay API';
   }
 });
 

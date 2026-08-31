@@ -7,8 +7,11 @@
     "dev": "node server.mjs",
     "build": "node -e \"console.log('Static patzcom storefront ready')\"",
     "preview": "node server.mjs",
-    "start": "node server.mjs"
+    "start": "node server.mjs",
+    "import:ebay": "node scripts/import-ebay-report.mjs",
+    "enrich:ebay-images": "node scripts/enrich-ebay-images.mjs"
   },
-  "dependencies": {},
-  "devDependencies": {}
+  "dependencies": {
+    "playwright-core": "^1.62.1"
+  }
 }
