@@ -238,16 +238,17 @@ async function main() {
     console.log('eBay Browse API image enrichment skipped: missing EBAY_CLIENT_ID / EBAY_CLIENT_SECRET.');
   }
 
+  const savedProducts = await saveCatalogSnapshot(products);
+
   fs.mkdirSync(outputsDir, { recursive: true });
   fs.writeFileSync(path.join(outputsDir, 'ebay-active-listings-patzcom.json'), JSON.stringify({
     source: sources,
     generatedAt: new Date().toISOString(),
-    count: products.length,
-    items: products,
+    count: savedProducts.length,
+    items: savedProducts,
   }, null, 2), 'utf8');
 
-  await saveCatalogSnapshot(products);
-  console.log(`Imported ${products.length} eBay listings from ${sources.length} source file(s).`);
+  console.log(`Imported ${savedProducts.length} unique eBay listings from ${sources.length} source file(s).`);
 }
 
 await main();

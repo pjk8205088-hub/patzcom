@@ -9,7 +9,8 @@
     "preview": "node server.mjs",
     "start": "node server.mjs",
     "import:ebay": "node scripts/import-ebay-report.mjs",
-    "enrich:ebay-images": "node scripts/enrich-ebay-images.mjs"
+    "enrich:ebay-images": "node scripts/enrich-ebay-images.mjs",
+    "dedupe:catalog": "node scripts/dedupe-catalog.mjs"
   },
   "dependencies": {
     "playwright-core": "^1.62.1"
