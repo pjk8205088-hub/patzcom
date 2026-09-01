@@ -157,6 +157,86 @@
         </article>
       </section>
 
+      <section class="seller-workbench" id="active-listings">
+        <div class="seller-workbench-head">
+          <div>
+            <span class="seller-workbench-kicker">Listings</span>
+            <h2>Manage active listings (<span id="active-listings-count">--</span>)</h2>
+            <p>Seller Hub style workspace for inventory, offers, and listing performance on PATZCOM.</p>
+          </div>
+          <div class="seller-workbench-actions">
+            <a class="admin-btn" href="#messages">Messages (0)</a>
+            <a class="admin-btn primary" href="#selling">Create listing</a>
+          </div>
+        </div>
+
+        <div class="seller-insights-grid">
+          <article class="seller-insight-card">
+            <div class="seller-insight-icon"><i class="bi bi-bullseye"></i></div>
+            <div>
+              <h3>Adjust ad rates to scale your reach</h3>
+              <p>Help your listings get more impressions by increasing campaign visibility.</p>
+              <a href="#reports">Adjust now</a>
+            </div>
+          </article>
+          <article class="seller-insight-card">
+            <div class="seller-insight-icon"><i class="bi bi-megaphone"></i></div>
+            <div>
+              <h3>Drive more sales with a campaign built for you</h3>
+              <p>Promote listings with priority merchandising and buyer-ready discovery placement.</p>
+              <a href="#marketing">Try it now</a>
+            </div>
+          </article>
+        </div>
+
+        <div class="seller-tools-row">
+          <div class="seller-search-box">
+            <i class="bi bi-search"></i>
+            <input id="seller-search-input" type="search" placeholder="Search by title, SKU, or item number">
+          </div>
+          <div class="seller-tool-pills">
+            <button class="seller-pill on" type="button">All filters (1)</button>
+            <button class="seller-pill" type="button">Clear all</button>
+          </div>
+        </div>
+
+        <div class="seller-results-row">
+          <div class="seller-results-copy">
+            <strong>Results: <span id="seller-result-range">1-200</span></strong>
+            <span>Total: <span id="seller-total-value">$18,076,087.90</span></span>
+            <span>Qty: <span id="seller-total-qty">7,842</span></span>
+          </div>
+          <div class="seller-results-tools">
+            <a href="#selling">Customize table</a>
+            <a href="#reports">Download</a>
+            <a href="#selling">Upload</a>
+          </div>
+        </div>
+
+        <div class="seller-bulk-row">
+          <button class="admin-btn primary" type="button">Edit</button>
+          <button class="admin-btn" type="button">Sell similar</button>
+          <button class="admin-btn" type="button">Actions</button>
+          <button class="admin-btn" type="button">Sell it faster</button>
+        </div>
+
+        <div class="seller-listing-table">
+          <table class="admin-table admin-active-table">
+            <thead>
+              <tr>
+                <th>Listing</th>
+                <th>Status</th>
+                <th>Price</th>
+                <th>Performance</th>
+              </tr>
+            </thead>
+            <tbody id="active-listings-table">
+              <tr><td colspan="4" class="table-empty">Loading active listings...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
       <section class="admin-workbench">
         <div class="workbench-main">
           <article class="panel" id="overview">
@@ -366,7 +446,10 @@ const tokenState = document.getElementById('token-state');
 const ebayConfigState = document.getElementById('ebay-config-state');
 const ebayConfigChecklist = document.getElementById('ebay-config-checklist');
 const inventoryTable = document.getElementById('inventory-table');
+const activeListingsTable = document.getElementById('active-listings-table');
 const productCountLabel = document.getElementById('product-count-label');
+const activeListingsCount = document.getElementById('active-listings-count');
+const sellerSearchInput = document.getElementById('seller-search-input');
 const searchInput = document.getElementById('admin-search-input');
 const searchBtn = document.getElementById('admin-search-btn');
 const logoutBtn = document.getElementById('admin-logout-btn');
@@ -487,6 +570,39 @@ function renderInventory(products) {
   `).join('');
 }
 
+function renderActiveListings(products) {
+  const query = (sellerSearchInput?.value || '').trim().toLowerCase();
+  const filtered = query
+    ? products.filter((item) =>
+        [item.title, item.vendor, item.category, item.handle, item.sku, item.id]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(query)))
+    : products;
+
+  activeListingsCount.textContent = filtered.length.toLocaleString();
+  if (!filtered.length) {
+    activeListingsTable.innerHTML = `<tr><td colspan="4" class="table-empty">No active listings found.</td></tr>`;
+    return;
+  }
+
+  activeListingsTable.innerHTML = filtered.slice(0, 8).map((item, index) => `
+    <tr>
+      <td>
+        <div class="active-listing-card">
+          <div class="active-listing-thumb">${item.image ? `<img src="${item.image}" alt="">` : 'P'}</div>
+          <div>
+            <strong>${item.title}</strong>
+            <span>${item.handle || item.sku || `Listing ${index + 1}`}</span>
+          </div>
+        </div>
+      </td>
+      <td><span class="status-chip ${item.available ? 'ok' : 'warn'}">${item.available ? 'Active' : 'Draft'}</span></td>
+      <td class="cell-strong">${item.price ? `$${item.price}` : '—'}</td>
+      <td class="cell-muted">${item.available ? 'Views, watchers, and conversion tracking enabled' : 'Pending image or publish review'}</td>
+    </tr>
+  `).join('');
+}
+
 function flashFromQuery() {
   const params = new URLSearchParams(window.location.search);
   const ebay = params.get('ebay');
@@ -561,6 +677,7 @@ async function loadDashboard() {
   renderQueue(dashboard);
   renderIntegrations(dashboard);
   renderInventory(allProducts);
+  renderActiveListings(allProducts);
 }
 
 connectBtn?.addEventListener('click', () => {
@@ -614,6 +731,7 @@ refreshBtnSide.addEventListener('click', async () => {
 
 searchBtn.addEventListener('click', () => renderInventory(allProducts));
 searchInput.addEventListener('input', () => renderInventory(allProducts));
+sellerSearchInput.addEventListener('input', () => renderActiveListings(allProducts));
 
 catalogImportBtn?.addEventListener('click', async () => {
   let payload;
