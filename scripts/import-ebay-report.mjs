@@ -10,6 +10,7 @@ const outputsDir = path.join(process.cwd(), 'outputs');
 const DEFAULT_REPORT = 'C:/Users/user/Downloads/eBay-all-active-listings-report-2026-06-18-13308736874.csv';
 const reportFiles = process.argv.slice(2);
 const sourceFiles = reportFiles.length ? reportFiles : [DEFAULT_REPORT];
+const targetListingSite = String(process.env.EBAY_LISTING_SITE || 'US').trim().toUpperCase();
 
 const CATEGORY_TRANSLATIONS = [
   { pattern: /calipers? & brackets?|bremssättel|pinze e staffe|pinzas y sujeciones|étriers et supports|pinze e staffe/i, value: 'Brake Calipers & Brackets' },
@@ -197,8 +198,12 @@ async function main() {
     }
   }
   const rows = Array.from(mergedRows.values());
+  const siteRows = targetListingSite
+    ? rows.filter((row) => row.listingSite.toUpperCase() === targetListingSite)
+    : rows;
+  const skippedRows = rows.length - siteRows.length;
 
-  const products = rows.map((row) => {
+  const products = siteRows.map((row) => {
     const titleKey = normalizeKey(row.title);
     const existing = existingMap.get(titleKey);
     const category = inferCategory(row.title, row.category);
@@ -209,6 +214,7 @@ async function main() {
 
     return {
       id: itemNumber,
+      ebayItemId: itemNumber,
       title: row.title,
       handle,
       vendor: guessVendor(row.title),
@@ -219,6 +225,9 @@ async function main() {
       available: row.qty > 0,
       grams: 0,
       sku: row.sku || '',
+      currency: row.currency || '',
+      listingSite: row.listingSite || '',
+      ebaySource: 'seller-hub-active-listings',
       desc_text: `${row.title} imported from eBay Seller Hub active listings report.`,
       desc_html: descHtml,
       images,
@@ -229,6 +238,7 @@ async function main() {
     try {
       const enrichment = await enrichProductsWithBrowseImages(products, {
         maxItems: Number(process.env.EBAY_IMAGE_ENRICH_LIMIT || 0) || Infinity,
+        force: true,
       });
       console.log(`eBay Browse API image enrichment updated ${enrichment.updated} products.`);
     } catch (error) {
@@ -248,7 +258,8 @@ async function main() {
     items: savedProducts,
   }, null, 2), 'utf8');
 
-  console.log(`Imported ${savedProducts.length} unique eBay listings from ${sources.length} source file(s).`);
+  console.log(`Imported ${savedProducts.length} unique ${targetListingSite || 'all'} eBay listings from ${sources.length} source file(s).`);
+  if (skippedRows) console.log(`Skipped ${skippedRows} listings outside ${targetListingSite}.`);
 }
 
 await main();

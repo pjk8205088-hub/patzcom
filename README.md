@@ -44,6 +44,7 @@ Required variables:
 EBAY_CLIENT_ID
 EBAY_CLIENT_SECRET
 EBAY_MARKETPLACE_ID=EBAY_US
+EBAY_LISTING_SITE=US
 EBAY_IMAGE_ENRICH_LIMIT=0
 ```
 
@@ -51,3 +52,6 @@ After OAuth credentials are configured, sign in at `/admin-login.html` and use
 `Selling -> Catalog import -> Sync all eBay images`. The sync rebuilds every
 affected PATZCOM product detail page and preserves existing media for ended or
 unavailable eBay listings.
+
+Seller Hub CSV imports default to `Listing site=US`; listings from AU, CA, DE, FR,
+GB, and IT are excluded before PATZCOM pages are rebuilt.
