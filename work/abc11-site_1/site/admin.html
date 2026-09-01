@@ -318,9 +318,10 @@
               <div class="catalog-button-row">
                 <button class="admin-btn" id="catalog-source-btn" type="button">Import from URL</button>
                 <button class="admin-btn primary" id="catalog-import-btn" type="button">Import pasted JSON</button>
-                <button class="admin-btn" id="catalog-enrich-btn" type="button">Enrich images from eBay API</button>
+                <button class="admin-btn" id="catalog-enrich-btn" type="button">Sync all eBay images</button>
               </div>
               <div class="catalog-state" id="catalog-import-state">Ready for JSON import or remote source URL. Duplicate items are collapsed automatically.</div>
+              <div class="catalog-sync-note"><strong>Image sync order:</strong> exact eBay item number first, title search only when no trusted media is available. Existing PATZCOM images are preserved when an old listing is unavailable.</div>
             </div>
           </article>
 
@@ -377,7 +378,7 @@
               <div class="side-copy" id="ebay-config-state">Loading eBay configuration status...</div>
             </div>
             <div class="side-stack">
-              <a class="admin-btn" href="https://developer.ebay.com/" target="_blank" rel="noreferrer">Developer Program</a>
+              <a class="admin-btn" href="https://developer.ebay.com/my/keys" target="_blank" rel="noreferrer">Application Keys</a>
               <a class="admin-btn" href="https://developer.ebay.com/develop/apis" target="_blank" rel="noreferrer">API Reference</a>
               <a class="admin-btn" href="https://developer.ebay.com/develop/tools/sandbox" target="_blank" rel="noreferrer">Sandbox / API Explorer</a>
               <div class="info-card">
@@ -388,7 +389,7 @@
                   <li>EBAY_REDIRECT_URI = OAuth callback URL</li>
                   <li>EBAY_SCOPES = consent scopes for seller tools</li>
                   <li>Refresh token stored after consent</li>
-                  <li>Browse API app token powers image enrichment</li>
+                  <li>Browse API app token powers exact item image sync</li>
                 </ul>
               </div>
               <p class="side-copy">When these variables are set, use <strong>Connect account</strong> to complete authorization and store the refresh token.</p>
@@ -500,6 +501,10 @@ function renderIntegrations(dashboard) {
     <div class="integration-card">
       <strong>eBay OAuth readiness</strong>
       <span>${dashboard.integrations.ebay.ready ? 'Client credentials detected. Continue with refresh-token authorization.' : 'Awaiting production credentials.'}</span>
+    </div>
+    <div class="integration-card">
+      <strong>eBay image sync</strong>
+      <span>${dashboard.integrations.ebay.browseApiReady ? 'Browse API ready. Exact item-number image lookup is enabled.' : 'Set the Production App ID and Cert ID to enable image sync.'}</span>
     </div>
     <div class="integration-card">
       <strong>PayPal checkout readiness</strong>
@@ -646,8 +651,8 @@ async function loadDashboard() {
   kpiBrands.textContent = dashboard.catalog.vendorCount;
   kpiCategories.textContent = dashboard.catalog.categoryCount;
 
-  statusBadge.textContent = dashboard.integrations.ebay.ready ? 'eBay ready' : 'eBay setup needed';
-  statusBadge.className = `status-chip ${dashboard.integrations.ebay.ready ? 'ok' : 'warn'}`;
+  statusBadge.textContent = dashboard.integrations.ebay.browseApiReady ? 'eBay images ready' : 'eBay setup needed';
+  statusBadge.className = `status-chip ${dashboard.integrations.ebay.browseApiReady ? 'ok' : 'warn'}`;
   storeflowChip.textContent = dashboard.integrations.paypal.ready ? 'PayPal ready · Stripe planned' : 'PayPal approval pending';
   storeflowChip.className = `status-chip ${dashboard.integrations.paypal.ready ? 'ok' : 'warn'}`;
   tokenState.textContent = dashboard.integrations.ebay.tokenStorePresent
@@ -660,7 +665,7 @@ async function loadDashboard() {
       { label: 'Cert ID / Client Secret', ready: Boolean(ebayConfig.consentReady) },
       { label: 'Redirect URI approved', ready: Boolean(ebayConfig.redirectUri) },
       { label: 'OAuth consent + refresh token', ready: Boolean(ebayConfig.tokenStorePresent) },
-      { label: 'Browse API image enrichment', ready: Boolean(ebayConfig.consentReady && dashboard.integrations.ebay.ready) },
+      { label: 'Browse API image sync', ready: Boolean(ebayConfig.browseApiReady) },
     ];
     ebayConfigChecklist.innerHTML = items.map((item) => `
       <li class="${item.ready ? 'ok' : 'warn'}">${item.label}${item.ready ? ' · ready' : ' · needs setup'}</li>
@@ -791,20 +796,20 @@ catalogSourceBtn?.addEventListener('click', async () => {
 });
 
 catalogEnrichBtn?.addEventListener('click', async () => {
-  const restore = setBusyState(catalogEnrichBtn, 'Enriching...', 'Enrich images from eBay API');
-  catalogImportState.textContent = 'Matching product images from the eBay Browse API...';
+  const restore = setBusyState(catalogEnrichBtn, 'Syncing...', 'Sync all eBay images');
+  catalogImportState.textContent = 'Reading exact eBay item numbers and refreshing the product galleries...';
   try {
     const response = await fetch('/api/admin/catalog/enrich-images', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({}),
+      body: JSON.stringify({ force: true }),
     });
     const result = await response.json();
     if (!response.ok) {
       throw new Error(result.message || 'Image enrichment failed.');
     }
     catalogImportState.textContent = result.updated
-      ? `Updated ${result.updated} product images from eBay API.`
+      ? `Synced ${result.updated} galleries: ${result.directMatches || 0} exact item matches, ${result.searchMatches || 0} title fallbacks. ${result.preserved || 0} existing galleries preserved.`
       : result.message || 'No new images were found.';
     await loadDashboard();
   } catch (error) {

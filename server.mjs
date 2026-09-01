@@ -228,6 +228,7 @@ const server = http.createServer(async (req, res) => {
       redirectUri: config.redirectUri,
       scopes: config.scopes,
       consentReady: Boolean(config.clientId && config.clientSecret && config.redirectUri && config.scopes.length),
+      browseApiReady: hasEbayBrowseCredentials(),
       tokenStorePresent: Boolean(storedTokens),
       storedTokenUpdatedAt: storedTokens?.updatedAt || null,
     });
@@ -390,10 +391,11 @@ const server = http.createServer(async (req, res) => {
       return json(res, 401, { error: 'Admin login required' });
     }
     try {
+      const body = JSON.parse(await readBody(req).catch(() => '{}') || '{}');
       if (!hasEbayBrowseCredentials()) {
         return json(res, 400, {
           ok: false,
-          message: 'Set EBAY_CLIENT_ID and EBAY_CLIENT_SECRET before enriching images from the eBay Browse API.',
+          message: 'Set the Production App ID and Cert ID as EBAY_CLIENT_ID and EBAY_CLIENT_SECRET before syncing eBay images.',
         });
       }
 
@@ -404,13 +406,21 @@ const server = http.createServer(async (req, res) => {
         return json(res, 400, { ok: false, message: 'No products found in assets/products.json.' });
       }
 
-      const body = JSON.parse(await readBody(req).catch(() => '{}') || '{}');
       const limit = Number(body.limit || process.env.EBAY_IMAGE_ENRICH_LIMIT || 0);
       const enrichment = await enrichProductsWithBrowseImages(products, {
         maxItems: Number.isFinite(limit) && limit > 0 ? limit : Infinity,
+        force: body.force !== false,
       });
       if (!enrichment.updated) {
-        return json(res, 200, { ok: true, updated: 0, processed: enrichment.processed, message: 'No new images were found.' });
+        return json(res, 200, {
+          ok: true,
+          updated: 0,
+          processed: enrichment.processed,
+          directMatches: enrichment.directMatches,
+          searchMatches: enrichment.searchMatches,
+          preserved: enrichment.preserved,
+          message: 'No new eBay images were found. Existing PATZCOM media was preserved where listings were unavailable.',
+        });
       }
       await saveCatalogSnapshot(products);
       clearProductCache();
@@ -418,6 +428,9 @@ const server = http.createServer(async (req, res) => {
         ok: true,
         updated: enrichment.updated,
         processed: enrichment.processed,
+        directMatches: enrichment.directMatches,
+        searchMatches: enrichment.searchMatches,
+        preserved: enrichment.preserved,
       });
     } catch (error) {
       return json(res, 400, { ok: false, message: error.message });

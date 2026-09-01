@@ -301,6 +301,8 @@ img{max-width:100%;display:block}
 .catalog-source-row input{border:1px solid #d8e0eb;border-radius:10px;padding:12px 14px;font:inherit;background:#fff;color:#111827}
 .catalog-button-row{display:flex;gap:10px;flex-wrap:wrap}
 .catalog-state{color:#607186;font-size:13px}
+.catalog-sync-note{padding:12px 14px;border:1px solid #dce5f1;border-radius:12px;background:#f7faff;color:#607186;font-size:12px;line-height:1.55}
+.catalog-sync-note strong{color:#1f2937}
 .integration-list{display:grid;gap:12px}
 .integration-card{display:grid;gap:4px;padding:14px;border:1px solid #e3eaf6;border-radius:14px;background:#f8faff}
 .integration-card strong{color:#111827}
