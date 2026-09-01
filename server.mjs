@@ -431,10 +431,15 @@ const server = http.createServer(async (req, res) => {
   }
 
   let filePath = safePath(req.url || '/');
+  const requestedPath = decodeURIComponent((req.url || '/').split('?')[0]);
   try {
     const info = await stat(filePath);
     if (info.isDirectory()) filePath = path.join(filePath, 'index.html');
   } catch {
+    if (path.extname(requestedPath).toLowerCase() === '.html') {
+      res.statusCode = 404;
+      return res.end('Not found');
+    }
     filePath = path.join(siteRoot, 'index.html');
   }
 
