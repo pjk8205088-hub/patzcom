@@ -4,19 +4,21 @@
 - `index.html` - Home page with hero, categories, and featured products
 - `collections/*.html` - Category listings (`all.html` includes the full imported catalog)
 - `products/*.html` - Product detail pages generated from the imported catalog snapshot
-- `cart.html` - Cart and PayPal checkout
+- `cart.html` - Cart with PayPal-first and Stripe card checkout
 - `about.html`, `contact.html`, `policies.html`
 - `assets/site.css`, `assets/site.js`, `assets/config.js`, `assets/products.json`
 
 ## 1. Enable payments
-Open `assets/config.js` and paste your PayPal **Live client ID**.
+Add the PayPal and Stripe server credentials in Railway. Do not put secret keys
+in `assets/config.js` or any frontend file.
 
 ```js
-paypalClientId: "paste_it_here",
+paypalClientId: "",
 shippingFlat: 0, // flat shipping rate (USD)
 ```
 
-After saving, the live PayPal checkout button appears automatically in the cart page.
+After the server credentials are configured, the live PayPal and Stripe checkout
+buttons appear automatically in the cart page.
 
 ## 2. Localize images (recommended)
 The current site uses the original CDN image links. To host images locally:
