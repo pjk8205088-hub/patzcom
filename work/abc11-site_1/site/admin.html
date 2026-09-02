@@ -512,7 +512,11 @@ function renderIntegrations(dashboard) {
     </div>
     <div class="integration-card">
       <strong>PayPal checkout readiness</strong>
-      <span>${dashboard.integrations.paypal.ready ? 'Configured for storefront checkout flows.' : 'Approval or live client ID still pending.'}</span>
+      <span>${dashboard.integrations.paypal.serverReady ? 'Server-side Orders API checkout is ready.' : 'Add PayPal Client ID and Client Secret in Railway.'}</span>
+    </div>
+    <div class="integration-card">
+      <strong>Stripe card checkout</strong>
+      <span>${dashboard.integrations.stripe.ready ? 'Hosted card checkout is ready.' : 'Add STRIPE_SECRET_KEY in Railway to enable card checkout.'}</span>
     </div>
     <div class="integration-card">
       <strong>Public storefront feed</strong>
@@ -667,8 +671,8 @@ async function loadDashboard() {
 
   statusBadge.textContent = dashboard.integrations.ebay.browseApiReady ? 'eBay images ready' : 'eBay setup needed';
   statusBadge.className = `status-chip ${dashboard.integrations.ebay.browseApiReady ? 'ok' : 'warn'}`;
-  storeflowChip.textContent = dashboard.integrations.paypal.ready ? 'PayPal ready · Stripe planned' : 'PayPal approval pending';
-  storeflowChip.className = `status-chip ${dashboard.integrations.paypal.ready ? 'ok' : 'warn'}`;
+  storeflowChip.textContent = `${dashboard.integrations.paypal.serverReady ? 'PayPal ready' : 'PayPal setup pending'} · ${dashboard.integrations.stripe.ready ? 'Stripe ready' : 'Stripe setup pending'}`;
+  storeflowChip.className = `status-chip ${dashboard.integrations.paypal.serverReady ? 'ok' : 'warn'}`;
   tokenState.textContent = dashboard.integrations.ebay.tokenStorePresent
     ? `Stored token updated ${dashboard.integrations.ebay.storedTokenUpdatedAt}`
     : 'No stored eBay token yet.';

@@ -3,6 +3,7 @@
 <title>Cart | patzcom</title>
 <meta name="description" content="">
 <link rel="stylesheet" href="assets/site.css">
+<script defer src="assets/config.js"></script>
 <script defer src="assets/site.js"></script>
 <script>window.ROOT="";</script>
 </head><body><header class="hdr"><div class="wrap">
@@ -22,9 +23,14 @@
 <div id="cartbody"></div>
 <div id="checkout" class="checkout" style="display:none">
   <div class="totals">Total <b id="total">$0</b></div>
+  <div class="checkout-methods">
+    <div class="checkout-method-heading"><strong>Secure checkout</strong><span>PayPal first · Card by Stripe</span></div>
+    <div id="payment-status" class="payment-status" role="status" aria-live="polite"></div>
+  </div>
   <div id="paypal-button-container"></div>
-  <p class="muted">Products displayed on patzcom.com are intended to be sold directly on PATZCOM. PayPal checkout is being prepared first for U.S. customers, while the storefront UI is being aligned with API-connected inventory and order workflows.</p>
-  <p class="muted">Stripe card checkout is planned as the second option and will be added after the PATZCOM U.S. Stripe/Atlas setup is confirmed. Add live payment keys in <code>assets/config.js</code> to activate checkout.</p>
+  <div id="stripe-checkout-container" class="stripe-checkout-container"></div>
+  <p class="muted">Products displayed on patzcom.com are sold directly by PATZCOM. The final amount and shipping details are verified by the server before payment.</p>
+  <p class="muted">PayPal is the primary option. Stripe provides secure card checkout for Visa, Mastercard, American Express, and other cards enabled in the Stripe account.</p>
   <p class="muted">Seller and site operation are Korea-based, with checkout and policy language prepared for U.S. buyers.</p>
 </div></div></section><footer class="ftr"><div class="wrap ftr-grid">
 <div><div class="logo">PATZCOM</div><p>Your trusted source for premium automotive parts and performance upgrades.</p><p class="pay">Checkout: PayPal first · Stripe cards planned</p></div>

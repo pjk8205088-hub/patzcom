@@ -28,6 +28,12 @@ import {
   hasEbayBrowseCredentials,
   isBrowseApiUrl,
 } from './lib/ebay-browse.mjs';
+import {
+  capturePayPalOrder,
+  createPayPalOrder,
+  createStripeCheckoutSession,
+  getPaymentConfig,
+} from './lib/payment-api.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const siteRoot = path.join(__dirname, 'work', 'abc11-site_1', 'site');
@@ -201,6 +207,37 @@ const server = http.createServer(async (req, res) => {
       service: 'patzcom-storefront',
       date: new Date().toISOString(),
     });
+  }
+
+  if (pathname === '/api/payments/config' && req.method === 'GET') {
+    return json(res, 200, getPaymentConfig());
+  }
+
+  if (pathname === '/api/paypal/orders' && req.method === 'POST') {
+    try {
+      const body = JSON.parse(await readBody(req) || '{}');
+      return json(res, 201, await createPayPalOrder(body.items));
+    } catch (error) {
+      return json(res, 400, { ok: false, message: error.message });
+    }
+  }
+
+  const paypalCaptureMatch = pathname.match(/^\/api\/paypal\/orders\/([^/]+)\/capture$/);
+  if (paypalCaptureMatch && req.method === 'POST') {
+    try {
+      return json(res, 200, await capturePayPalOrder(paypalCaptureMatch[1]));
+    } catch (error) {
+      return json(res, 400, { ok: false, message: error.message });
+    }
+  }
+
+  if (pathname === '/api/stripe/checkout-session' && req.method === 'POST') {
+    try {
+      const body = JSON.parse(await readBody(req) || '{}');
+      return json(res, 201, await createStripeCheckoutSession(body.items));
+    } catch (error) {
+      return json(res, 400, { ok: false, message: error.message });
+    }
   }
 
   if (pathname === '/admin.html' && !adminSession) {

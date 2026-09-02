@@ -472,6 +472,12 @@ img{max-width:100%;display:block}
 .rm{color:var(--mut);cursor:pointer;background:none;border:0;font-size:20px}
 .checkout{margin-top:26px;max-width:420px}
 .totals{display:flex;justify-content:space-between;font-size:22px;font-weight:800;margin-bottom:18px}
+.checkout-methods{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px;background:var(--card)}
+.checkout-method-heading{display:flex;justify-content:space-between;gap:12px;font-size:14px}.checkout-method-heading span{color:var(--mut);font-size:12px}
+.payment-status{min-height:20px;margin-top:8px;color:var(--mut);font-size:13px}.payment-status.success{color:#16844a}.payment-status.error{color:#c53b2c}
+.payment-loading,.payment-unavailable{border:1px dashed var(--line);border-radius:10px;padding:14px;color:var(--mut);font-size:13px;display:grid;gap:4px}.payment-unavailable strong{color:var(--txt);font-size:14px}
+.stripe-checkout-container{margin-top:10px}.stripe-checkout-btn{width:100%;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:12px 14px;border:1px solid #635bff;border-radius:6px;background:#635bff;color:#fff;font:inherit;font-weight:800;cursor:pointer}.stripe-checkout-btn:hover{filter:brightness(1.05)}.stripe-checkout-btn:disabled{opacity:.65;cursor:wait}.stripe-checkout-btn small{font-size:11px;font-weight:500;opacity:.85}.stripe-mark{display:grid;place-items:center;width:24px;height:24px;border-radius:5px;background:#fff;color:#635bff;font-weight:900}
+.payment-result{max-width:680px;text-align:center;background:#fff;border:1px solid #d9e0ea;border-radius:18px;padding:64px 28px;color:#111827}.payment-result h1{margin:0 0 14px}.payment-result .muted{color:#607186}.payment-result-icon{width:64px;height:64px;display:grid;place-items:center;margin:0 auto 18px;border-radius:50%;background:#e9f8ef;color:#16844a;font-size:36px;font-weight:800}.payment-result .eyebrow{color:#16844a;font-weight:800;letter-spacing:.12em}
 /* footer */
 .ftr{background:var(--card);border-top:1px solid var(--line);margin-top:40px;padding:46px 0 20px;font-size:14px;color:var(--mut)}
 .ftr-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:30px}

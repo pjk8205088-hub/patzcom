@@ -224,23 +224,108 @@ function renderCart(){
   total += (cfg.shippingFlat||0);
   document.getElementById('total').textContent = money(total);
   document.getElementById('checkout').style.display='block';
-  mountPaypal(total);
+  mountPayments(total);
 }
 function setQty(id,v){ const c=cart(); v=parseInt(v)||0; if(v<=0) delete c[id]; else c[id]=v; saveCart(c); renderCart(); }
 
-function mountPaypal(total){
-  const cfg = window.PATZCOM_CONFIG||{}, el = document.getElementById('paypal-button-container');
-  if(!cfg.paypalClientId){ el.innerHTML = '<div class="muted" style="border:1px dashed var(--line);padding:14px;border-radius:8px">PayPal checkout is being prepared first and is not configured yet. Add your PayPal live client ID in <code>assets/config.js</code>. Stripe card checkout is planned as the second option after the PATZCOM U.S. Stripe/Atlas setup is confirmed.</div>'; return; }
-  if(window.paypal){ return draw(); }
-  const s=document.createElement('script');
-  s.src=`https://www.paypal.com/sdk/js?client-id=${cfg.paypalClientId}&currency=${cfg.currency||'USD'}`;
-  s.onload=draw; document.head.appendChild(s);
-  function draw(){
-    el.innerHTML='';
-    paypal.Buttons({
-      createOrder:(d,a)=>a.order.create({purchase_units:[{amount:{value:total.toFixed(2)}}]}),
-      onApprove:(d,a)=>a.order.capture().then(()=>{ localStorage.removeItem(CART_KEY); alert('Thank you! Your order is confirmed.'); location.href=R+'index.html'; })
-    }).render('#paypal-button-container');
+let paymentConfigPromise;
+function paymentItems(){
+  return Object.entries(cart()).map(([id, quantity]) => ({ id, quantity: Number(quantity) }));
+}
+
+function setPaymentStatus(message, kind = ''){
+  const el = document.getElementById('payment-status');
+  if(!el) return;
+  el.className = `payment-status${kind ? ` ${kind}` : ''}`;
+  el.textContent = message;
+}
+
+function loadPaymentConfig(){
+  if(!paymentConfigPromise){
+    paymentConfigPromise = fetch(`${R}api/payments/config`, { cache:'no-store' }).then((response) => {
+      if(!response.ok) throw new Error('Payment configuration could not be loaded.');
+      return response.json();
+    });
+  }
+  return paymentConfigPromise;
+}
+
+function loadPayPalSdk(clientId, currency){
+  if(window.paypal) return Promise.resolve(window.paypal);
+  if(window.__paypalSdkPromise) return window.__paypalSdkPromise;
+  window.__paypalSdkPromise = new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=${encodeURIComponent(currency || 'USD')}&intent=capture`;
+    script.onload = () => window.paypal ? resolve(window.paypal) : reject(new Error('PayPal SDK did not load.'));
+    script.onerror = () => reject(new Error('PayPal SDK could not be loaded.'));
+    document.head.appendChild(script);
+  });
+  return window.__paypalSdkPromise;
+}
+
+async function mountPayments(total){
+  const paypalEl = document.getElementById('paypal-button-container');
+  const stripeEl = document.getElementById('stripe-checkout-container');
+  if(!paypalEl || !stripeEl) return;
+  paypalEl.innerHTML = '<div class="payment-loading">Loading secure PayPal checkout…</div>';
+  stripeEl.innerHTML = '';
+  try {
+    const config = await loadPaymentConfig();
+    const items = paymentItems();
+    if(config.paypal?.enabled && config.paypal.clientId){
+      const paypal = await loadPayPalSdk(config.paypal.clientId, config.currency);
+      paypalEl.innerHTML = '';
+      paypal.Buttons({
+        style: { layout:'vertical', shape:'rect', label:'paypal', tagline:false },
+        createOrder: async () => {
+          const response = await fetch(`${R}api/paypal/orders`, {
+            method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ items }),
+          });
+          const payload = await response.json();
+          if(!response.ok || !payload.id) throw new Error(payload.message || 'PayPal order could not be created.');
+          return payload.id;
+        },
+        onApprove: async (data) => {
+          setPaymentStatus('Confirming your PayPal payment…');
+          const response = await fetch(`${R}api/paypal/orders/${encodeURIComponent(data.orderID)}/capture`, { method:'POST' });
+          const payload = await response.json();
+          if(!response.ok || payload.status !== 'COMPLETED') throw new Error(payload.message || 'PayPal payment could not be completed.');
+          localStorage.removeItem(CART_KEY);
+          setPaymentStatus('Payment confirmed. Thank you for your order.', 'success');
+          setTimeout(() => { location.href = `${R}payment-success.html?provider=paypal&order_id=${encodeURIComponent(payload.id)}`; }, 500);
+        },
+        onCancel: () => setPaymentStatus('PayPal checkout was cancelled. Your cart is still saved.'),
+        onError: (error) => setPaymentStatus(error?.message || 'PayPal checkout is temporarily unavailable.', 'error'),
+      }).render('#paypal-button-container');
+    } else {
+      paypalEl.innerHTML = '<div class="payment-unavailable"><strong>PayPal is not configured yet.</strong><span>The primary checkout will appear after the PayPal Live credentials are added in Railway.</span></div>';
+    }
+
+    if(config.stripe?.enabled){
+      stripeEl.innerHTML = '<button class="stripe-checkout-btn" type="button"><span class="stripe-mark">S</span><span>Pay with card</span><small>Secure checkout by Stripe</small></button>';
+      stripeEl.querySelector('button').addEventListener('click', async (event) => {
+        const button = event.currentTarget;
+        button.disabled = true;
+        setPaymentStatus('Opening secure card checkout…');
+        try {
+          const response = await fetch(`${R}api/stripe/checkout-session`, {
+            method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ items: paymentItems() }),
+          });
+          const payload = await response.json();
+          if(!response.ok || !payload.url) throw new Error(payload.message || 'Stripe checkout could not be started.');
+          location.href = payload.url;
+        } catch(error) {
+          button.disabled = false;
+          setPaymentStatus(error.message, 'error');
+        }
+      });
+    } else {
+      stripeEl.innerHTML = '<div class="payment-unavailable"><strong>Stripe card checkout is ready to activate.</strong><span>Add STRIPE_SECRET_KEY in Railway to enable secure Visa, Mastercard, and American Express checkout.</span></div>';
+    }
+  } catch(error) {
+    paypalEl.innerHTML = '<div class="payment-unavailable"><strong>Secure checkout is temporarily unavailable.</strong><span>Please try again shortly or contact PATZCOM support.</span></div>';
+    stripeEl.innerHTML = '';
+    setPaymentStatus(error.message, 'error');
   }
 }
 

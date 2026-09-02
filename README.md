@@ -31,6 +31,27 @@ Add `www.patzcom.com` in Railway under:
 Service -> Settings -> Networking -> Public Networking -> Custom Domain
 ```
 
+## Payments
+
+The public cart exposes PayPal first and Stripe card checkout second. Payment
+amounts are rebuilt from `assets/products.json` on the server; browser-submitted
+prices are never trusted. PayPal uses the server-side Orders v2 create/capture
+flow, and Stripe uses a server-created hosted Checkout Session.
+
+Set these Railway variables to enable live checkout. Never commit these values:
+
+```text
+PAYPAL_CLIENT_ID
+PAYPAL_CLIENT_SECRET
+PAYPAL_ENV=live
+STRIPE_SECRET_KEY
+PATZCOM_PUBLIC_URL=https://www.patzcom.com
+PATZCOM_SHIPPING_FLAT=0
+```
+
+Until the credentials are present, the cart shows a clear setup message instead
+of pretending that a payment was completed.
+
 ## eBay image sync
 
 Set the Production App ID and Cert ID in Railway variables only. Never commit the
