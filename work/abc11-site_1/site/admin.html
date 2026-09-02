@@ -127,6 +127,7 @@
           <h1>PATZCOM Admin Hub</h1>
           <p>A protected marketplace control room for product curation, buyer support, shipping updates, payout reporting, and eBay API-connected workflows.</p>
           <div class="seller-mini-stats">
+            <span>US listings only</span>
             <span>Catalog management</span>
             <span>Order and shipping desk</span>
             <span>PayPal-first checkout</span>
@@ -203,8 +204,8 @@
         <div class="seller-results-row">
           <div class="seller-results-copy">
             <strong>Results: <span id="seller-result-range">1-200</span></strong>
-            <span>Total: <span id="seller-total-value">$18,076,087.90</span></span>
-            <span>Qty: <span id="seller-total-qty">7,842</span></span>
+            <span>Total catalog value: <span id="seller-total-value">--</span></span>
+            <span>Listings: <span id="seller-total-qty">--</span></span>
           </div>
           <div class="seller-results-tools">
             <a href="#selling">Customize table</a>
@@ -214,10 +215,10 @@
         </div>
 
         <div class="seller-bulk-row">
-          <button class="admin-btn primary" type="button">Edit</button>
-          <button class="admin-btn" type="button">Sell similar</button>
-          <button class="admin-btn" type="button">Actions</button>
-          <button class="admin-btn" type="button">Sell it faster</button>
+          <button class="admin-btn primary seller-bulk-action" type="button">Edit</button>
+          <button class="admin-btn seller-bulk-action" type="button">Sell similar</button>
+          <button class="admin-btn seller-bulk-action" type="button">Actions</button>
+          <button class="admin-btn seller-bulk-action" type="button">Sell it faster</button>
         </div>
 
         <div class="seller-listing-table">
@@ -453,6 +454,9 @@ const activeListingsCount = document.getElementById('active-listings-count');
 const sellerSearchInput = document.getElementById('seller-search-input');
 const searchInput = document.getElementById('admin-search-input');
 const searchBtn = document.getElementById('admin-search-btn');
+const sellerResultRange = document.getElementById('seller-result-range');
+const sellerTotalValue = document.getElementById('seller-total-value');
+const sellerTotalQty = document.getElementById('seller-total-qty');
 const logoutBtn = document.getElementById('admin-logout-btn');
 const connectBtn = document.getElementById('ebay-connect-btn');
 const refreshBtn = document.getElementById('ebay-refresh-btn');
@@ -575,6 +579,15 @@ function renderInventory(products) {
   `).join('');
 }
 
+function renderSellerTotals(products, filteredProducts = products) {
+  const total = products.reduce((sum, item) => sum + Number(item.price || 0), 0);
+  sellerTotalValue.textContent = `$${total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  sellerTotalQty.textContent = products.length.toLocaleString('en-US');
+  sellerResultRange.textContent = filteredProducts.length
+    ? `1-${Math.min(200, filteredProducts.length).toLocaleString('en-US')} of ${filteredProducts.length.toLocaleString('en-US')}`
+    : '0';
+}
+
 function renderActiveListings(products) {
   const query = (sellerSearchInput?.value || '').trim().toLowerCase();
   const filtered = query
@@ -585,6 +598,7 @@ function renderActiveListings(products) {
     : products;
 
   activeListingsCount.textContent = filtered.length.toLocaleString();
+  renderSellerTotals(products, filtered);
   if (!filtered.length) {
     activeListingsTable.innerHTML = `<tr><td colspan="4" class="table-empty">No active listings found.</td></tr>`;
     return;
@@ -735,8 +749,27 @@ refreshBtnSide.addEventListener('click', async () => {
 });
 
 searchBtn.addEventListener('click', () => renderInventory(allProducts));
-searchInput.addEventListener('input', () => renderInventory(allProducts));
+searchInput.addEventListener('input', () => { renderInventory(allProducts); renderActiveListings(allProducts); });
 sellerSearchInput.addEventListener('input', () => renderActiveListings(allProducts));
+
+document.querySelector('.seller-tool-pills button:last-child')?.addEventListener('click', () => {
+  sellerSearchInput.value = '';
+  renderActiveListings(allProducts);
+});
+document.querySelectorAll('.seller-bulk-action').forEach((button) => {
+  button.addEventListener('click', () => {
+    flash.textContent = `${button.textContent.trim()} is ready for the selected PATZCOM listings.`;
+    flash.hidden = false;
+    flash.className = 'flash-banner info';
+  });
+});
+document.querySelectorAll('.admin-tabs-row a, .rail-link, .seller-workbench-actions a').forEach((link) => {
+  link.addEventListener('click', () => {
+    const target = link.getAttribute('href');
+    if(!target?.startsWith('#')) return;
+    document.querySelectorAll('.admin-tabs-row a').forEach((item) => item.classList.toggle('on', item.getAttribute('href') === target));
+  });
+});
 
 catalogImportBtn?.addEventListener('click', async () => {
   let payload;

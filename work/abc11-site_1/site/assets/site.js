@@ -28,7 +28,7 @@ const imgFallback = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
   </g>
 </svg>`);
 
-fetch(R+'assets/products.json').then(r=>r.json()).then(p=>{ PRODUCTS=p; initSearch(); renderCart(); });
+fetch(R+'assets/products.json').then(r=>r.json()).then(p=>{ PRODUCTS=p; initSearch(); initMarketplaceHome(); renderCart(); });
 paintCount();
 initQandA();
 installImageFallbacks();
@@ -48,6 +48,162 @@ function initSearch(){
     box.style.display='block';
   });
   document.addEventListener('click', e=>{ if(!e.target.closest('.hdr')) box.style.display='none'; });
+}
+
+function initMarketplaceHome(){
+  const list = document.getElementById('market-list');
+  if(!list) return;
+
+  const categoryList = document.getElementById('market-category-list');
+  const searchInput = document.getElementById('market-search-input');
+  const resultsCount = document.getElementById('market-results-count');
+  const catalogCount = document.getElementById('store-catalog-count');
+  const inStockCount = document.getElementById('in-stock-count');
+  const allListingsCount = document.getElementById('all-listings-count');
+  const buyNowCount = document.getElementById('buy-now-count');
+  const pager = document.getElementById('market-pager');
+  const sortSelect = document.getElementById('market-sort');
+  const viewToggle = document.getElementById('market-view-toggle');
+  const state = { query:'', category:'', inStock:false, sale:false, shipping:false, format:'all', priceBand:'', min:null, max:null, sort:'match', page:1, compact:false, includeDescription:false };
+  const pageSize = 24;
+
+  const productText = (product) => [
+    product.title, product.vendor, product.type, product.sku, product.ebayItemId,
+    ...(Array.isArray(product.tags) ? product.tags : []),
+    state.includeDescription ? product.desc_text : '',
+  ].filter(Boolean).join(' ').toLowerCase();
+  const categories = [...new Map(PRODUCTS.map((product) => [product.type || 'All Products', 0])).keys()]
+    .sort((a, b) => a.localeCompare(b));
+
+  catalogCount.textContent = PRODUCTS.length.toLocaleString('en-US');
+  allListingsCount.textContent = `(${PRODUCTS.length.toLocaleString('en-US')})`;
+  buyNowCount.textContent = `(${PRODUCTS.length.toLocaleString('en-US')})`;
+  inStockCount.textContent = `(${PRODUCTS.filter((product) => product.available !== false).length.toLocaleString('en-US')})`;
+  categoryList.innerHTML = [
+    `<button class="category-link active" data-category="" type="button">All products <span>(${PRODUCTS.length})</span></button>`,
+    ...categories.map((category) => {
+      const count = PRODUCTS.filter((product) => (product.type || 'All Products') === category).length;
+      return `<button class="category-link" data-category="${escapeHtml(category)}" type="button">${escapeHtml(category)} <span>(${count})</span></button>`;
+    }),
+  ].join('');
+
+  function filteredProducts(){
+    const min = Number.isFinite(state.min) ? state.min : null;
+    const max = Number.isFinite(state.max) ? state.max : null;
+    const filtered = PRODUCTS.filter((product) => {
+      const price = Number(product.price || 0);
+      if(state.category && (product.type || 'All Products') !== state.category) return false;
+      if(state.query && !productText(product).includes(state.query)) return false;
+      if(state.inStock && product.available === false) return false;
+      if(state.format === 'buy' && product.available === false) return false;
+      if(state.sale && !product.compare) return false;
+      if(state.shipping && product.shipping === false) return false;
+      if(state.priceBand === 'under' && price >= 500) return false;
+      if(state.priceBand === 'mid' && (price < 500 || price > 2000)) return false;
+      if(state.priceBand === 'over' && price <= 2000) return false;
+      if(min !== null && price < min) return false;
+      if(max !== null && price > max) return false;
+      return true;
+    });
+
+    return filtered.sort((a, b) => {
+      if(state.sort === 'price-low') return Number(a.price || 0) - Number(b.price || 0);
+      if(state.sort === 'price-high') return Number(b.price || 0) - Number(a.price || 0);
+      if(state.sort === 'title') return String(a.title).localeCompare(String(b.title));
+      return String(a.title).localeCompare(String(b.title));
+    });
+  }
+
+  function productHref(product){
+    return `${R}products/${encodeURIComponent(product.handle)}.html`;
+  }
+
+  function renderPager(totalPages){
+    if(totalPages <= 1){ pager.innerHTML = ''; return; }
+    const buttons = [];
+    for(let page = 1; page <= totalPages; page += 1){
+      if(page === 1 || page === totalPages || Math.abs(page - state.page) <= 1){
+        buttons.push(`<button class="page-btn${page === state.page ? ' active' : ''}" data-page="${page}" type="button">${page}</button>`);
+      } else if(buttons[buttons.length - 1] !== '<span class="page-gap">…</span>') {
+        buttons.push('<span class="page-gap">…</span>');
+      }
+    }
+    pager.innerHTML = `<button class="page-btn" data-page="${Math.max(1, state.page - 1)}" type="button" ${state.page === 1 ? 'disabled' : ''}>‹</button>${buttons.join('')}<button class="page-btn" data-page="${Math.min(totalPages, state.page + 1)}" type="button" ${state.page === totalPages ? 'disabled' : ''}>›</button>`;
+  }
+
+  function render(){
+    const products = filteredProducts();
+    const totalPages = Math.max(1, Math.ceil(products.length / pageSize));
+    state.page = Math.min(state.page, totalPages);
+    const pageItems = products.slice((state.page - 1) * pageSize, state.page * pageSize);
+    resultsCount.textContent = products.length.toLocaleString('en-US');
+    list.classList.toggle('compact', state.compact);
+    if(!pageItems.length){
+      list.innerHTML = `<div class="market-empty"><strong>No products match these filters.</strong><span>Clear a filter or try a broader search.</span><button class="filter-apply" id="empty-clear" type="button">Clear filters</button></div>`;
+    } else {
+      list.innerHTML = pageItems.map((product) => {
+        const image = product.images?.[0] || imgFallback;
+        const price = money(Number(product.price || 0));
+        const compare = product.compare ? `<div class="market-old">${money(Number(product.compare))}</div>` : '';
+        const status = product.available === false ? 'Out of stock' : 'In stock';
+        return `<article class="market-row">
+          <a class="market-row-img" href="${productHref(product)}"><img loading="lazy" src="${escapeHtml(image)}" alt="${escapeHtml(product.title)}"></a>
+          <div class="market-row-body">
+            <div class="market-row-kicker">${escapeHtml(product.vendor || 'PATZCOM')} · ${escapeHtml(product.type || 'Automotive parts')}</div>
+            <h3><a href="${productHref(product)}">${escapeHtml(product.title)}</a></h3>
+            <div class="market-sub">Brand New · ${escapeHtml(status)}</div>
+            <div class="market-price">${price}</div>
+            ${compare}
+            <div class="market-extra"><span>Buy it now</span><span>International shipping available</span><span>Secure checkout</span></div>
+          </div>
+          <div class="market-row-meta"><div>Ships from <strong>South Korea</strong></div><div>PATZCOM direct catalog</div>${product.sku ? `<div>SKU ${escapeHtml(product.sku)}</div>` : ''}</div>
+        </article>`;
+      }).join('');
+    }
+    renderPager(totalPages);
+  }
+
+  function clearFilters(){
+    state.query = ''; state.category = ''; state.inStock = false; state.sale = false; state.shipping = false; state.format = 'all'; state.priceBand = ''; state.min = null; state.max = null; state.page = 1;
+    if(searchInput) searchInput.value = '';
+    document.querySelectorAll('#filter-in-stock,#filter-shipping,#filter-sale').forEach((input) => { input.checked = false; });
+    document.querySelectorAll('input[name="price-band"], input[name="bf"]').forEach((input) => { input.checked = input.value === 'all'; });
+    document.getElementById('min-price').value = ''; document.getElementById('max-price').value = '';
+    document.querySelectorAll('.category-link').forEach((button) => button.classList.toggle('active', !button.dataset.category));
+    document.querySelectorAll('.market-pills .pill').forEach((button) => button.classList.toggle('active', button.dataset.format === 'all' && !button.dataset.stock && !button.dataset.sale));
+    render();
+  }
+
+  categoryList.addEventListener('click', (event) => {
+    const button = event.target.closest('.category-link');
+    if(!button) return;
+    state.category = button.dataset.category || ''; state.page = 1;
+    document.querySelectorAll('.category-link').forEach((item) => item.classList.toggle('active', item === button));
+    render();
+  });
+  searchInput?.addEventListener('input', () => { state.query = searchInput.value.trim().toLowerCase(); state.page = 1; render(); });
+  document.getElementById('include-description')?.addEventListener('change', (event) => { state.includeDescription = event.target.checked; render(); });
+  document.getElementById('filter-in-stock')?.addEventListener('change', (event) => { state.inStock = event.target.checked; state.page = 1; render(); });
+  document.getElementById('filter-shipping')?.addEventListener('change', (event) => { state.shipping = event.target.checked; state.page = 1; render(); });
+  document.getElementById('filter-sale')?.addEventListener('change', (event) => { state.sale = event.target.checked; state.page = 1; render(); });
+  document.querySelectorAll('input[name="price-band"]').forEach((input) => input.addEventListener('change', () => { state.priceBand = input.checked ? input.value : ''; state.page = 1; render(); }));
+  document.querySelectorAll('input[name="bf"]').forEach((input) => input.addEventListener('change', () => { if(input.checked){ state.format = input.value; state.page = 1; render(); } }));
+  document.getElementById('apply-price')?.addEventListener('click', () => {
+    const minValue = Number(document.getElementById('min-price').value); const maxValue = Number(document.getElementById('max-price').value);
+    state.min = Number.isFinite(minValue) && minValue >= 0 ? minValue : null; state.max = Number.isFinite(maxValue) && maxValue >= 0 ? maxValue : null; state.page = 1; render();
+  });
+  document.getElementById('clear-filters')?.addEventListener('click', (event) => { event.preventDefault(); clearFilters(); });
+  document.querySelector('.market-pills')?.addEventListener('click', (event) => {
+    const button = event.target.closest('.pill'); if(!button) return;
+    state.format = button.dataset.format || 'all'; state.inStock = button.dataset.stock === 'true'; state.sale = button.dataset.sale === 'true'; state.page = 1;
+    document.querySelectorAll('.market-pills .pill').forEach((item) => item.classList.toggle('active', item === button)); render();
+  });
+  sortSelect?.addEventListener('change', () => { state.sort = sortSelect.value; state.page = 1; render(); });
+  viewToggle?.addEventListener('click', () => { state.compact = !state.compact; viewToggle.setAttribute('aria-pressed', String(state.compact)); render(); });
+  pager.addEventListener('click', (event) => { const button = event.target.closest('[data-page]'); if(!button || button.disabled) return; state.page = Number(button.dataset.page); render(); window.scrollTo({ top: list.offsetTop - 120, behavior: 'smooth' }); });
+  list.addEventListener('click', (event) => { if(event.target.closest('#empty-clear')) clearFilters(); });
+  document.getElementById('header-search-btn')?.addEventListener('click', () => { if(searchInput){ searchInput.value = document.getElementById('q').value; state.query = searchInput.value.trim().toLowerCase(); state.page = 1; render(); document.getElementById('market-list').scrollIntoView({behavior:'smooth', block:'start'}); } });
+  render();
 }
 
 function renderCart(){
@@ -308,7 +464,7 @@ function initCollectionWhiteUI(){
   document.body.classList.add('collection-white-body');
 }
 
-function initQandA(){
+function initQandAFromGeneratedPage(){
   let mount = document.querySelector('.qa-mount');
   const isProductPage = Boolean(document.querySelector('.pwrap'));
   const isCollectionPage = Boolean(document.querySelector('.grid') && document.querySelector('.crumbs'));
@@ -416,6 +572,6 @@ function initQandA(){
   optionsForCategory(presetCategory);
 }
 
-function escapeHtml(str){
+function escapeHtmlFromGeneratedPage(str){
   return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
 }

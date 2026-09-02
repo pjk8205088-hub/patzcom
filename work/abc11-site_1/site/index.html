@@ -32,7 +32,7 @@
   <option>Lift Coilover Suspension Kit</option>
   <option>Lowering Springs</option>
  </select>
- <button class="search-btn" type="button">Search</button>
+ <button class="search-btn" id="header-search-btn" type="button">Search</button>
 </div>
 <div class="hdr-actions">
  <a class="mini-link" href="admin.html">My Seller Hub</a>
@@ -49,66 +49,58 @@
 </header>
 <section class="storefront-topline">
   <div class="wrap topline-row">
-    <label class="include-description"><input type="checkbox"> Include description</label>
+    <label class="include-description"><input id="include-description" type="checkbox"> Include description</label>
   </div>
 </section>
 <section class="storefront-listing">
   <div class="wrap ebay-market-shell">
-    <aside class="market-left">
+    <aside class="market-left" aria-label="Marketplace filters">
       <div class="market-card">
         <div class="market-card-title">Category</div>
-        <div class="market-filter-group">
-          <strong>All</strong>
-          <a href="#">eBay Motors</a>
-          <a href="#">Car &amp; Truck Calipers &amp; Brackets</a>
-          <a href="#">Car &amp; Truck Exhaust System Kits</a>
-          <a href="#">Car &amp; Truck Parts &amp; Accessories</a>
-          <a href="#">Car &amp; Truck Brake Pads</a>
-          <a href="#">More +</a>
+        <div class="market-filter-group" id="market-category-list">
+          <span class="filter-loading">Loading categories...</span>
         </div>
       </div>
       <div class="market-card">
         <div class="market-card-title">Condition</div>
-        <label class="filter-check"><input type="checkbox"> New <span>(469)</span></label>
-        <a class="see-all" href="#">see all</a>
+        <label class="filter-check"><input id="filter-in-stock" type="checkbox"> In stock <span id="in-stock-count"></span></label>
+        <a class="see-all" id="clear-filters" href="#">Clear filters</a>
       </div>
       <div class="market-card">
         <div class="market-card-title">Price</div>
-        <label class="filter-check"><input type="checkbox"> Under KRW1,032,200.00</label>
-        <label class="filter-check"><input type="checkbox"> KRW1,032,200.00 to KRW4,817,200.00</label>
-        <label class="filter-check"><input type="checkbox"> Over KRW4,817,200.00</label>
+        <label class="filter-check"><input name="price-band" value="under" type="radio"> Under $500</label>
+        <label class="filter-check"><input name="price-band" value="mid" type="radio"> $500 to $2,000</label>
+        <label class="filter-check"><input name="price-band" value="over" type="radio"> Over $2,000</label>
         <div class="price-range">
-          <input type="text" placeholder="Min KRW">
+          <input id="min-price" type="number" min="0" placeholder="Min USD" aria-label="Minimum price">
           <span>to</span>
-          <input type="text" placeholder="Max KRW">
+          <input id="max-price" type="number" min="0" placeholder="Max USD" aria-label="Maximum price">
         </div>
-        <a class="see-all" href="#">see all</a>
+        <button class="filter-apply" id="apply-price" type="button">Apply price</button>
       </div>
       <div class="market-card">
         <div class="market-card-title">Buying Format</div>
-        <label class="filter-radio"><input type="radio" name="bf" checked> All Listings (469)</label>
-        <label class="filter-radio"><input type="radio" name="bf"> Auction</label>
-        <label class="filter-radio"><input type="radio" name="bf"> Buy It Now (469)</label>
-        <label class="filter-radio"><input type="radio" name="bf"> Accepts Offers (2)</label>
+        <label class="filter-radio"><input type="radio" name="bf" value="all" checked> All listings <span id="all-listings-count"></span></label>
+        <label class="filter-radio"><input type="radio" name="bf" value="buy"> Buy it now <span id="buy-now-count"></span></label>
       </div>
       <div class="market-card">
         <div class="market-card-title">Shipping Options</div>
-        <label class="filter-check"><input type="checkbox"> Free International Shipping</label>
+        <label class="filter-check"><input id="filter-shipping" type="checkbox"> International shipping</label>
       </div>
       <div class="market-card">
         <div class="market-card-title">Show only</div>
-        <label class="filter-check"><input type="checkbox"> Returns Accepted</label>
+        <label class="filter-check"><input id="filter-sale" type="checkbox"> On sale</label>
       </div>
     </aside>
     <main class="market-right">
       <div class="store-brand-row ebay-store-row">
         <div class="store-avatar">P</div>
         <div class="store-brand-copy">
-          <h1>PARTS COMBINED</h1>
+          <h1>PATZCOM</h1>
           <div class="store-stat-row ebay-stat-row">
-            <span><strong>100%</strong> positive feedback</span>
-            <span><strong>3.5K</strong> items sold</span>
-            <span><strong>595</strong> followers</span>
+            <span><strong>US</strong> catalog</span>
+            <span><strong id="store-catalog-count">--</strong> items</span>
+            <span><strong>100%</strong> product focus</span>
           </div>
         </div>
         <div class="store-actions ebay-actions">
@@ -118,88 +110,35 @@
         </div>
       </div>
       <div class="market-search-row">
-        <div class="market-search-box">
+          <div class="market-search-box">
           <span class="search-icon">⌕</span>
-          <input type="search" placeholder="Search all 451 items" aria-label="Search all items">
+          <input id="market-search-input" type="search" placeholder="Search all products" aria-label="Search all products">
         </div>
         <div class="market-right-tools">
           <div class="shipping-to">Shipping to: <strong>KOR, 31504</strong></div>
           <div class="market-sort">
-            <button type="button">Sort: Best Match ▾</button>
-            <button type="button">☰</button>
+            <label class="sr-only" for="market-sort">Sort products</label>
+            <select id="market-sort">
+              <option value="match">Sort: Best match</option>
+              <option value="price-low">Price: lowest first</option>
+              <option value="price-high">Price: highest first</option>
+              <option value="title">Title: A to Z</option>
+            </select>
+            <button id="market-view-toggle" type="button" aria-label="Toggle compact view">☰</button>
           </div>
         </div>
       </div>
       <div class="market-results-head">
-        <span>451 results</span>
+        <span><strong id="market-results-count">--</strong> results</span>
         <div class="market-pills">
-          <button class="pill active" type="button">All</button>
-          <button class="pill" type="button">Auction</button>
-          <button class="pill" type="button">Buy It Now</button>
-          <button class="pill" type="button">Condition ▾</button>
-          <button class="pill" type="button">Shipping ▾</button>
+          <button class="pill active" data-format="all" type="button">All</button>
+          <button class="pill" data-format="buy" type="button">Buy it now</button>
+          <button class="pill" data-stock="true" type="button">In stock</button>
+          <button class="pill" data-sale="true" type="button">On sale</button>
         </div>
       </div>
-      <div class="market-list">
-        <article class="market-row">
-          <a class="market-row-img" href="products/fits-19-20-21-22-23-24-25-hyundai-palisade-lx2-lift-up-bigfoot-contour-coilover-.html">
-            <img src="assets/img/partscombined/PALISADECONTOURCOILOVER_aa-min-81d8681c-8.jpg" alt="Fits 19 20 21 22 23 24 25 Hyundai Palisade LX2 Lift Up Bigfoot Contour Coilover Suspension Kit">
-          </a>
-          <div class="market-row-body">
-            <h3><a href="products/fits-19-20-21-22-23-24-25-hyundai-palisade-lx2-lift-up-bigfoot-contour-coilover-.html">3&quot; Lift Coilover Suspension Kit Fits Hyundai Palisade LX2 20-25 Off-Road Shocks</a></h3>
-            <div class="market-sub">Brand New</div>
-            <div class="market-price">KRW2,849,023.80</div>
-            <div class="market-old">KRW3,165,582.00</div>
-            <div class="market-extra">
-              <span>Buy It Now</span>
-              <span>Free shipping</span>
-              <span>from South Korea</span>
-            </div>
-          </div>
-          <div class="market-row-meta">
-            <div>Guaranteed by <strong>Tue, Sep. 22</strong></div>
-            <div>partscombined 100% positive (1.2K)</div>
-          </div>
-        </article>
-        <article class="market-row">
-          <a class="market-row-img" href="products/sangsin-hardron-zr-brake-pads-for-kia-stinger-genesis-g70-3-3t-brembo-front-rear.html">
-            <img src="assets/img/partscombined/HARDRONZRF_RSTINGER_G70_aa-min-d1bd826d-1.jpg" alt="Sangsin Hardron ZR Racing Brake Pads">
-          </a>
-          <div class="market-row-body">
-            <h3><a href="products/sangsin-hardron-zr-brake-pads-for-kia-stinger-genesis-g70-3-3t-brembo-front-rear.html">Sangsin Hardron ZR Racing Brake Pads for G80 SPORT (Front &amp; Rear)</a></h3>
-            <div class="market-sub">Brand New</div>
-            <div class="market-price">KRW397,762.26</div>
-            <div class="market-extra">
-              <span>Buy It Now</span>
-              <span>Free shipping</span>
-              <span>from South Korea</span>
-            </div>
-          </div>
-          <div class="market-row-meta">
-            <div>Guaranteed by <strong>Tue, Sep. 8</strong></div>
-            <div>partscombined 100% positive (1.2K)</div>
-          </div>
-        </article>
-        <article class="market-row">
-          <a class="market-row-img" href="products/front-rear-brake-pads-set-for-2022-2026-genesis-gv70-sangsin-hardron-zr-oem-size.html">
-            <img src="assets/img/partscombined/GV80OEMBRAKEPADSREPLACEMENT-98dbbb6e-1.jpg" alt="Front Rear Brake Pads Set for 2022-2026 Genesis GV70">
-          </a>
-          <div class="market-row-body">
-            <h3><a href="products/front-rear-brake-pads-set-for-2022-2026-genesis-gv70-sangsin-hardron-zr-oem-size.html">Front Rear Brake Pads Set for 2022-2026 Genesis GV70 Sangsin Hardron ZR OEM Size</a></h3>
-            <div class="market-sub">Brand New</div>
-            <div class="market-price">KRW410,149.32</div>
-            <div class="market-extra">
-              <span>Buy It Now</span>
-              <span>Free shipping</span>
-              <span>9 watchers</span>
-            </div>
-          </div>
-          <div class="market-row-meta">
-            <div>Guaranteed by <strong>Tue, Sep. 8</strong></div>
-            <div>partscombined 100% positive (1.2K)</div>
-          </div>
-        </article>
-      </div>
+      <div class="market-list" id="market-list" aria-live="polite"><div class="market-empty">Loading PATZCOM products...</div></div>
+      <div class="market-pager" id="market-pager" aria-label="Product pages"></div>
     </main>
   </div>
 </section>
