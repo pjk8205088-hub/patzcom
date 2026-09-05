@@ -573,11 +573,11 @@ img{max-width:100%;display:block}
 .topline-row{display:flex;justify-content:flex-end;align-items:center;padding:10px 20px 8px}
 .include-description{display:inline-flex;align-items:center;gap:8px;color:#111;font-size:14px}
 .include-description input{width:18px;height:18px;border:1px solid #111;border-radius:4px}
-.ebay-market-shell{display:grid;grid-template-columns:110px minmax(0,1fr);gap:22px;align-items:start;padding:0 14px 30px}
+.ebay-market-shell{display:grid;grid-template-columns:220px minmax(0,1fr);gap:22px;align-items:start;padding:0 14px 30px}
 .market-left{display:grid;grid-template-columns:minmax(0,1fr);min-width:0;gap:10px;position:sticky;top:12px}
-.ebay-market-shell > .market-left{width:110px;max-width:110px;overflow:hidden;position:static;contain:inline-size}
+.ebay-market-shell > .market-left{width:100%;max-width:220px;position:static;contain:inline-size}
 .ebay-market-shell > .market-left .market-card{padding:10px}
-.ebay-market-shell > .market-left .category-link{font-size:12px;gap:4px;line-height:1.45}
+.ebay-market-shell > .market-left .category-link{font-size:14px;gap:8px;line-height:1.45}
 .ebay-market-shell > .market-left .market-card{min-width:0;width:100%;overflow-wrap:anywhere}
 .ebay-market-shell .price-range{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)}
 .ebay-market-shell .price-range input{min-width:0;width:100%}
@@ -781,7 +781,25 @@ img{max-width:100%;display:block}
 .market-card-title{font-size:18px;font-weight:800;margin-bottom:6px;text-decoration:underline;text-decoration-thickness:1px}
 .market-cats a{display:block;color:#111;text-decoration:none;font-size:15px;padding:4px 0}
 .market-cats a:hover{color:#3665f3}
-.market-right{min-width:0}
+.market-right{min-width:0;container-type:inline-size;container-name:product-results}
+.market-right .market-search-box,.market-right .market-search-box input,.market-right .market-row-body,.market-right .market-row-meta{min-width:0}
+.market-right .market-row-body,.market-right .market-row-meta{overflow-wrap:anywhere}
+@container product-results (max-width:800px){
+  .market-row,.market-list.compact .market-row{grid-template-columns:minmax(0,180px) minmax(0,1fr)}
+  .market-row-meta{grid-column:2}
+  .market-row-img,.market-list.compact .market-row-img{width:100%;height:auto;aspect-ratio:1}
+  .market-search-row,.market-results-head{flex-wrap:wrap}
+  .market-search-box{width:100%;max-width:100%;flex-basis:100%}
+}
+@container product-results (max-width:440px){
+  .market-row,.market-list.compact .market-row{grid-template-columns:minmax(0,1fr)}
+  .market-row-meta{grid-column:auto}
+  .market-right-tools,.market-sort,.market-pills{max-width:100%;flex-wrap:wrap}
+}
+@media(max-width:600px){
+  .ebay-home-body .ebay-market-shell{grid-template-columns:minmax(0,1fr)}
+  .ebay-market-shell > .market-left{max-width:100%}
+}
 .market-feature{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:18px;box-shadow:0 4px 18px rgba(17,24,39,.04)}
 .market-feature-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .market-kicker{font-size:12px;font-weight:800;letter-spacing:.12em;color:#667085;margin-bottom:4px}
