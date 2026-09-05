@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Manage listings | PATZCOM Seller Hub</title>
+<link rel="stylesheet" href="assets/admin-products.css">
+<script src="assets/admin-products.js" defer></script></head>
+<body>
+<header><a class="brand" href="index.html">PATZCOM</a><strong>Seller Hub</strong><a href="admin.html">Overview</a><a href="admin-products.html" aria-current="page">Listings</a><a href="index.html">Visit store</a></header>
+<main>
+<div class="heading"><div><p class="eyebrow">PATZCOM INVENTORY</p><h1>Manage listings <span id="count"></span></h1></div><button id="create" disabled>Create listing</button></div>
+<p class="notice">Changes apply only to PATZCOM. Your eBay listings are never modified. Server-local changes and backups need persistent hosting storage to survive redeployment.</p>
+<div class="toolbar"><label>Search listings <input id="search" type="search" placeholder="Title, SKU or item number"></label><label>Status <select id="filter"><option value="all">All listings</option><option value="active">Available</option><option value="inactive">Unavailable</option></select></label><button id="reload" class="secondary">Reload</button><button id="export" class="secondary" disabled>Download catalog backup</button></div>
+<p id="status" role="status" aria-live="polite">Loading listings...</p>
+<div class="table-wrap"><table><thead><tr><th>Listing</th><th>SKU / Item number</th><th>Category</th><th>Price (USD)</th><th>Status</th><th>Actions</th></tr></thead><tbody id="rows"></tbody></table></div>
+</main>
+<dialog id="editor"><form id="form"><div class="heading"><h2 id="editor-title">Edit listing</h2><button type="button" id="cancel" class="secondary">Close</button></div>
+<p id="form-status" role="status" aria-live="polite"></p>
+<label>Title <input name="title" required maxlength="300"></label>
+<div class="fields"><label>SKU <input name="sku" maxlength="300"></label><label>Brand <input name="vendor" maxlength="300"></label><label>Category <input name="type" list="categories" required maxlength="300"></label><label>Price (USD) <input name="price" type="number" min="0.01" max="1000000" step="0.01" required></label></div>
+<datalist id="categories"></datalist>
+<label class="check"><input name="available" type="checkbox"> Available for purchase</label>
+<label>Image URLs, one per line <textarea name="images" rows="5" placeholder="https://i.ebayimg.com/images/.../s-l1600.jpg"></textarea></label>
+<label>Upload photos <input id="upload" type="file" accept="image/jpeg,image/png,image/webp" multiple></label><p id="upload-status" role="status"></p>
+<p class="hint">Up to 30 HTTPS image URLs. First image is the cover. Existing local image paths are preserved.</p><div id="previews"></div>
+<label>Description <textarea name="desc_text" rows="8" maxlength="100000"></textarea></label>
+<p class="hint">Editing this text replaces the existing rich description. Leave it unchanged to preserve videos and formatting.</p>
+<button id="save" type="submit">Save to PATZCOM</button></form></dialog>
+</body></html>

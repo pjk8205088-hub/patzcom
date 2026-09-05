@@ -76,3 +76,6 @@ unavailable eBay listings.
 
 Seller Hub CSV imports default to `Listing site=US`; listings from AU, CA, DE, FR,
 GB, and IT are excluded before PATZCOM pages are rebuilt.
+### Seller Hub listing management
+
+The protected `/admin-products.html` page supports creating and editing PATZCOM listings, changing price/category/availability, entering image URLs, and uploading JPEG/PNG/WebP photos. It never writes to eBay. Set `PATZCOM_ADMIN_PASSWORD` to a unique password of at least 12 characters in Railway before enabling saves; the existing short fallback password intentionally leaves editing disabled. Catalog writes and generated pages use the server filesystem, so configure a persistent Railway volume if edits must survive redeploys.

@@ -4,6 +4,7 @@ import { readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import crypto from 'node:crypto';
+import { readEditorCatalog, saveEditorProduct, uploadProductImage } from './lib/product-editor.mjs';
 import {
   buildEbayConsentUrl,
   exchangeAuthorizationCode,
@@ -70,12 +71,12 @@ function json(res, statusCode, payload) {
   res.end(JSON.stringify(payload, null, 2));
 }
 
-function readBody(req) {
+function readBody(req, limit = 1_000_000) {
   return new Promise((resolve, reject) => {
     let data = '';
     req.on('data', (chunk) => {
       data += chunk;
-      if (data.length > 1_000_000) {
+      if (data.length > limit) {
         reject(new Error('Payload too large'));
         req.destroy();
       }
@@ -240,7 +241,7 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
-  if (pathname === '/admin.html' && !adminSession) {
+  if (['/admin.html', '/admin-products.html'].includes(pathname) && !adminSession) {
     return redirect(res, '/admin-login.html');
   }
 
@@ -349,6 +350,29 @@ const server = http.createServer(async (req, res) => {
     if (adminSession?.token) adminSessions.delete(adminSession.token);
     clearSessionCookie(res);
     return json(res, 200, { ok: true });
+  }
+
+  if (['/api/admin/products', '/api/admin/product-image'].includes(pathname)) {
+    if (!adminSession) return json(res, 401, { error: 'Admin login required' });
+    res.setHeader('Cache-Control', 'no-store');
+    try {
+      if (req.method === 'GET' && pathname === '/api/admin/products') return json(res, 200, await readEditorCatalog());
+      if (req.method !== 'POST') return json(res, 405, { error: 'Method not allowed' });
+      if (!process.env.PATZCOM_ADMIN_PASSWORD || process.env.PATZCOM_ADMIN_PASSWORD.length < 12) {
+        return json(res, 503, { error: 'Set PATZCOM_ADMIN_PASSWORD to a unique password of at least 12 characters before enabling product editing.' });
+      }
+      if (req.headers['sec-fetch-site'] === 'cross-site' || (req.headers.origin && new URL(req.headers.origin).host !== req.headers.host)) return json(res, 403, { error: 'Cross-site request rejected' });
+      if (!String(req.headers['content-type']).startsWith('application/json')) return json(res, 415, { error: 'JSON required' });
+      if (pathname === '/api/admin/product-image') {
+        const url = await uploadProductImage(JSON.parse(await readBody(req, 7_100_000)));
+        return json(res, 201, { ok: true, url });
+      }
+      const result = await saveEditorProduct(JSON.parse(await readBody(req)));
+      clearProductCache();
+      return json(res, 200, { ok: true, ...result });
+    } catch (error) {
+      return json(res, 400, { error: error.message });
+    }
   }
 
   if (pathname === '/api/admin/dashboard') {
