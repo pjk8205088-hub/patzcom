@@ -638,6 +638,10 @@ function flashFromQuery() {
 }
 
 async function loadDashboard() {
+  const fetchWithTimeout = (url, options = {}) => Promise.race([
+    fetch(url, options),
+    new Promise((_, reject) => setTimeout(() => reject(new Error(`Request timed out: ${url}`)), 12000)),
+  ]);
   const sessionResponse = await fetch('/api/admin/session');
   const session = await sessionResponse.json();
   if (!session.authenticated) {
@@ -649,9 +653,9 @@ async function loadDashboard() {
   sessionBadge.textContent = `Signed in as ${session.user.email}`;
 
   const [dashboardResponse, productsResponse, ebayConfigResponse] = await Promise.all([
-    fetch('/api/admin/dashboard'),
-    fetch('/api/products'),
-    fetch('/api/ebay/config'),
+    fetchWithTimeout('/api/admin/dashboard'),
+    fetchWithTimeout('/api/products'),
+    fetchWithTimeout('/api/ebay/config'),
   ]);
 
   if (!dashboardResponse.ok) {
@@ -859,7 +863,16 @@ catalogEnrichBtn?.addEventListener('click', async () => {
 flashFromQuery();
 loadDashboard().catch((error) => {
   console.error(error);
-  alert(error.message);
+  document.querySelectorAll('[id*="loading"], [id$="-state"]').forEach((element) => {
+    if (element.textContent.includes('Loading') || element.textContent.includes('Checking')) {
+      element.textContent = 'Unable to load this panel. Check the server connection and reload.';
+    }
+  });
+  if (flash) {
+    flash.textContent = error.message;
+    flash.hidden = false;
+    flash.className = 'flash-banner error';
+  }
 });
 </script>
 </body>
