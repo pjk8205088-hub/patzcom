@@ -16,6 +16,46 @@ function setMain(el){
   document.getElementById('mainimg').src = el.src;
   document.querySelectorAll('.thumb').forEach(t=>t.classList.remove('on')); el.classList.add('on');
 }
+function enhanceGallery(){
+  const main = document.getElementById('mainimg');
+  const thumbs = [...document.querySelectorAll('.thumb')];
+  if(!main || !thumbs.length) return;
+  let selected = 0;
+  const controls = document.createElement('div');
+  controls.className = 'gallery-controls';
+  controls.innerHTML = '<button type="button" aria-label="Previous image">Previous</button><span aria-live="polite"></span><button type="button" aria-label="Next image">Next</button><button type="button">Enlarge image</button>';
+  main.parentElement.after(controls);
+  const select = (index) => {
+    selected = (index + thumbs.length) % thumbs.length;
+    setMain(thumbs[selected]);
+    controls.querySelector('span').textContent = `${selected + 1} / ${thumbs.length}`;
+    thumbs.forEach((thumb, i) => thumb.setAttribute('aria-pressed', String(i === selected)));
+  };
+  thumbs.forEach((thumb, index) => {
+    thumb.tabIndex = 0;
+    thumb.setAttribute('role', 'button');
+    thumb.setAttribute('aria-label', `View image ${index + 1}`);
+    thumb.addEventListener('click', () => select(index));
+    thumb.addEventListener('keydown', (event) => {
+      if(event.key === 'Enter' || event.key === ' '){ event.preventDefault(); select(index); }
+    });
+  });
+  const buttons = controls.querySelectorAll('button');
+  buttons[0].onclick = () => select(selected - 1);
+  buttons[1].onclick = () => select(selected + 1);
+  const dialog = document.createElement('dialog');
+  dialog.className = 'gallery-dialog';
+  dialog.innerHTML = '<button type="button" autofocus>Close image</button><img alt="">';
+  document.body.append(dialog);
+  buttons[2].onclick = () => {
+    dialog.querySelector('img').src = main.src;
+    dialog.querySelector('img').alt = main.alt;
+    dialog.showModal();
+  };
+  dialog.querySelector('button').onclick = () => dialog.close();
+  select(0);
+}
+document.addEventListener('DOMContentLoaded', enhanceGallery);
 const money = n => '$'+n.toLocaleString('en-US',{minimumFractionDigits:2});
 const qaKey = id => `patzcom_qa_${id}`;
 const imgFallback = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`

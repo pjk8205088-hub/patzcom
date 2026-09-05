@@ -1,4 +1,13 @@
 *{box-sizing:border-box}
+/* Shared marketplace surfaces and accessible product media controls. */
+body.detail-white-page,body.collection-white-body,body.ebay-home-body,body.admin-dashboard-body{--bg:#fff;--card:#fff;--line:#e5e5e5;--txt:#191919;--mut:#595959;--acc:#0654ff;--acc2:#555}
+.gallery-controls{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:12px;margin:14px 0}
+.gallery-controls button,.gallery-dialog button{border:1px solid #767676;border-radius:24px;background:#fff;color:#191919;padding:9px 16px;cursor:pointer;font:inherit;font-size:14px}
+.gallery-controls button:focus-visible,.thumb:focus-visible{outline:3px solid #0654ff;outline-offset:3px}
+.gallery-dialog{border:0;border-radius:16px;max-width:94vw;max-height:94vh;padding:20px;background:#fff}
+.gallery-dialog::backdrop{background:rgba(0,0,0,.65)}
+.gallery-dialog img{max-height:78vh;max-width:85vw;object-fit:contain;margin:12px auto}
+@media(min-width:1100px){body.detail-white-page .pdp{grid-template-columns:minmax(0,1.6fr) minmax(350px,1fr);gap:32px}body.detail-white-page .buy{box-shadow:none;border:0;border-radius:0}body.ebay-home-body .market-card{box-shadow:none;border:0;border-bottom:1px solid #e5e5e5;border-radius:0}body.admin-dashboard-body .panel{box-shadow:none;border-radius:8px}}
 :root{--bg:#0d0f12;--card:#15181d;--line:#242a32;--txt:#e9edf2;--mut:#93a0b0;--acc:#ff5a1f;--acc2:#ffb020}
 html,body{margin:0;padding:0}
 body{background:var(--bg);color:var(--txt);font:16px/1.6 "Helvetica Neue",Arial,"Noto Sans KR",sans-serif}
@@ -565,7 +574,11 @@ img{max-width:100%;display:block}
 .include-description{display:inline-flex;align-items:center;gap:8px;color:#111;font-size:14px}
 .include-description input{width:18px;height:18px;border:1px solid #111;border-radius:4px}
 .ebay-market-shell{display:grid;grid-template-columns:226px minmax(0,1fr);gap:22px;align-items:start;padding:0 14px 30px}
-.market-left{display:grid;gap:10px;position:sticky;top:12px}
+.market-left{display:grid;grid-template-columns:minmax(0,1fr);min-width:0;gap:10px;position:sticky;top:12px}
+.ebay-market-shell > .market-left{width:226px;max-width:100%}
+.ebay-market-shell > .market-left .market-card{min-width:0;width:100%;overflow-wrap:anywhere}
+.ebay-market-shell .price-range{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)}
+.ebay-market-shell .price-range input{min-width:0;width:100%}
 .market-card{background:#fff;border-right:1px solid #e6e6e6;padding:0 0 14px}
 .market-card-title{font-size:18px;font-weight:800;color:#111;margin-bottom:10px}
 .market-filter-group,.market-card{font-size:14px;color:#1f2a3a}
