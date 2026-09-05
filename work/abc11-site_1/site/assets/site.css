@@ -573,9 +573,9 @@ img{max-width:100%;display:block}
 .topline-row{display:flex;justify-content:flex-end;align-items:center;padding:10px 20px 8px}
 .include-description{display:inline-flex;align-items:center;gap:8px;color:#111;font-size:14px}
 .include-description input{width:18px;height:18px;border:1px solid #111;border-radius:4px}
-.ebay-market-shell{display:grid;grid-template-columns:130px minmax(0,1fr);gap:22px;align-items:start;padding:0 14px 30px}
+.ebay-market-shell{display:grid;grid-template-columns:110px minmax(0,1fr);gap:22px;align-items:start;padding:0 14px 30px}
 .market-left{display:grid;grid-template-columns:minmax(0,1fr);min-width:0;gap:10px;position:sticky;top:12px}
-.ebay-market-shell > .market-left{width:130px;max-width:100%}
+.ebay-market-shell > .market-left{width:110px;max-width:110px;overflow:hidden;position:static;contain:inline-size}
 .ebay-market-shell > .market-left .market-card{padding:10px}
 .ebay-market-shell > .market-left .category-link{font-size:12px;gap:4px;line-height:1.45}
 .ebay-market-shell > .market-left .market-card{min-width:0;width:100%;overflow-wrap:anywhere}
