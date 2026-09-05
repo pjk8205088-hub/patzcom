@@ -11,6 +11,7 @@
     "import:ebay": "node scripts/import-ebay-report.mjs",
     "enrich:ebay-images": "node scripts/enrich-ebay-images.mjs",
     "dedupe:catalog": "node scripts/dedupe-catalog.mjs"
+    ,"sync:ebay-csv": "node scripts/sync-ebay-csv-fields.mjs"
   },
   "dependencies": {
     "playwright-core": "^1.62.1"
