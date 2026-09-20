@@ -8696,8 +8696,15 @@
     "ebaySource": "seller-hub-active-listings",
     "desc_text": "1:1 Full Replacement Dry Carbon Fiber Exterior Door Handles for Veloster N JS imported from eBay Seller Hub active listings report.",
     "desc_html": "\n  <div style=\"font-family: Arial, Helvetica, sans-serif; line-height: 1.7; max-width: 760px; margin: 0 auto;\">\n    <h2 style=\"margin-bottom: 12px;\">1:1 Full Replacement Dry Carbon Fiber Exterior Door Handles for Veloster N JS</h2>\n    <p>This product was imported from an eBay active listings report and remapped into the PATZCOM storefront format.</p>\n    <ul>\n      <li><strong>Item number:</strong> 127457461623</li>\n      <li><strong>Category:</strong> Door Handles</li>\n      <li><strong>Available quantity:</strong> 5</li>\n    </ul>\n    <p>Images were not included in the Seller Hub active listings CSV export, so this product uses the PATZCOM image fallback until richer image data is provided.</p>\n  </div>\n",
-    "images": [],
-    "imageStatus": "awaiting-exact-ebay-image"
+    "images": [
+      "https://i.ebayimg.com/images/g/k5QAAeSwevZpNoxk/s-l1600.webp",
+      "https://i.ebayimg.com/images/g/njwAAeSwaXJpNoxk/s-l1600.webp",
+      "https://i.ebayimg.com/images/g/hpcAAeSwfWJpNoxk/s-l1600.webp",
+      "https://i.ebayimg.com/images/g/~YoAAeSwbbJpNoxk/s-l1600.webp",
+      "https://i.ebayimg.com/images/g/YsQAAeSwPGtpNoxk/s-l1600.webp",
+      "https://i.ebayimg.com/images/g/LwoAAeSwCrhpNoxk/s-l1600.webp"
+    ],
+    "imageStatus": "exact-ebay-item-match"
   },
   {
     "id": "127477761322",
