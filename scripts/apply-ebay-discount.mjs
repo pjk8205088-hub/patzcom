@@ -31,16 +31,40 @@ const ebay = new Map(rows.map(row => [row[column('Item number')], row]));
 const catalogPath = path.resolve('work/abc11-site_1/site/assets/products.json');
 const products = JSON.parse(await readFile(catalogPath, 'utf8'));
 let matched = 0;
+let titleUpdates = 0;
+let skuUpdates = 0;
 const next = products.map(product => {
   const id = String(product.ebayItemId || product.id || '');
   const row = ebay.get(id);
   if (!row || row[column('Listing site')] !== 'US' || row[column('Currency')] !== 'USD') return product;
   const ebayPrice = Number(row[column('Current price')]);
   if (!Number.isFinite(ebayPrice) || ebayPrice <= 0) throw new Error(`Invalid eBay price for ${id}.`);
+  const title = String(row[column('Title')] || '').trim();
+  const sku = String(row[column('Custom label (SKU)')] || '').trim();
+  if (!title) throw new Error(`Missing eBay title for ${id}.`);
+  if (title !== product.title) titleUpdates += 1;
+  if (sku !== String(product.sku || '')) skuUpdates += 1;
   matched += 1;
-  return { ...product, price: Number((ebayPrice * 0.95).toFixed(2)), compare: ebayPrice, currency: 'USD', listingSite: 'US' };
+  return {
+    ...product,
+    id,
+    ebayItemId: id,
+    title,
+    sku,
+    price: Number((ebayPrice * 0.95).toFixed(2)),
+    compare: ebayPrice,
+    currency: 'USD',
+    listingSite: 'US',
+  };
 });
 
 if (matched !== products.length) throw new Error(`Refusing partial discount: matched ${matched} of ${products.length} products.`);
 await saveCatalogSnapshot(next, { deduplicate: false });
-console.log(JSON.stringify({ catalogProducts: products.length, matched, discountPercent: 5, examples: next.slice(0, 5).map(({ id, price, compare }) => ({ id, price, compare })) }, null, 2));
+console.log(JSON.stringify({
+  catalogProducts: products.length,
+  matched,
+  titleUpdates,
+  skuUpdates,
+  discountPercent: 5,
+  examples: next.slice(0, 5).map(({ id, title, price, compare }) => ({ id, title, price, compare })),
+}, null, 2));

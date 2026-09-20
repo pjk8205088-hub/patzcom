@@ -13,6 +13,7 @@
     "dedupe:catalog": "node scripts/dedupe-catalog.mjs"
     ,"sync:ebay-csv": "node scripts/sync-ebay-csv-fields.mjs"
     ,"apply:ebay-discount": "node scripts/apply-ebay-discount.mjs"
+    ,"clean:mismatched-images": "node scripts/remove-mismatched-images.mjs"
   },
   "dependencies": {
     "playwright-core": "^1.62.1"
