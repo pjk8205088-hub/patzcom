@@ -12,7 +12,7 @@ async function main() {
   }
 
   if (!hasEbayBrowseCredentials()) {
-    throw new Error('Set EBAY_CLIENT_ID and EBAY_CLIENT_SECRET before running image enrichment.');
+    throw new Error('Set EBAY_ACCESS_TOKEN or EBAY_CLIENT_ID and EBAY_CLIENT_SECRET before running image enrichment.');
   }
 
   const raw = JSON.parse(fs.readFileSync(productsJsonPath, 'utf8'));
@@ -23,10 +23,17 @@ async function main() {
 
   const result = await enrichProductsWithBrowseImages(products, {
     maxItems: Number(process.env.EBAY_IMAGE_ENRICH_LIMIT || 0) || Infinity,
+    exactOnly: process.env.EBAY_IMAGE_EXACT_ONLY !== 'false',
   });
 
   await saveCatalogSnapshot(products);
-  console.log(`Updated ${result.updated} products with eBay Browse API images.`);
+  console.log(JSON.stringify({
+    processed: result.processed,
+    updated: result.updated,
+    directMatches: result.directMatches,
+    searchMatches: result.searchMatches,
+    preserved: result.preserved,
+  }, null, 2));
 }
 
 await main();
