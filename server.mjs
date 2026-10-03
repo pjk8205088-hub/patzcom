@@ -4,7 +4,7 @@ import { readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import crypto from 'node:crypto';
-import { readEditorCatalog, saveEditorProduct, uploadProductImage } from './lib/product-editor.mjs';
+import { initializeEditorCatalog, readEditorCatalog, saveEditorProduct, uploadProductImage } from './lib/product-editor.mjs';
 import {
   buildEbayConsentUrl,
   exchangeAuthorizationCode,
@@ -36,7 +36,7 @@ import {
   getPaymentConfig,
   retrieveStripeCheckoutSession,
 } from './lib/payment-api.mjs';
-import { databaseConfigured, initializeDatabase, listOrders, recordOrder, updateOrderStatus } from './lib/postgres.mjs';
+import { databaseConfigured, initializeDatabase, listOrders, recordOrder, saveCatalogSnapshotToDatabase, updateOrderFulfillment, updateOrderStatus } from './lib/postgres.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const siteRoot = path.join(__dirname, 'work', 'abc11-site_1', 'site');
@@ -415,6 +415,19 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
+  const adminOrderMatch = pathname.match(/^\/api\/admin\/orders\/([^/]+)$/);
+  if (adminOrderMatch && req.method === 'PATCH') {
+    if (!adminSession) return json(res, 401, { error: 'Admin login required' });
+    if (req.headers['sec-fetch-site'] === 'cross-site' || (req.headers.origin && new URL(req.headers.origin).host !== req.headers.host)) return json(res, 403, { error: 'Cross-site request rejected' });
+    try {
+      const body = JSON.parse(await readBody(req) || '{}');
+      const order = await updateOrderFulfillment(adminOrderMatch[1], body.fulfillmentStatus, body.trackingNumber);
+      return json(res, 200, { ok: true, order });
+    } catch (error) {
+      return json(res, 400, { error: error.message });
+    }
+  }
+
   if (pathname === '/api/admin/ebay/refresh' && req.method === 'POST') {
     if (!adminSession) {
       return json(res, 401, { error: 'Admin login required' });
@@ -439,6 +452,7 @@ const server = http.createServer(async (req, res) => {
         return json(res, 400, { ok: false, message: 'No catalog items found in the import payload.' });
       }
       await saveCatalogSnapshot(items);
+      await saveCatalogSnapshotToDatabase(items);
       clearProductCache();
       return json(res, 200, { ok: true, count: items.length });
     } catch (error) {
@@ -463,6 +477,7 @@ const server = http.createServer(async (req, res) => {
         return json(res, 400, { ok: false, message: 'No catalog items found in the remote payload.' });
       }
       await saveCatalogSnapshot(items);
+      await saveCatalogSnapshotToDatabase(items);
       clearProductCache();
       return json(res, 200, {
         ok: true,
@@ -512,6 +527,7 @@ const server = http.createServer(async (req, res) => {
         });
       }
       await saveCatalogSnapshot(products);
+      await saveCatalogSnapshotToDatabase(products);
       clearProductCache();
       return json(res, 200, {
         ok: true,
@@ -557,6 +573,12 @@ const server = http.createServer(async (req, res) => {
 server.listen(port, '0.0.0.0', () => {
   console.log(`PATZCOM storefront running on port ${port}`);
   initializeDatabase()
-    .then((connected) => console.log(connected ? 'PostgreSQL schema ready' : 'PostgreSQL not configured; continuing without persistence'))
+    .then(async (connected) => {
+      console.log(connected ? 'PostgreSQL schema ready' : 'PostgreSQL not configured; continuing without persistence');
+      if (connected) {
+        const catalog = await initializeEditorCatalog();
+        console.log(`PostgreSQL catalog ${catalog.restored ? 'restored' : 'seeded'} (${catalog.count} products)`);
+      }
+    })
     .catch((error) => console.error(`PostgreSQL initialization failed: ${error.message}`));
 });

@@ -300,17 +300,17 @@
           <article class="panel" id="orders">
             <div class="panel-head">
               <div>
-                <h2>Action queue</h2>
-                <p class="panel-note">Seller tasks that mirror the eBay workflow: inventory, consent, and checkout alignment.</p>
+                <h2>Orders and shipping</h2>
+                <p class="panel-note">Paid orders from PATZCOM checkout, with fulfillment status and carrier tracking.</p>
               </div>
-              <span class="status-chip">Workflow queue</span>
+              <button class="admin-btn" id="orders-reload" type="button">Refresh orders</button>
             </div>
-            <div id="action-queue" class="queue-grid">
-              <div class="queue-card">
-                <strong>Loading queue...</strong>
-                <p>Preparing the current seller actions.</p>
-              </div>
+            <div class="orders-toolbar">
+              <label for="orders-filter">Order status</label>
+              <select id="orders-filter"><option value="all">All orders</option><option value="paid">Paid</option><option value="awaiting_fulfillment">Awaiting fulfillment</option><option value="shipped">Shipped</option><option value="delivered">Delivered</option><option value="on_hold">On hold</option></select>
             </div>
+            <p id="orders-state" class="panel-note" role="status" aria-live="polite">Loading orders from PostgreSQL...</p>
+            <div class="admin-table-scroll"><table class="admin-table orders-table"><thead><tr><th>Order</th><th>Date</th><th>Items</th><th>Payment</th><th>Total</th><th>Fulfillment</th><th>Tracking</th><th>Update</th></tr></thead><tbody id="orders-table"><tr><td colspan="8" class="table-empty">Loading orders...</td></tr></tbody></table></div>
           </article>
 
           <article class="panel" id="selling">
@@ -478,6 +478,10 @@ const catalogEnrichBtn = document.getElementById('catalog-enrich-btn');
 const catalogImportState = document.getElementById('catalog-import-state');
 const catalogImportJson = document.getElementById('catalog-import-json');
 const catalogSourceUrl = document.getElementById('catalog-source-url');
+const ordersTable = document.getElementById('orders-table');
+const ordersState = document.getElementById('orders-state');
+const ordersFilter = document.getElementById('orders-filter');
+let allOrders = [];
 const flashMessages = {
   connected: 'eBay account connected. Refresh the token when you need updated consent.',
   invalid-state: 'OAuth state did not match. Open the developer portal again and start a fresh consent flow.',
@@ -487,6 +491,76 @@ const flashMessages = {
 };
 let allProducts = [];
 
+function renderOrders() {
+  if (!ordersTable) return;
+  const filter = ordersFilter?.value || 'all';
+  const shown = allOrders.filter((order) => filter === 'all'
+    || (filter === 'paid' ? ['paid', 'completed', 'captured', 'succeeded'].includes(String(order.status).toLowerCase()) : false)
+    || order.fulfillment_status === filter);
+  ordersTable.replaceChildren();
+  if (!shown.length) {
+    const row = document.createElement('tr');
+    const cell = document.createElement('td');
+    cell.colSpan = 8;
+    cell.className = 'table-empty';
+    cell.textContent = allOrders.length ? 'No orders match this filter.' : 'No checkout orders yet. New PayPal and Stripe orders will appear here.';
+    row.append(cell);
+    ordersTable.append(row);
+    return;
+  }
+  for (const order of shown) {
+    const row = document.createElement('tr');
+    const lines = Array.isArray(order.items) ? order.items : [];
+    const itemSummary = lines.map((line) => `${line.title || 'Item'} × ${line.quantity || 1}`).join(', ');
+    const payment = document.createElement('td'); payment.textContent = `${String(order.provider || '').toUpperCase()} · ${order.status}`;
+    const id = document.createElement('td'); id.textContent = order.reference;
+    const date = document.createElement('td'); date.textContent = Number.isNaN(Date.parse(order.created_at)) ? '—' : new Date(order.created_at).toLocaleDateString();
+    const items = document.createElement('td'); items.textContent = itemSummary || '—';
+    const total = document.createElement('td'); total.textContent = new Intl.NumberFormat('en-US', { style: 'currency', currency: order.currency || 'USD' }).format(Number(order.total || 0));
+    const fulfillmentCell = document.createElement('td');
+    const fulfillment = document.createElement('select');
+    for (const [value, label] of [['awaiting_fulfillment','Awaiting fulfillment'],['packing','Packing'],['shipped','Shipped'],['delivered','Delivered'],['on_hold','On hold']]) {
+      const option = document.createElement('option'); option.value = value; option.textContent = label; fulfillment.append(option);
+    }
+    fulfillment.value = order.fulfillment_status || 'awaiting_fulfillment'; fulfillmentCell.append(fulfillment);
+    const trackingCell = document.createElement('td');
+    const tracking = document.createElement('input'); tracking.type = 'text'; tracking.maxLength = 120; tracking.placeholder = 'Tracking number'; tracking.value = order.tracking_number || ''; trackingCell.append(tracking);
+    const actionCell = document.createElement('td');
+    const save = document.createElement('button'); save.type = 'button'; save.className = 'admin-btn'; save.textContent = 'Save';
+    save.addEventListener('click', async () => {
+      save.disabled = true; save.textContent = 'Saving...';
+      try {
+        const response = await fetch(`/api/admin/orders/${encodeURIComponent(order.id)}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fulfillmentStatus: fulfillment.value, trackingNumber: tracking.value }) });
+        const payload = await response.json();
+        if (!response.ok) throw new Error(payload.error || 'Unable to update order.');
+        ordersState.textContent = `Order ${order.reference} updated.`;
+        await loadOrders();
+      } catch (error) { ordersState.textContent = error.message; }
+      finally { save.disabled = false; save.textContent = 'Save'; }
+    });
+    actionCell.append(save);
+    row.append(id, date, items, payment, total, fulfillmentCell, trackingCell, actionCell);
+    ordersTable.append(row);
+  }
+}
+
+async function loadOrders() {
+  if (!ordersTable) return;
+  ordersState.textContent = 'Loading orders from PostgreSQL...';
+  try {
+    const response = await fetch('/api/admin/orders', { cache: 'no-store' });
+    if (response.status === 401) { window.location.href = '/admin-login.html'; return; }
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error || 'Unable to load orders.');
+    allOrders = Array.isArray(payload.orders) ? payload.orders : [];
+    ordersState.textContent = payload.databaseConfigured ? `${allOrders.length} orders loaded from PostgreSQL.` : 'PostgreSQL is not connected in this environment.';
+    renderOrders();
+  } catch (error) {
+    ordersState.textContent = error.message;
+    ordersTable.innerHTML = '<tr><td colspan="8" class="table-empty">Order data could not be loaded.</td></tr>';
+  }
+}
+
 function statusClass(status) {
   const value = String(status || '').toLowerCase();
   if (value.includes('ready') || value.includes('success') || value.includes('positive')) return 'ok';
@@ -495,6 +569,7 @@ function statusClass(status) {
 }
 
 function renderQueue(dashboard) {
+  if (!queue) return;
   queue.innerHTML = `
     <div class="queue-card">
       <strong>Map inventory items to offers</strong>
@@ -712,10 +787,10 @@ async function loadDashboard() {
 
   renderOperations(dashboard);
   renderApiPlan(dashboard);
-  renderQueue(dashboard);
   renderIntegrations(dashboard);
   renderInventory(allProducts);
   renderActiveListings(allProducts);
+  await loadOrders();
 }
 
 connectBtn?.addEventListener('click', () => {
@@ -777,11 +852,22 @@ document.querySelector('.seller-tool-pills button:last-child')?.addEventListener
 });
 document.querySelectorAll('.seller-bulk-action').forEach((button) => {
   button.addEventListener('click', () => {
-    flash.textContent = `${button.textContent.trim()} is ready for the selected PATZCOM listings.`;
+    const action = button.textContent.trim();
+    if (action === 'Edit' || action === 'Sell similar') {
+      window.location.href = `admin-products.html${action === 'Sell similar' ? '?mode=duplicate' : ''}`;
+      return;
+    }
+    if (action === 'Actions') {
+      window.location.href = 'admin-products.html';
+      return;
+    }
+    flash.textContent = 'Promoted listings are not configured yet. Set up an advertising integration before launching campaigns.';
     flash.hidden = false;
-    flash.className = 'flash-banner info';
+    flash.className = 'flash-banner warn';
   });
 });
+ordersFilter?.addEventListener('change', renderOrders);
+document.getElementById('orders-reload')?.addEventListener('click', loadOrders);
 document.querySelectorAll('.admin-tabs-row a, .rail-link, .seller-workbench-actions a').forEach((link) => {
   link.addEventListener('click', () => {
     const target = link.getAttribute('href');

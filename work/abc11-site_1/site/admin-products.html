@@ -8,15 +8,16 @@
 <header><a class="brand" href="index.html">PATZCOM</a><strong>Seller Hub</strong><a href="admin.html">Overview</a><a href="admin-products.html" aria-current="page">Listings</a><a href="index.html">Visit store</a></header>
 <main>
 <div class="heading"><div><p class="eyebrow">PATZCOM INVENTORY</p><h1>Manage listings <span id="count"></span></h1></div><button id="create" disabled>Create listing</button></div>
-<p class="notice">Changes apply only to PATZCOM. Your eBay listings are never modified. Server-local changes and backups need persistent hosting storage to survive redeployment.</p>
+<p class="notice">Changes apply only to PATZCOM; eBay listings are never modified. With PostgreSQL connected, product records survive redeployments. Uploaded files still require persistent file storage.</p>
 <div class="toolbar"><label>Search listings <input id="search" type="search" placeholder="Title, SKU or item number"></label><label>Status <select id="filter"><option value="all">All listings</option><option value="active">Available</option><option value="inactive">Unavailable</option></select></label><button id="reload" class="secondary">Reload</button><button id="export" class="secondary" disabled>Download catalog backup</button></div>
+<div class="bulk-toolbar"><label class="check"><input id="select-all" type="checkbox"> Select visible</label><span id="selection-count">0 selected</span><button id="bulk-activate" class="secondary" type="button" disabled>Activate</button><button id="bulk-pause" class="secondary" type="button" disabled>Pause</button><a class="secondary button-link" href="admin.html#orders">Orders &amp; shipping</a></div>
 <p id="status" role="status" aria-live="polite">Loading listings...</p>
-<div class="table-wrap"><table><thead><tr><th>Listing</th><th>SKU / Item number</th><th>Category</th><th>Price (USD)</th><th>Status</th><th>Actions</th></tr></thead><tbody id="rows"></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>Select</th><th>Listing</th><th>SKU / Item number</th><th>Category</th><th>Price (USD)</th><th>Quantity</th><th>Status</th><th>Actions</th></tr></thead><tbody id="rows"></tbody></table></div>
 </main>
 <dialog id="editor"><form id="form"><div class="heading"><h2 id="editor-title">Edit listing</h2><button type="button" id="cancel" class="secondary">Close</button></div>
 <p id="form-status" role="status" aria-live="polite"></p>
 <label>Title <input name="title" required maxlength="300"></label>
-<div class="fields"><label>SKU <input name="sku" maxlength="300"></label><label>Brand <input name="vendor" maxlength="300"></label><label>Category <input name="type" list="categories" required maxlength="300"></label><label>Price (USD) <input name="price" type="number" min="0.01" max="1000000" step="0.01" required></label></div>
+<div class="fields"><label>SKU <input name="sku" maxlength="300"></label><label>Brand <input name="vendor" maxlength="300"></label><label>Category <input name="type" list="categories" required maxlength="300"></label><label>Price (USD) <input name="price" type="number" min="0.01" max="1000000" step="0.01" required></label><label>Condition <select name="condition"><option value="new">New</option><option value="used">Used</option></select></label><label>Available quantity <input name="quantity" type="number" min="0" max="1000000" step="1" required></label></div>
 <datalist id="categories"></datalist>
 <label class="check"><input name="available" type="checkbox"> Available for purchase</label>
 <label>Image URLs, one per line <textarea name="images" rows="5" placeholder="https://i.ebayimg.com/images/.../s-l1600.jpg"></textarea></label>
