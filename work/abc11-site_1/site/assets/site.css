@@ -624,22 +624,16 @@ img{max-width:100%;display:block}
 .market-pills{display:flex;gap:10px;flex-wrap:wrap}
 .pill{height:34px;padding:0 15px;border:1px solid #d9e0ea;border-radius:999px;background:#fff;color:#111;font-weight:600}
 .pill.active{background:#767676;color:#fff;border-color:#767676}
-.market-list{display:grid;gap:22px}
-.market-row{display:grid;grid-template-columns:240px minmax(0,1fr) 220px;gap:16px;padding:0 0 22px;border-bottom:1px solid #ebedf0}
-.market-row-img{display:block;width:240px;height:240px;border:1px solid #e2e8f0;background:#f6f7fb;overflow:hidden;border-radius:8px}
+.market-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:start;gap:16px}
+.market-product-card{display:grid;grid-template-columns:minmax(0,1fr);min-width:0;overflow:hidden;border:1px solid #e2e8f0;border-radius:10px;background:#fff;color:#111;transition:border-color .15s,box-shadow .15s}
+.market-product-card:hover{border-color:#b8c3d2;box-shadow:0 3px 12px rgba(17,24,39,.1)}
+.market-row-img{display:block;width:100%;aspect-ratio:1;background:#f3f4f6;overflow:hidden}
 .market-row-img img{width:100%;height:100%;object-fit:cover}
-.market-row-body h3{margin:0 0 6px;font-size:20px;line-height:1.28;font-weight:400;color:#111}
+.market-row-body{display:grid;align-content:start;gap:8px;min-width:0;padding:10px 12px 13px}
+.market-row-body h3{display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:2;min-height:42px;margin:0;font-size:15px;line-height:1.4;font-weight:400;color:#111;overflow-wrap:normal;word-break:normal}
 .market-row-body h3 a:hover{color:#3665f3}
-.market-sub{color:#6f7282;font-size:14px;margin-bottom:14px}
-.market-price{font-size:22px;font-weight:800;letter-spacing:-.02em;color:#111;margin-bottom:4px}
+.market-price{font-size:19px;font-weight:800;letter-spacing:-.02em;color:#111}
 .market-old{font-size:14px;color:#8b8b8b;text-decoration:line-through;margin-bottom:8px}
-.market-extra{display:flex;flex-direction:column;gap:4px;color:#111;font-size:14px}
-.market-row-meta{font-size:14px;color:#111;display:grid;align-content:start;gap:8px;padding-top:2px}
-.market-row-meta strong{color:#177733}
-.market-row-kicker{margin-bottom:6px;color:#607186;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
-.market-list.compact .market-row-img{width:160px;height:160px}
-.market-list.compact .market-row{grid-template-columns:160px minmax(0,1fr) 200px;padding-bottom:16px}
-.market-list.compact .market-row-body h3{font-size:17px}
 .market-empty{display:grid;gap:7px;justify-items:start;padding:42px 24px;border:1px dashed #cfd8e3;border-radius:14px;color:#526276;background:#fbfcfe}
 .market-empty strong{color:#111827;font-size:17px}
 .market-empty span{font-size:14px}
@@ -787,24 +781,13 @@ img{max-width:100%;display:block}
 .market-cats a{display:block;color:#111;text-decoration:none;font-size:15px;padding:4px 0}
 .market-cats a:hover{color:#3665f3}
 .market-right{min-width:0;container-type:inline-size;container-name:product-results}
-.market-right .market-search-box,.market-right .market-search-box input,.market-right .market-row-body,.market-right .market-row-meta{min-width:0}
-.market-right .market-row-body,.market-right .market-row-meta{overflow-wrap:break-word;word-break:normal}
-.market-right .market-row{min-width:0;grid-template-columns:minmax(0,180px) minmax(0,1fr);align-items:start}
-.market-right .market-row-img{width:100%;height:auto;aspect-ratio:1;min-width:0}
-.market-right .market-row-body{min-width:0;width:100%}
-.market-right .market-row-body h3,.market-right .market-row-kicker{min-width:0;max-width:100%;overflow-wrap:normal;word-break:normal;hyphens:auto}
-.market-right .market-row-meta{grid-column:2;min-width:0}
-@container product-results (max-width:800px){
-  .market-row,.market-list.compact .market-row{grid-template-columns:minmax(0,180px) minmax(0,1fr)}
-  .market-row-meta{grid-column:2}
-  .market-row-img,.market-list.compact .market-row-img{width:100%;height:auto;aspect-ratio:1}
+@container product-results (max-width:900px){
+  .market-list{grid-template-columns:repeat(2,minmax(0,1fr))}
   .market-search-row,.market-results-head{flex-wrap:wrap}
   .market-search-box{width:100%;max-width:100%;flex-basis:100%}
 }
 @container product-results (max-width:440px){
-  .market-row,.market-list.compact .market-row{grid-template-columns:minmax(0,1fr)}
-  .market-row-img,.market-list.compact .market-row-img{grid-column:1;width:100%;aspect-ratio:16/10}
-  .market-row-body,.market-row-meta{grid-column:1/-1;min-width:0}
+  .market-list{grid-template-columns:minmax(0,1fr)}
   .market-right-tools,.market-sort,.market-pills{max-width:100%;flex-wrap:wrap}
 }
 @media(max-width:600px){

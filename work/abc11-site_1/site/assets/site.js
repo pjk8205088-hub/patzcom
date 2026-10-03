@@ -104,12 +104,11 @@ function initMarketplaceHome(){
   const buyNowCount = document.getElementById('buy-now-count');
   const pager = document.getElementById('market-pager');
   const sortSelect = document.getElementById('market-sort');
-  const viewToggle = document.getElementById('market-view-toggle');
   const featuredCategories = document.getElementById('featured-categories');
   const featuredItems = document.getElementById('featured-item-grid');
   const vehicleMakes = document.getElementById('store-vehicle-makes');
   const headerCategory = document.getElementById('header-search-category');
-  const state = { query:'', category:'', inStock:false, sale:false, shipping:false, format:'all', priceBand:'', min:null, max:null, sort:'match', page:1, compact:false, includeDescription:false };
+  const state = { query:'', category:'', inStock:false, sale:false, shipping:false, format:'all', priceBand:'', min:null, max:null, sort:'match', page:1, includeDescription:false };
   const initialQuery=new URLSearchParams(window.location.search).get('q');
   if(initialQuery){state.query=initialQuery.trim().toLowerCase();if(searchInput)searchInput.value=initialQuery;if(document.getElementById('q'))document.getElementById('q').value=initialQuery;}
   const pageSize = 24;
@@ -218,26 +217,18 @@ function initMarketplaceHome(){
     state.page = Math.min(state.page, totalPages);
     const pageItems = products.slice((state.page - 1) * pageSize, state.page * pageSize);
     resultsCount.textContent = products.length.toLocaleString('en-US');
-    list.classList.toggle('compact', state.compact);
     if(!pageItems.length){
       list.innerHTML = `<div class="market-empty"><strong>No products match these filters.</strong><span>Clear a filter or try a broader search.</span><button class="filter-apply" id="empty-clear" type="button">Clear filters</button></div>`;
     } else {
       list.innerHTML = pageItems.map((product) => {
         const image = product.images?.[0] || imgFallback;
         const price = money(Number(product.price || 0));
-        const compare = product.compare ? `<div class="market-old">${money(Number(product.compare))}</div>` : '';
-        const status = product.available === false ? 'Out of stock' : 'In stock';
-        return `<article class="market-row">
+        return `<article class="market-product-card">
           <a class="market-row-img" href="${productHref(product)}"><img loading="lazy" src="${escapeHtml(image)}" alt="${escapeHtml(product.title)}"></a>
           <div class="market-row-body">
-            <div class="market-row-kicker">${escapeHtml(product.vendor || 'PATZCOM')} · ${escapeHtml(product.type || 'Automotive parts')}</div>
             <h3><a href="${productHref(product)}">${escapeHtml(product.title)}</a></h3>
-            <div class="market-sub">Brand New · ${escapeHtml(status)}</div>
             <div class="market-price">${price}</div>
-            ${compare}
-            <div class="market-extra"><span>Buy it now</span><span>International shipping available</span><span>Secure checkout</span></div>
           </div>
-          <div class="market-row-meta"><div>Ships from <strong>South Korea</strong></div><div>PATZCOM direct catalog</div>${product.sku ? `<div>SKU ${escapeHtml(product.sku)}</div>` : ''}</div>
         </article>`;
       }).join('');
     }
@@ -301,7 +292,6 @@ function initMarketplaceHome(){
     document.querySelectorAll('.market-pills .pill').forEach((item) => item.classList.toggle('active', item === button)); render();
   });
   sortSelect?.addEventListener('change', () => { state.sort = sortSelect.value; state.page = 1; render(); });
-  viewToggle?.addEventListener('click', () => { state.compact = !state.compact; viewToggle.setAttribute('aria-pressed', String(state.compact)); render(); });
   pager.addEventListener('click', (event) => { const button = event.target.closest('[data-page]'); if(!button || button.disabled) return; state.page = Number(button.dataset.page); render(); window.scrollTo({ top: list.offsetTop - 120, behavior: 'smooth' }); });
   list.addEventListener('click', (event) => { if(event.target.closest('#empty-clear')) clearFilters(); });
   const runHeaderSearch=()=>{if(searchInput){searchInput.value=document.getElementById('q').value;state.query=searchInput.value.trim().toLowerCase();selectCategory(headerCategory?.value||'');document.getElementById('all-items').scrollIntoView({behavior:'smooth',block:'start'});}};
