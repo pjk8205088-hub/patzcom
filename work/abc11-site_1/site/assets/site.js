@@ -68,7 +68,7 @@ const imgFallback = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
   </g>
 </svg>`);
 
-fetch(R+'assets/products.json').then(r=>r.json()).then(p=>{ PRODUCTS=p; initSearch(); initMarketplaceHome(); renderCart(); });
+fetch(R+'assets/products.json').then(r=>r.json()).then(p=>{ PRODUCTS=p; document.querySelectorAll('#store-catalog-count').forEach((node)=>node.textContent=PRODUCTS.length.toLocaleString('en-US')); initSearch(); initMarketplaceHome(); initAboutStorePage(); renderCart(); });
 paintCount();
 initQandA();
 installImageFallbacks();
@@ -110,6 +110,8 @@ function initMarketplaceHome(){
   const vehicleMakes = document.getElementById('store-vehicle-makes');
   const headerCategory = document.getElementById('header-search-category');
   const state = { query:'', category:'', inStock:false, sale:false, shipping:false, format:'all', priceBand:'', min:null, max:null, sort:'match', page:1, compact:false, includeDescription:false };
+  const initialQuery=new URLSearchParams(window.location.search).get('q');
+  if(initialQuery){state.query=initialQuery.trim().toLowerCase();if(searchInput)searchInput.value=initialQuery;if(document.getElementById('q'))document.getElementById('q').value=initialQuery;}
   const pageSize = 24;
 
   const productText = (product) => [
@@ -306,6 +308,18 @@ function initMarketplaceHome(){
   document.getElementById('header-search-btn')?.addEventListener('click',runHeaderSearch);
   document.getElementById('q')?.addEventListener('keydown',(event)=>{if(event.key==='Enter'){event.preventDefault();runHeaderSearch();}});
   render();
+}
+
+function initAboutStorePage(){
+  if(!document.querySelector('.about-store-main'))return;
+  const queryInput=document.getElementById('q');
+  const inlineInput=document.getElementById('about-search-input');
+  const categorySelect=document.getElementById('header-search-category');
+  if(categorySelect){const categories=[...new Set(PRODUCTS.map((product)=>product.type).filter(Boolean))].sort((a,b)=>a.localeCompare(b));categorySelect.replaceChildren(new Option('All categories',''),...categories.map((category)=>new Option(category,category)));}
+  const goToResults=()=>{const query=(inlineInput?.value||queryInput?.value||'').trim();if(query)window.location.href=`${R}index.html?q=${encodeURIComponent(query)}#all-items`;};
+  inlineInput?.addEventListener('keydown',(event)=>{if(event.key==='Enter'){event.preventDefault();goToResults();}});
+  document.getElementById('header-search-btn')?.addEventListener('click',goToResults);
+  queryInput?.addEventListener('keydown',(event)=>{if(event.key==='Enter'){event.preventDefault();goToResults();}});
 }
 
 function renderCart(){

@@ -826,6 +826,18 @@ img{max-width:100%;display:block}
 .market-product-body{padding:12px 14px 16px}
 .market-product-body .vendor{font-size:12px;font-weight:800;color:#667085;letter-spacing:.12em}
 .market-product-body h3{font-size:16px;line-height:1.35;margin:6px 0 0;font-weight:700}
+.about-store-main{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.75fr);gap:30px;max-width:1240px;padding-top:30px;padding-bottom:54px;color:#191919}
+.about-us-copy h1{margin:0 0 18px;color:#191919;font-size:28px;letter-spacing:-.025em}
+.about-us-copy p{max-width:760px;margin:0 0 16px;color:#333;font-size:16px;line-height:1.75}
+.about-us-copy .about-lead{font-size:19px;line-height:1.55;font-weight:600;color:#191919}
+.about-store-facts{align-self:start;padding:20px 22px;border:1px solid #dedede;border-radius:4px;background:#f7f7f7}
+.about-store-facts>div{display:flex;align-items:center;gap:14px;padding-bottom:16px;border-bottom:1px solid #dedede}
+.about-fact-icon{display:grid;place-items:center;flex:0 0 52px;width:52px;height:52px;border-radius:50%;background:#fff;border:1px solid #e4e4e4;color:#111;font-size:24px;font-weight:900}
+.about-store-facts h2{margin:0;color:#191919;font-size:20px}.about-store-facts p{margin:2px 0 0;color:#626262;font-size:13px}
+.about-store-facts dl{display:grid;gap:12px;margin:17px 0 0}.about-store-facts dl div{display:grid;grid-template-columns:95px 1fr;gap:10px}.about-store-facts dt{color:#666;font-size:13px}.about-store-facts dd{margin:0;color:#191919;font-size:13px;font-weight:600}.about-store-facts dd a,.about-brands>a{color:#315fe8}
+.about-brands{grid-column:1/-1;padding:22px 24px;border-top:1px solid #e4e4e4;border-bottom:1px solid #e4e4e4}.about-brands h2{margin:0 0 5px;color:#191919;font-size:21px}.about-brands p{margin:0 0 15px;color:#555}.about-brand-tags{display:flex;gap:9px;flex-wrap:wrap;margin:0 0 16px}.about-brand-tags span{padding:7px 11px;border:1px solid #d8d8d8;border-radius:999px;color:#303030;background:#fff;font-size:13px}.about-brands>a{font-weight:700}
+body.about-white-page .ftr{background:#fff;color:#191919;border-top:1px solid #ddd}body.about-white-page .ftr p,body.about-white-page .ftr li{color:#4f4f4f}body.about-white-page .ftr a:hover{color:#315fe8}
+@media(max-width:760px){.about-store-main{grid-template-columns:1fr;gap:18px;padding-top:22px}.about-brands{grid-column:auto}.about-store-facts{order:2}.about-brands{order:3}.about-store-toolbar .store-inline-search{width:100%}}
 @media(max-width:1200px){.admin-market-shell{grid-template-columns:1fr}.market-search{min-width:0;width:100%}.market-category-grid,.market-product-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:720px){.market-category-grid,.market-product-grid{grid-template-columns:1fr}.ebay-admin-search{grid-template-columns:1fr}.market-feature-head{align-items:flex-start}.market-search{grid-template-columns:1fr}.market-search button{width:100%}}
 
