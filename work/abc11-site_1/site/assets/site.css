@@ -789,9 +789,10 @@ img{max-width:100%;display:block}
 .market-right{min-width:0;container-type:inline-size;container-name:product-results}
 .market-right .market-search-box,.market-right .market-search-box input,.market-right .market-row-body,.market-right .market-row-meta{min-width:0}
 .market-right .market-row-body,.market-right .market-row-meta{overflow-wrap:break-word;word-break:normal}
-.market-right .market-row{min-width:0;grid-template-columns:minmax(0,180px) minmax(0,1fr)}
+.market-right .market-row{min-width:0;grid-template-columns:minmax(0,180px) minmax(0,1fr);align-items:start}
 .market-right .market-row-img{width:100%;height:auto;aspect-ratio:1;min-width:0}
-.market-right .market-row-body h3{min-width:0;overflow-wrap:break-word;word-break:normal}
+.market-right .market-row-body{min-width:0;width:100%}
+.market-right .market-row-body h3,.market-right .market-row-kicker{min-width:0;max-width:100%;overflow-wrap:normal;word-break:normal;hyphens:auto}
 .market-right .market-row-meta{grid-column:2;min-width:0}
 @container product-results (max-width:800px){
   .market-row,.market-list.compact .market-row{grid-template-columns:minmax(0,180px) minmax(0,1fr)}
@@ -801,8 +802,8 @@ img{max-width:100%;display:block}
   .market-search-box{width:100%;max-width:100%;flex-basis:100%}
 }
 @container product-results (max-width:440px){
-  .market-row,.market-list.compact .market-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
-  .market-row-img,.market-list.compact .market-row-img{grid-column:1/-1;width:100%;aspect-ratio:16/10}
+  .market-row,.market-list.compact .market-row{grid-template-columns:minmax(0,1fr)}
+  .market-row-img,.market-list.compact .market-row-img{grid-column:1;width:100%;aspect-ratio:16/10}
   .market-row-body,.market-row-meta{grid-column:1/-1;min-width:0}
   .market-right-tools,.market-sort,.market-pills{max-width:100%;flex-wrap:wrap}
 }
