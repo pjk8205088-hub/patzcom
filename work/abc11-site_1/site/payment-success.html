@@ -13,8 +13,20 @@
   <div class="payment-result-icon">✓</div>
   <p class="eyebrow">PAYMENT CONFIRMED</p>
   <h1>Thank you for your PATZCOM order.</h1>
-  <p class="muted">Your payment was completed securely by the payment provider. PATZCOM will use the payment confirmation to prepare fulfillment and shipping.</p>
+  <p id="payment-verification" class="muted">Your payment was completed securely by the payment provider. PATZCOM will use the payment confirmation to prepare fulfillment and shipping.</p>
   <a class="btn" href="index.html">Continue shopping</a>
 </div></main>
 </body>
+<script>
+const params = new URLSearchParams(location.search);
+const sessionId = params.get('session_id');
+if (sessionId) {
+  fetch(`/api/stripe/checkout-session/${encodeURIComponent(sessionId)}`)
+    .then((response) => response.json())
+    .then((payload) => {
+      if (payload.status && payload.status !== 'paid') document.getElementById('payment-verification').textContent = 'Stripe returned the order, but payment is not marked as paid yet. PATZCOM will verify it before fulfillment.';
+    })
+    .catch(() => {});
+}
+</script>
 </html>

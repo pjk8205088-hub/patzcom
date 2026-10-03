@@ -34,7 +34,9 @@ import {
   createPayPalOrder,
   createStripeCheckoutSession,
   getPaymentConfig,
+  retrieveStripeCheckoutSession,
 } from './lib/payment-api.mjs';
+import { databaseConfigured, listOrders, recordOrder, updateOrderStatus } from './lib/postgres.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const siteRoot = path.join(__dirname, 'work', 'abc11-site_1', 'site');
@@ -217,7 +219,9 @@ const server = http.createServer(async (req, res) => {
   if (pathname === '/api/paypal/orders' && req.method === 'POST') {
     try {
       const body = JSON.parse(await readBody(req) || '{}');
-      return json(res, 201, await createPayPalOrder(body.items));
+      const order = await createPayPalOrder(body.items);
+      await recordOrder({ reference: order.reference, provider: 'paypal', providerOrderId: order.id, status: 'created', cart: order });
+      return json(res, 201, order);
     } catch (error) {
       return json(res, 400, { ok: false, message: error.message });
     }
@@ -226,7 +230,9 @@ const server = http.createServer(async (req, res) => {
   const paypalCaptureMatch = pathname.match(/^\/api\/paypal\/orders\/([^/]+)\/capture$/);
   if (paypalCaptureMatch && req.method === 'POST') {
     try {
-      return json(res, 200, await capturePayPalOrder(paypalCaptureMatch[1]));
+      const order = await capturePayPalOrder(paypalCaptureMatch[1]);
+      await updateOrderStatus({ providerOrderId: paypalCaptureMatch[1], status: order.status === 'COMPLETED' ? 'paid' : 'capture_pending' });
+      return json(res, 200, order);
     } catch (error) {
       return json(res, 400, { ok: false, message: error.message });
     }
@@ -235,7 +241,20 @@ const server = http.createServer(async (req, res) => {
   if (pathname === '/api/stripe/checkout-session' && req.method === 'POST') {
     try {
       const body = JSON.parse(await readBody(req) || '{}');
-      return json(res, 201, await createStripeCheckoutSession(body.items));
+      const session = await createStripeCheckoutSession(body.items);
+      await recordOrder({ reference: session.reference, provider: 'stripe', providerOrderId: session.id, status: 'checkout_created', cart: session });
+      return json(res, 201, session);
+    } catch (error) {
+      return json(res, 400, { ok: false, message: error.message });
+    }
+  }
+
+  const stripeSessionMatch = pathname.match(/^\/api\/stripe\/checkout-session\/([^/]+)$/);
+  if (stripeSessionMatch && req.method === 'GET') {
+    try {
+      const session = await retrieveStripeCheckoutSession(stripeSessionMatch[1]);
+      await updateOrderStatus({ reference: session.reference, providerOrderId: session.id, status: session.status === 'paid' ? 'paid' : session.status });
+      return json(res, 200, session);
     } catch (error) {
       return json(res, 400, { ok: false, message: error.message });
     }
@@ -384,6 +403,15 @@ const server = http.createServer(async (req, res) => {
       return json(res, 200, snapshot);
     } catch (error) {
       return json(res, 500, { error: 'Unable to build admin snapshot', detail: error.message });
+    }
+  }
+
+  if (pathname === '/api/admin/orders' && req.method === 'GET') {
+    if (!adminSession) return json(res, 401, { error: 'Admin login required' });
+    try {
+      return json(res, 200, { databaseConfigured: databaseConfigured(), orders: await listOrders(200) });
+    } catch (error) {
+      return json(res, 500, { error: 'Unable to load orders', detail: error.message });
     }
   }
 

@@ -10,12 +10,13 @@
     "start": "node server.mjs",
     "import:ebay": "node scripts/import-ebay-report.mjs",
     "enrich:ebay-images": "node scripts/enrich-ebay-images.mjs",
-    "dedupe:catalog": "node scripts/dedupe-catalog.mjs"
-    ,"sync:ebay-csv": "node scripts/sync-ebay-csv-fields.mjs"
-    ,"apply:ebay-discount": "node scripts/apply-ebay-discount.mjs"
-    ,"clean:mismatched-images": "node scripts/remove-mismatched-images.mjs"
+    "dedupe:catalog": "node scripts/dedupe-catalog.mjs",
+    "sync:ebay-csv": "node scripts/sync-ebay-csv-fields.mjs",
+    "apply:ebay-discount": "node scripts/apply-ebay-discount.mjs",
+    "clean:mismatched-images": "node scripts/remove-mismatched-images.mjs"
   },
   "dependencies": {
+    "pg": "^8.23.1",
     "playwright-core": "^1.62.1"
   }
 }
