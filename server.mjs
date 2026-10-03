@@ -36,7 +36,7 @@ import {
   getPaymentConfig,
   retrieveStripeCheckoutSession,
 } from './lib/payment-api.mjs';
-import { databaseConfigured, listOrders, recordOrder, updateOrderStatus } from './lib/postgres.mjs';
+import { databaseConfigured, initializeDatabase, listOrders, recordOrder, updateOrderStatus } from './lib/postgres.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const siteRoot = path.join(__dirname, 'work', 'abc11-site_1', 'site');
@@ -556,4 +556,7 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(port, '0.0.0.0', () => {
   console.log(`PATZCOM storefront running on port ${port}`);
+  initializeDatabase()
+    .then((connected) => console.log(connected ? 'PostgreSQL schema ready' : 'PostgreSQL not configured; continuing without persistence'))
+    .catch((error) => console.error(`PostgreSQL initialization failed: ${error.message}`));
 });
