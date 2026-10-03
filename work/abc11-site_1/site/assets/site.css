@@ -782,9 +782,11 @@ img{max-width:100%;display:block}
 .market-cats a:hover{color:#3665f3}
 .market-right{min-width:0;container-type:inline-size;container-name:product-results}
 @container product-results (max-width:900px){
-  .market-list{grid-template-columns:repeat(2,minmax(0,1fr))}
   .market-search-row,.market-results-head{flex-wrap:wrap}
   .market-search-box{width:100%;max-width:100%;flex-basis:100%}
+}
+@container product-results (max-width:480px){
+  .market-list{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @container product-results (max-width:440px){
   .market-list{grid-template-columns:minmax(0,1fr)}
