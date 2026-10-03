@@ -2,21 +2,21 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>patzcom | Automotive Parts Store</title>
 <meta name="description" content="patzcom - premium automotive parts and performance upgrades for U.S. drivers.">
-<link rel="stylesheet" href="assets/site.css?v=columns-220-v3">
+<link rel="stylesheet" href="assets/site.css?v=patz-storefront-v7">
 <script defer src="assets/config.js"></script>
-<script defer src="assets/site.js"></script>
+<script defer src="assets/site.js?v=patz-storefront-v7"></script>
 <script>window.ROOT="";</script>
 </head><body class="ebay-home-body">
 <header class="hdr ebay-shell">
 <div class="hdr-top wrap">
 <div class="top-links">
- <a href="#">Hi! Sign in</a>
- <a href="#">Daily Deals</a>
- <a href="#">Help &amp; Contact</a>
+ <a href="about.html">Welcome to PATZCOM</a>
+ <a href="#featured-items">Featured parts</a>
+ <a href="contact.html">Help &amp; Contact</a>
 </div>
 <div class="top-links right">
- <a href="#">Ship to</a>
- <a href="#">Saved</a>
+ <a href="policies.html#shipping">Shipping</a>
+ <a href="#store-profile">Saved store</a>
  <a href="admin.html">Seller Hub</a>
 </div>
 </div>
@@ -25,12 +25,8 @@
 <button class="cat-toggle" type="button" onclick="location.href='collections/all.html'">Shop by category ▾</button>
 <div class="search-shell">
  <input id="q" class="search" type="search" placeholder="Search for anything">
- <select class="search-select" aria-label="Category">
-  <option>All categories</option>
-  <option>Brake Pads</option>
-  <option>Big Brake Kits</option>
-  <option>Lift Coilover Suspension Kit</option>
-  <option>Lowering Springs</option>
+ <select class="search-select" id="header-search-category" aria-label="Category">
+  <option value="">All categories</option>
  </select>
  <button class="search-btn" id="header-search-btn" type="button">Search</button>
 </div>
@@ -39,21 +35,60 @@
  <a class="cartbtn ebay-cart" href="cart.html">Cart <span id="cartcount">0</span></a>
 </div>
 </div>
-<div class="wrap ebay-subnav">
- <a class="on" href="index.html">Shop</a>
- <a href="about.html">About</a>
- <a href="contact.html">Contact</a>
- <a href="admin.html">Feedback</a>
-</div>
 <div id="results" class="results"></div>
 </header>
-<section class="storefront-topline">
-  <div class="wrap topline-row">
-    <label class="include-description"><input id="include-description" type="checkbox"> Include description</label>
+<section class="storefront-intro" id="store-profile">
+  <div class="wrap">
+    <div class="store-cover">
+      <div class="store-cover-copy">
+        <span class="store-cover-kicker">KOREAN AUTOMOTIVE PERFORMANCE</span>
+        <h1>PATZCOM PERFORMANCE</h1>
+        <p>Parts selected for the way you drive.</p>
+      </div>
+      <div class="store-cover-art" aria-hidden="true"><span>FITMENT<br>FIRST</span><i></i></div>
+    </div>
+    <div class="store-brand-row ebay-store-row">
+      <div class="store-avatar" aria-hidden="true">P</div>
+      <div class="store-brand-copy">
+        <h2>PATZCOM</h2>
+        <div class="store-stat-row ebay-stat-row">
+          <span><strong>100%</strong> positive eBay feedback</span>
+          <span><strong id="store-catalog-count">--</strong> U.S. catalog items</span>
+          <span><strong>Korea</strong> ships worldwide</span>
+        </div>
+      </div>
+      <div class="store-actions ebay-actions">
+        <a class="admin-btn" href="contact.html">Contact seller</a>
+        <button class="admin-btn store-save-button" id="save-store" type="button" aria-pressed="false">♡ Save store</button>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="wrap store-shop-toolbar">
+  <button class="store-category-trigger" type="button" onclick="document.getElementById('store-vehicle-makes')?.scrollIntoView({behavior:'smooth',block:'center'})"><span aria-hidden="true">☰</span> Categories</button>
+  <nav class="store-shop-tabs" aria-label="Store navigation"><a class="on" href="index.html">Shop</a><a href="#all-items" data-store-sale>Sale</a><a href="about.html">About</a><a href="contact.html">Contact</a></nav>
+  <label class="store-inline-search"><span aria-hidden="true">⌕</span><input id="store-inline-search-input" type="search" placeholder="Search all products" aria-label="Search all products"></label>
+</div>
+<section class="storefront-featured" aria-label="Featured store products">
+  <div class="wrap">
+    <div class="store-discovery-grid">
+      <aside class="vehicle-nav" aria-label="Shop by vehicle make">
+        <div class="vehicle-nav-title">Shop by vehicle</div>
+        <div id="store-vehicle-makes"><button type="button" data-make="HYUNDAI">HYUNDAI <span>⌄</span></button><button type="button" data-make="KIA">KIA <span>⌄</span></button><button type="button" data-make="CHEVROLET">CHEVROLET <span>⌄</span></button><button type="button" data-make="VOLKSWAGEN">VOLKSWAGEN <span>⌄</span></button><button type="button" data-make="MERCEDES">MERCEDES-BENZ <span>⌄</span></button><button type="button" data-make="HONDA">HONDA <span>⌄</span></button><button type="button" data-make="JAGUAR">JAGUAR <span>⌄</span></button><button type="button" data-make="TESLA">TESLA <span>⌄</span></button></div>
+        <a href="#all-items">Browse all vehicles <span aria-hidden="true">→</span></a>
+      </aside>
+      <div class="featured-category-area">
+        <div class="store-section-heading"><div><span class="store-section-kicker">FIND YOUR NEXT UPGRADE</span><h2>Featured categories</h2></div><a href="#all-items">All categories <span aria-hidden="true">→</span></a></div>
+        <div class="featured-category-grid" id="featured-categories"><div class="store-skeleton">Loading categories…</div></div>
+      </div>
+    </div>
+    <div class="store-section-heading featured-items-heading" id="featured-items"><div><span class="store-section-kicker">PICKS FROM OUR CATALOG</span><h2>Featured items</h2></div><a href="#all-items">View all products <span aria-hidden="true">→</span></a></div>
+    <div class="featured-item-grid" id="featured-item-grid"><div class="store-skeleton">Loading featured products…</div></div>
+    <div class="store-all-link"><a href="#all-items">Explore all products <span aria-hidden="true">→</span></a><span><strong id="store-featured-count">445</strong> parts in the catalog</span></div>
   </div>
 </section>
 <section class="storefront-listing">
-  <div class="wrap ebay-market-shell">
+  <div class="wrap ebay-market-shell" id="all-items">
     <aside class="market-left" aria-label="Marketplace filters">
       <div class="market-card">
         <div class="market-card-title">Category</div>
@@ -94,25 +129,11 @@
     </aside>
     <main class="market-right">
       <div class="store-brand-row ebay-store-row">
-        <div class="store-avatar">P</div>
-        <div class="store-brand-copy">
-          <h1>PATZCOM</h1>
-          <div class="store-stat-row ebay-stat-row">
-            <span><strong>US</strong> catalog</span>
-            <span><strong id="store-catalog-count">--</strong> items</span>
-            <span><strong>100%</strong> product focus</span>
-          </div>
-        </div>
-        <div class="store-actions ebay-actions">
-          <a class="admin-btn" href="#">Visit store</a>
-          <a class="admin-btn" href="#">Contact</a>
-          <a class="admin-btn" href="#">Save Seller</a>
-        </div>
-      </div>
+      <div class="store-section-heading all-items-heading"><h2>All products</h2><span><strong id="market-results-count">--</strong> results</span></div>
       <div class="market-search-row">
           <div class="market-search-box">
           <span class="search-icon">⌕</span>
-          <input id="market-search-input" type="search" placeholder="Search all products" aria-label="Search all products">
+          <input id="market-search-input" type="search" placeholder="Search all 445 products" aria-label="Search all products">
         </div>
         <div class="market-right-tools">
           <div class="shipping-to">Shipping to: <strong>KOR, 31504</strong></div>
@@ -129,7 +150,7 @@
         </div>
       </div>
       <div class="market-results-head">
-        <span><strong id="market-results-count">--</strong> results</span>
+        <span><label class="include-description"><input id="include-description" type="checkbox"> Include description</label></span>
         <div class="market-pills">
           <button class="pill active" data-format="all" type="button">All</button>
           <button class="pill" data-format="buy" type="button">Buy it now</button>
@@ -141,9 +162,6 @@
       <div class="market-pager" id="market-pager" aria-label="Product pages"></div>
     </main>
   </div>
-</section>
-<section class="sec white-browse-strip">
-  <div class="wrap"><div class="sec-h"><h2>Shop by Category</h2><span class="count">Marketplace-style browsing</span></div><div class="cats"><a class="cat" href="collections/brake-pads.html"><img loading="lazy" src="assets/img/4030e7687189.jpg?v=1782821806" alt=""><span>Brake Pads</span></a><a class="cat" href="collections/big-brake-kit.html"><img loading="lazy" src="assets/img/b3c09b4fd793.jpg?v=1782468989" alt=""><span>Big Brake Kits</span></a><a class="cat" href="collections/heavy-duty-durability.html"><img loading="lazy" src="assets/img/59af96cb81bc.jpg?v=1781401752" alt=""><span>Heavy-Duty Durability</span></a><a class="cat" href="collections/lift-coilover-suspension-kit.html"><img loading="lazy" src="assets/img/c0545526a7c2.jpg?v=1781514470" alt=""><span>Lift Coilover Suspension Kit</span></a></div></div>
 </section>
 <footer class="ftr"><div class="wrap ftr-grid">
 <div><div class="logo">PATZCOM</div><p>A sales-focused storefront for automotive parts and performance upgrades.</p><p class="pay">Checkout: PayPal first · Stripe cards planned</p></div>

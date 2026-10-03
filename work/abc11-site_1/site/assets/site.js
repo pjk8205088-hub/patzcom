@@ -98,12 +98,17 @@ function initMarketplaceHome(){
   const searchInput = document.getElementById('market-search-input');
   const resultsCount = document.getElementById('market-results-count');
   const catalogCount = document.getElementById('store-catalog-count');
+  const featuredCount = document.getElementById('store-featured-count');
   const inStockCount = document.getElementById('in-stock-count');
   const allListingsCount = document.getElementById('all-listings-count');
   const buyNowCount = document.getElementById('buy-now-count');
   const pager = document.getElementById('market-pager');
   const sortSelect = document.getElementById('market-sort');
   const viewToggle = document.getElementById('market-view-toggle');
+  const featuredCategories = document.getElementById('featured-categories');
+  const featuredItems = document.getElementById('featured-item-grid');
+  const vehicleMakes = document.getElementById('store-vehicle-makes');
+  const headerCategory = document.getElementById('header-search-category');
   const state = { query:'', category:'', inStock:false, sale:false, shipping:false, format:'all', priceBand:'', min:null, max:null, sort:'match', page:1, compact:false, includeDescription:false };
   const pageSize = 24;
 
@@ -116,6 +121,7 @@ function initMarketplaceHome(){
     .sort((a, b) => a.localeCompare(b));
 
   catalogCount.textContent = PRODUCTS.length.toLocaleString('en-US');
+  if(featuredCount) featuredCount.textContent = PRODUCTS.length.toLocaleString('en-US');
   allListingsCount.textContent = `(${PRODUCTS.length.toLocaleString('en-US')})`;
   buyNowCount.textContent = `(${PRODUCTS.length.toLocaleString('en-US')})`;
   inStockCount.textContent = `(${PRODUCTS.filter((product) => product.available !== false).length.toLocaleString('en-US')})`;
@@ -126,6 +132,39 @@ function initMarketplaceHome(){
       return `<button class="category-link" data-category="${escapeHtml(category)}" type="button">${escapeHtml(category)} <span>(${count})</span></button>`;
     }),
   ].join('');
+  if(headerCategory){
+    headerCategory.replaceChildren(new Option('All categories',''), ...categories.map((category)=>new Option(category,category)));
+  }
+  if(searchInput) searchInput.placeholder=`Search all ${PRODUCTS.length.toLocaleString('en-US')} products`;
+  if(vehicleMakes){
+    const makes=['HYUNDAI','KIA','CHEVROLET','VOLKSWAGEN','MERCEDES','HONDA','JAGUAR','TESLA','GENESIS','BMW','AUDI','TOYOTA','FORD','NISSAN','SUBARU','JEEP'];
+    const availableMakes=makes.map((make)=>({make,count:PRODUCTS.filter((product)=>productText(product).includes(make.toLowerCase())).length})).filter((entry)=>entry.count>0);
+    vehicleMakes.innerHTML=availableMakes.map(({make,count})=>`<button type="button" data-make="${make}">${make==='MERCEDES'?'MERCEDES-BENZ':make}<span>${count.toLocaleString('en-US')} <i aria-hidden="true">⌄</i></span></button>`).join('');
+  }
+
+  const categoryLeaders = categories
+    .map((category)=>({category, products:PRODUCTS.filter((product)=>(product.type||'All Products')===category)}))
+    .sort((a,b)=>b.products.length-a.products.length || a.category.localeCompare(b.category))
+    .slice(0,6);
+  if(featuredCategories){
+    featuredCategories.innerHTML=categoryLeaders.map(({category,products})=>{
+      const product=products.find((item)=>item.images?.[0])||products[0];
+      const image=product?.images?.[0]||imgFallback;
+      return `<button class="featured-category-card" type="button" data-category="${escapeHtml(category)}" aria-label="Browse ${escapeHtml(category)}, ${products.length} products"><img loading="lazy" src="${escapeHtml(image)}" alt=""><span>${escapeHtml(category)}</span><small>${products.length.toLocaleString('en-US')} items</small></button>`;
+    }).join('');
+  }
+  if(featuredItems){
+    const showcase=PRODUCTS.filter((product)=>product.available!==false && product.images?.[0]).slice(0,3);
+    featuredItems.innerHTML=showcase.map((product)=>`<a class="featured-item-card" href="${productHref(product)}"><img loading="lazy" src="${escapeHtml(product.images[0])}" alt="${escapeHtml(product.title)}"><div class="featured-item-copy"><strong>${escapeHtml(product.title)}</strong><span>${money(Number(product.price||0))}</span><small>${escapeHtml(product.vendor||'PATZCOM')} · Buy it now</small></div></a>`).join('');
+  }
+
+  const saveStoreButton=document.getElementById('save-store');
+  if(saveStoreButton){
+    const storageKey='patzcom_saved_store';
+    const paintSaved=()=>{const saved=localStorage.getItem(storageKey)==='true';saveStoreButton.setAttribute('aria-pressed',String(saved));saveStoreButton.textContent=saved?'♥ Saved':'♡ Save store';};
+    paintSaved();
+    saveStoreButton.addEventListener('click',()=>{localStorage.setItem(storageKey,String(localStorage.getItem(storageKey)!=='true'));paintSaved();});
+  }
 
   function filteredProducts(){
     const min = Number.isFinite(state.min) ? state.min : null;
@@ -214,14 +253,35 @@ function initMarketplaceHome(){
     render();
   }
 
+  function selectCategory(category){
+    state.category=category||'';state.page=1;
+    document.querySelectorAll('.category-link').forEach((item)=>item.classList.toggle('active',(item.dataset.category||'')===state.category));
+    if(headerCategory)headerCategory.value=state.category;
+    render();
+  }
   categoryList.addEventListener('click', (event) => {
     const button = event.target.closest('.category-link');
-    if(!button) return;
-    state.category = button.dataset.category || ''; state.page = 1;
-    document.querySelectorAll('.category-link').forEach((item) => item.classList.toggle('active', item === button));
+    if(button) selectCategory(button.dataset.category||'');
+  });
+  featuredCategories?.addEventListener('click',(event)=>{
+    const button=event.target.closest('[data-category]');
+    if(!button)return;
+    selectCategory(button.dataset.category);
+    document.getElementById('all-items')?.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+  document.getElementById('store-vehicle-makes')?.addEventListener('click',(event)=>{
+    const button=event.target.closest('[data-make]');
+    if(!button)return;
+    state.query=button.dataset.make.toLowerCase();state.category='';state.page=1;
+    if(searchInput)searchInput.value=button.dataset.make;
+    if(headerCategory)headerCategory.value='';
     render();
+    document.getElementById('all-items')?.scrollIntoView({behavior:'smooth',block:'start'});
   });
   searchInput?.addEventListener('input', () => { state.query = searchInput.value.trim().toLowerCase(); state.page = 1; render(); });
+  const inlineSearch=document.getElementById('store-inline-search-input');
+  inlineSearch?.addEventListener('input',()=>{state.query=inlineSearch.value.trim().toLowerCase();if(searchInput)searchInput.value=inlineSearch.value;state.page=1;render();});
+  document.querySelector('[data-store-sale]')?.addEventListener('click',()=>{state.sale=true;state.page=1;document.getElementById('filter-sale').checked=true;render();});
   document.getElementById('include-description')?.addEventListener('change', (event) => { state.includeDescription = event.target.checked; render(); });
   document.getElementById('filter-in-stock')?.addEventListener('change', (event) => { state.inStock = event.target.checked; state.page = 1; render(); });
   document.getElementById('filter-shipping')?.addEventListener('change', (event) => { state.shipping = event.target.checked; state.page = 1; render(); });
@@ -242,7 +302,9 @@ function initMarketplaceHome(){
   viewToggle?.addEventListener('click', () => { state.compact = !state.compact; viewToggle.setAttribute('aria-pressed', String(state.compact)); render(); });
   pager.addEventListener('click', (event) => { const button = event.target.closest('[data-page]'); if(!button || button.disabled) return; state.page = Number(button.dataset.page); render(); window.scrollTo({ top: list.offsetTop - 120, behavior: 'smooth' }); });
   list.addEventListener('click', (event) => { if(event.target.closest('#empty-clear')) clearFilters(); });
-  document.getElementById('header-search-btn')?.addEventListener('click', () => { if(searchInput){ searchInput.value = document.getElementById('q').value; state.query = searchInput.value.trim().toLowerCase(); state.page = 1; render(); document.getElementById('market-list').scrollIntoView({behavior:'smooth', block:'start'}); } });
+  const runHeaderSearch=()=>{if(searchInput){searchInput.value=document.getElementById('q').value;state.query=searchInput.value.trim().toLowerCase();selectCategory(headerCategory?.value||'');document.getElementById('all-items').scrollIntoView({behavior:'smooth',block:'start'});}};
+  document.getElementById('header-search-btn')?.addEventListener('click',runHeaderSearch);
+  document.getElementById('q')?.addEventListener('keydown',(event)=>{if(event.key==='Enter'){event.preventDefault();runHeaderSearch();}});
   render();
 }
 
