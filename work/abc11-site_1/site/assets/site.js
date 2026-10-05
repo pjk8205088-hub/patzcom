@@ -2,10 +2,39 @@ const R = window.ROOT || '';
 let PRODUCTS = [];
 const CART_KEY = 'patzcom_cart';
 const cart = () => JSON.parse(localStorage.getItem(CART_KEY) || '{}');
-const saveCart = c => { localStorage.setItem(CART_KEY, JSON.stringify(c)); paintCount(); };
+let cartWrites = Promise.resolve();
+const saveCart = c => {
+  localStorage.setItem(CART_KEY, JSON.stringify(c)); paintCount();
+  cartWrites = cartWrites.catch(() => {}).then(async () => {
+    const response = await fetch('/api/customer/cart', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(c) });
+    if (!response.ok) throw new Error('Cart database save failed.');
+  });
+  cartWrites.catch(() => { console.error('Cart was not saved to the server.'); });
+};
+const cartReady = fetch('/api/customer/cart').then(response => {
+  if (!response.ok) throw new Error('Cart database unavailable.');
+  return response.json();
+}).then(saved => {
+  if (Object.keys(saved).length) { localStorage.setItem(CART_KEY, JSON.stringify(saved)); paintCount(); }
+  else if (Object.keys(cart()).length) saveCart(cart());
+}).catch(() => console.error('Unable to restore saved cart.'));
 function paintCount(){
   const n = Object.values(cart()).reduce((a,b)=>a+b,0);
   document.querySelectorAll('#cartcount').forEach(e=>e.textContent=n);
+}
+function initContactForm(){
+  const form = document.getElementById('contact-form');
+  if(!form) return;
+  const button = form.querySelector('button'); const ok = form.querySelector('.ok');
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault(); button.disabled = true; button.textContent = 'Sending...';
+    try {
+      const response = await fetch('/api/contact', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(Object.fromEntries(new FormData(form))) });
+      const result = await response.json(); if(!response.ok) throw new Error(result.message || 'Unable to send message.');
+      ok.textContent = result.message; ok.style.display = 'block'; form.reset();
+    } catch(error) { ok.textContent = error.message; ok.classList.add('error'); ok.style.display = 'block'; }
+    finally { button.disabled = false; button.textContent = 'Send message'; }
+  });
 }
 function addToCart(id){
   const q = parseInt((document.getElementById('qty')||{}).value || 1) || 1;
@@ -55,7 +84,7 @@ function enhanceGallery(){
   dialog.querySelector('button').onclick = () => dialog.close();
   select(0);
 }
-document.addEventListener('DOMContentLoaded', enhanceGallery);
+document.addEventListener('DOMContentLoaded', () => { enhanceGallery(); initContactForm(); });
 const money = n => '$'+n.toLocaleString('en-US',{minimumFractionDigits:2});
 const qaKey = id => `patzcom_qa_${id}`;
 const imgFallback = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
@@ -68,7 +97,7 @@ const imgFallback = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
   </g>
 </svg>`);
 
-fetch(R+'assets/products.json').then(r=>r.json()).then(p=>{ PRODUCTS=p; document.querySelectorAll('#store-catalog-count').forEach((node)=>node.textContent=PRODUCTS.length.toLocaleString('en-US')); initSearch(); initMarketplaceHome(); initAboutStorePage(); renderCart(); });
+fetch(R+'assets/products.json').then(r=>r.json()).then(async p=>{ await cartReady; PRODUCTS=p; document.querySelectorAll('#store-catalog-count').forEach((node)=>node.textContent=PRODUCTS.length.toLocaleString('en-US')); initSearch(); initMarketplaceHome(); initAboutStorePage(); renderCart(); });
 paintCount();
 initQandA();
 installImageFallbacks();
@@ -361,11 +390,17 @@ function loadPayPalSdk(clientId, currency){
   if(window.__paypalSdkPromise) return window.__paypalSdkPromise;
   window.__paypalSdkPromise = new Promise((resolve, reject) => {
     const script = document.createElement('script');
-    script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=${encodeURIComponent(currency || 'USD')}&intent=capture`;
-    script.onload = () => window.paypal ? resolve(window.paypal) : reject(new Error('PayPal SDK did not load.'));
+    script.src = `${R}assets/paypal-loader.js`;
+    script.onload = async () => {
+      try {
+        const sdk = await window.paypalLoadScript({ clientId, currency: currency || 'USD', intent: 'capture', components: 'buttons' });
+        if(!sdk) throw new Error('PayPal SDK did not load.');
+        resolve(sdk);
+      } catch(error) { reject(error); }
+    };
     script.onerror = () => reject(new Error('PayPal SDK could not be loaded.'));
     document.head.appendChild(script);
-  });
+  }).catch(error => { window.__paypalSdkPromise = null; throw error; });
   return window.__paypalSdkPromise;
 }
 
@@ -381,7 +416,7 @@ async function mountPayments(total){
     if(config.paypal?.enabled && config.paypal.clientId){
       const paypal = await loadPayPalSdk(config.paypal.clientId, config.currency);
       paypalEl.innerHTML = '';
-      paypal.Buttons({
+      await paypal.Buttons({
         style: { layout:'vertical', shape:'rect', label:'paypal', tagline:false },
         createOrder: async () => {
           const response = await fetch(`${R}api/paypal/orders`, {

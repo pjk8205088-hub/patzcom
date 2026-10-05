@@ -36,14 +36,14 @@ import {
   getPaymentConfig,
   retrieveStripeCheckoutSession,
 } from './lib/payment-api.mjs';
-import { databaseConfigured, initializeDatabase, listOrders, recordOrder, saveCatalogSnapshotToDatabase, updateOrderFulfillment, updateOrderStatus } from './lib/postgres.mjs';
+import { databaseConfigured, initializeDatabase, listOrders, recordOrder, saveCatalogSnapshotToDatabase, updateOrderFulfillment, updateOrderStatus, readState, writeState, deleteState, readImage, createContactMessage, markContactMessage } from './lib/postgres.mjs';
+import { sendContactMessage } from './lib/contact-mail.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const siteRoot = path.join(__dirname, 'work', 'abc11-site_1', 'site');
 const port = Number(process.env.PORT || 4173);
 const adminEmail = process.env.PATZCOM_ADMIN_EMAIL || 'partscombined@gmail.com';
 const adminPassword = process.env.PATZCOM_ADMIN_PASSWORD || '1111';
-const adminSessions = new Map();
 const pendingEbayStates = new Map();
 const REMOTE_SOURCE_HOSTS = new Set([
   'raw.githubusercontent.com',
@@ -102,14 +102,13 @@ function parseCookies(req) {
   );
 }
 
-function getAdminSession(req) {
+async function getAdminSession(req) {
   const cookies = parseCookies(req);
   const token = cookies.patzcom_admin_session;
   if (!token) return null;
-  const session = adminSessions.get(token);
+  const session = await readState('admin-session', crypto.createHash('sha256').update(token).digest('hex'));
   if (!session) return null;
   if (session.expiresAt < Date.now()) {
-    adminSessions.delete(token);
     return null;
   }
   return { token, ...session };
@@ -202,7 +201,55 @@ async function loadRemoteCatalogPayload(sourceUrl) {
 
 const server = http.createServer(async (req, res) => {
   const pathname = routePath(req.url);
-  const adminSession = getAdminSession(req);
+  let adminSession;
+  try { adminSession = await getAdminSession(req); }
+  catch { return json(res, 503, { error: 'Database unavailable. Please retry.' }); }
+
+  if (/^\/assets\/img\/upload-[a-zA-Z0-9-]+\.(png|jpg|webp)$/.test(pathname)) {
+    try {
+      const bytes = await readImage(pathname.slice(1));
+      if (bytes) { res.setHeader('Content-Type', types[path.extname(pathname)]); return res.end(bytes); }
+    } catch { return json(res, 503, { error: 'Image storage unavailable.' }); }
+  }
+
+  if (pathname === '/api/customer/cart') {
+    try {
+      if (!['GET', 'PUT'].includes(req.method)) return json(res, 405, { error: 'Method not allowed.' });
+      if (req.method === 'PUT' && (!req.headers.origin || new URL(req.headers.origin).host !== req.headers.host)) return json(res, 403, { error: 'Same-origin request required.' });
+      let visitor = parseCookies(req).patzcom_visitor;
+      if (!/^[a-f0-9]{48}$/.test(visitor || '')) {
+        visitor = crypto.randomBytes(24).toString('hex');
+        res.setHeader('Set-Cookie', `patzcom_visitor=${visitor}; Path=/; HttpOnly; SameSite=Lax; Max-Age=2592000${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`);
+      }
+      if (req.method === 'GET') return json(res, 200, await readState('cart', visitor) || {});
+      const items = JSON.parse(await readBody(req, 20000));
+      if (!items || Array.isArray(items) || typeof items !== 'object' || Object.keys(items).length > 50 || Object.entries(items).some(([id,q]) => id.length > 100 || !Number.isInteger(q) || q < 1 || q > 99)) return json(res, 400, { error: 'Invalid cart.' });
+      await writeState('cart', visitor, items, Date.now() + 30 * 86400000);
+      return json(res, 200, { ok: true });
+    } catch { return json(res, 503, { error: 'Cart could not be saved. Please retry.' }); }
+  }
+
+  if (pathname === '/api/contact' && req.method === 'POST') {
+    try {
+      const body = JSON.parse(await readBody(req, 30000) || '{}');
+      const name = String(body.name || '').trim().slice(0, 120);
+      const email = String(body.email || '').trim().toLowerCase().slice(0, 254);
+      const vehicle = String(body.vehicle || '').trim().slice(0, 240);
+      const message = String(body.message || '').trim().slice(0, 10000);
+      if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !message) return json(res, 400, { ok: false, message: 'Name, valid email, and message are required.' });
+      const saved = await createContactMessage({ name, email, vehicle, message });
+      try {
+        await sendContactMessage(saved);
+        await markContactMessage(saved.id, { status: 'sent', sentAt: new Date() });
+        return json(res, 201, { ok: true, message: 'Your message was sent successfully.' });
+      } catch (error) {
+        await markContactMessage(saved.id, { status: 'email_failed', error: error.message });
+        return json(res, 202, { ok: true, queued: true, message: 'Your message was saved. Email delivery is pending.' });
+      }
+    } catch (error) {
+      return json(res, 503, { ok: false, message: error.message || 'Unable to save your message.' });
+    }
+  }
 
   if (pathname === '/api/health') {
     return json(res, 200, {
@@ -214,6 +261,12 @@ const server = http.createServer(async (req, res) => {
 
   if (pathname === '/api/payments/config' && req.method === 'GET') {
     return json(res, 200, getPaymentConfig());
+  }
+
+  if (pathname === '/assets/paypal-loader.js' && req.method === 'GET') {
+    res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-cache');
+    return createReadStream(path.join(process.cwd(), 'node_modules', '@paypal', 'paypal-js', 'dist', 'iife', 'paypal-js.min.js')).pipe(res);
   }
 
   if (pathname === '/api/paypal/orders' && req.method === 'POST') {
@@ -354,10 +407,10 @@ const server = http.createServer(async (req, res) => {
       }
 
       const token = crypto.randomBytes(24).toString('hex');
-      adminSessions.set(token, {
+      await writeState('admin-session', crypto.createHash('sha256').update(token).digest('hex'), {
         email: adminEmail,
         expiresAt: Date.now() + 12 * 60 * 60 * 1000,
-      });
+      }, Date.now() + 12 * 60 * 60 * 1000);
       setSessionCookie(res, token);
       return json(res, 200, { ok: true, email: adminEmail });
     } catch (error) {
@@ -366,7 +419,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (pathname === '/api/admin/logout' && req.method === 'POST') {
-    if (adminSession?.token) adminSessions.delete(adminSession.token);
+    if (adminSession?.token) await deleteState('admin-session', crypto.createHash('sha256').update(adminSession.token).digest('hex'));
     clearSessionCookie(res);
     return json(res, 200, { ok: true });
   }

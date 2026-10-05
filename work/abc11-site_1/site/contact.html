@@ -21,10 +21,10 @@
 <div id="results" class="results"></div></header><section class="sec"><div class="wrap page"><h1>Contact Us</h1><p>Questions about fitment, shipping or an existing order? Send us a message and we'll reply within one business day.</p>
 <h2>Customer support</h2><p>PATZCOM supports U.S. customers from Korea with English product guidance, fitment checks, order updates, and tracked international shipping assistance.</p>
 <ul><li>Email: <b>support@patzcom.com</b></li><li>Support hours: Monday-Friday, 09:00-18:00 Eastern Time</li><li>Typical response time: within one business day</li><li>Store website: <b>www.patzcom.com</b></li></ul>
-<form class="cform" onsubmit="event.preventDefault();this.querySelector('.ok').style.display='block'">
-<label>Name<input required></label><label>Email<input type="email" required></label>
-<label>Vehicle (year / model)<input placeholder="2024 Kia Telluride"></label>
-<label>Message<textarea rows="6" required></textarea></label>
+<form class="cform" id="contact-form">
+<label>Name<input name="name" required></label><label>Email<input name="email" type="email" required></label>
+<label>Vehicle (year / model)<input name="vehicle" placeholder="2024 Kia Telluride"></label>
+<label>Message<textarea name="message" rows="6" required></textarea></label>
 <button class="btn">Send message</button><p class="ok" style="display:none">Thanks — we'll get back to you shortly.</p></form>
 <p class="muted">Or email <b>support@patzcom.com</b></p></div></section><footer class="ftr"><div class="wrap ftr-grid">
 <div><div class="logo">PATZCOM</div><p>Your trusted source for premium automotive parts and performance upgrades.</p><p class="pay">Checkout: PayPal first · Stripe cards planned</p></div>
