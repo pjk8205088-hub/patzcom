@@ -615,6 +615,15 @@ const server = http.createServer(async (req, res) => {
   }
 
   res.setHeader('Content-Type', types[path.extname(filePath).toLowerCase()] || 'application/octet-stream');
+  if (requestedPath.startsWith('/assets/img/')) {
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+  } else if (requestedPath === '/assets/products.json') {
+    res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+  } else if (requestedPath.startsWith('/assets/')) {
+    res.setHeader('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
+  } else {
+    res.setHeader('Cache-Control', 'no-cache');
+  }
   createReadStream(filePath)
     .on('error', () => {
       res.statusCode = 404;

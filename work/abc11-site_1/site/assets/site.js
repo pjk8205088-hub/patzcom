@@ -97,7 +97,7 @@ const imgFallback = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
   </g>
 </svg>`);
 
-fetch(R+'assets/products.json').then(r=>r.json()).then(async p=>{ await cartReady; PRODUCTS=p; document.querySelectorAll('#store-catalog-count').forEach((node)=>node.textContent=PRODUCTS.length.toLocaleString('en-US')); initSearch(); initMarketplaceHome(); initAboutStorePage(); renderCart(); });
+fetch(R+'assets/products.json').then(r=>r.json()).then(p=>{ PRODUCTS=p; document.querySelectorAll('#store-catalog-count').forEach((node)=>node.textContent=PRODUCTS.length.toLocaleString('en-US')); initSearch(); initMarketplaceHome(); initAboutStorePage(); renderCart(); });
 paintCount();
 initQandA();
 installImageFallbacks();
@@ -112,7 +112,7 @@ function initSearch(){
     const v = q.value.trim().toLowerCase();
     if(v.length<2){ box.style.display='none'; return; }
     const hits = PRODUCTS.filter(p=>(p.title+' '+p.vendor+' '+p.type+' '+p.tags.join(' ')).toLowerCase().includes(v)).slice(0,8);
-    box.innerHTML = hits.length ? hits.map(p=>`<a href="${R}products/${p.handle}.html"><img src="${p.images[0]||''}"><span>${p.title}</span><b style="margin-left:auto">${p.price?money(p.price):''}</b></a>`).join('')
+    box.innerHTML = hits.length ? hits.map(p=>`<a href="${R}products/${p.handle}.html"><img loading="lazy" decoding="async" src="${p.images[0]||''}"><span>${p.title}</span><b style="margin-left:auto">${p.price?money(p.price):''}</b></a>`).join('')
       : '<a><span>No results</span></a>';
     box.style.display='block';
   });
@@ -349,7 +349,7 @@ function renderCart(){
   body.innerHTML = ids.map(id=>{
     const p = PRODUCTS.find(x=>x.id===id); if(!p) return '';
     total += (p.price||0)*c[id];
-    return `<div class="crow"><img src="${p.images[0]||''}">
+    return `<div class="crow"><img loading="lazy" decoding="async" src="${p.images[0]||''}">
       <div><a href="${R}products/${p.handle}.html">${p.title}</a><div class="vendor">${p.vendor}</div></div>
       <div>${money(p.price||0)}</div>
       <input type="number" min="1" value="${c[id]}" onchange="setQty('${id}',this.value)">
