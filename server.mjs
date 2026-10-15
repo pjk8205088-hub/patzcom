@@ -36,7 +36,7 @@ import {
   getPaymentConfig,
   retrieveStripeCheckoutSession,
 } from './lib/payment-api.mjs';
-import { databaseConfigured, initializeDatabase, listOrders, recordOrder, saveCatalogSnapshotToDatabase, updateOrderFulfillment, updateOrderStatus, readState, writeState, deleteState, readImage, createContactMessage, markContactMessage } from './lib/postgres.mjs';
+import { databaseConfigured, initializeDatabase, listOrders, listContactMessages, updateContactMessageStatus, recordOrder, saveCatalogSnapshotToDatabase, updateOrderFulfillment, updateOrderStatus, readState, writeState, deleteState, readImage, createContactMessage, markContactMessage } from './lib/postgres.mjs';
 import { sendContactMessage } from './lib/contact-mail.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -465,6 +465,29 @@ const server = http.createServer(async (req, res) => {
       return json(res, 200, { databaseConfigured: databaseConfigured(), orders: await listOrders(200) });
     } catch (error) {
       return json(res, 500, { error: 'Unable to load orders', detail: error.message });
+    }
+  }
+
+  if (pathname === '/api/admin/messages' && req.method === 'GET') {
+    if (!adminSession) return json(res, 401, { error: 'Admin login required' });
+    try {
+      return json(res, 200, { databaseConfigured: databaseConfigured(), messages: await listContactMessages(200) });
+    } catch (error) {
+      return json(res, 500, { error: 'Unable to load messages', detail: error.message });
+    }
+  }
+
+  const adminMessageMatch = pathname.match(/^\/api\/admin\/messages\/([^/]+)$/);
+  if (adminMessageMatch && req.method === 'PATCH') {
+    if (!adminSession) return json(res, 401, { error: 'Admin login required' });
+    if (req.headers['sec-fetch-site'] === 'cross-site' || (req.headers.origin && new URL(req.headers.origin).host !== req.headers.host)) return json(res, 403, { error: 'Cross-site request rejected' });
+    try {
+      const body = JSON.parse(await readBody(req) || '{}');
+      const message = await updateContactMessageStatus(adminMessageMatch[1], String(body.status || ''));
+      if (!message) return json(res, 404, { error: 'Message not found' });
+      return json(res, 200, { ok: true, message });
+    } catch (error) {
+      return json(res, 400, { error: error.message });
     }
   }
 

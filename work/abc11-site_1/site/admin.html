@@ -363,16 +363,18 @@
           <article class="panel" id="messages">
             <div class="panel-head">
               <div>
-                <h2>Integration status</h2>
-                <p class="panel-note">Current readiness across eBay, PayPal, and storefront flows.</p>
+                <h2>Messages</h2>
+                <p class="panel-note">Customer questions from the PATZCOM contact form.</p>
               </div>
+              <button class="admin-btn" id="messages-reload" type="button">Refresh</button>
             </div>
-            <div class="integration-list" id="integration-list">
-              <div class="integration-card">
-                <strong>Marketplace API</strong>
-                <span>Checking readiness...</span>
-              </div>
-            </div>
+            <p id="messages-state" class="panel-note">Loading messages from PostgreSQL...</p>
+            <div class="admin-table-scroll"><table class="admin-table messages-table"><thead><tr><th>From</th><th>Message</th><th>Status</th><th>Update</th></tr></thead><tbody id="messages-table"><tr><td colspan="4" class="table-empty">Loading messages...</td></tr></tbody></table></div>
+          </article>
+
+          <article class="panel" id="integration-status">
+            <div class="panel-head"><div><h2>Integration status</h2><p class="panel-note">Current readiness across eBay, PayPal, and storefront flows.</p></div></div>
+            <div class="integration-list" id="integration-list"><div class="integration-card"><strong>Marketplace API</strong><span>Checking readiness...</span></div></div>
           </article>
 
           <article class="panel" id="ebay-api">
@@ -481,7 +483,11 @@ const catalogSourceUrl = document.getElementById('catalog-source-url');
 const ordersTable = document.getElementById('orders-table');
 const ordersState = document.getElementById('orders-state');
 const ordersFilter = document.getElementById('orders-filter');
+const messagesTable = document.getElementById('messages-table');
+const messagesState = document.getElementById('messages-state');
+const messagesReload = document.getElementById('messages-reload');
 let allOrders = [];
+let allMessages = [];
 const flashMessages = {
   connected: 'eBay account connected. Refresh the token when you need updated consent.',
   invalid-state: 'OAuth state did not match. Open the developer portal again and start a fresh consent flow.',
@@ -559,6 +565,50 @@ async function loadOrders() {
     ordersState.textContent = error.message;
     ordersTable.innerHTML = '<tr><td colspan="8" class="table-empty">Order data could not be loaded.</td></tr>';
   }
+}
+
+function renderMessages() {
+  if (!messagesTable) return;
+  messagesTable.replaceChildren();
+  if (!allMessages.length) {
+    const row = document.createElement('tr');
+    const cell = document.createElement('td'); cell.colSpan = 4; cell.className = 'table-empty';
+    cell.textContent = 'No customer messages yet.'; row.append(cell); messagesTable.append(row); return;
+  }
+  for (const message of allMessages) {
+    const row = document.createElement('tr');
+    const from = document.createElement('td');
+    from.textContent = `${message.name || 'Customer'}\n${message.email || ''}${message.vehicle ? `\n${message.vehicle}` : ''}`;
+    from.style.whiteSpace = 'pre-line';
+    const body = document.createElement('td'); body.textContent = message.message || '';
+    const statusCell = document.createElement('td');
+    const status = document.createElement('select');
+    for (const value of ['queued', 'sent', 'read', 'closed', 'email_failed']) { const option = document.createElement('option'); option.value = value; option.textContent = value.replace('_', ' '); status.append(option); }
+    status.value = message.status || 'queued'; statusCell.append(status);
+    const action = document.createElement('td'); const save = document.createElement('button'); save.type = 'button'; save.className = 'admin-btn'; save.textContent = 'Save';
+    save.addEventListener('click', async () => {
+      save.disabled = true;
+      try {
+        const response = await fetch(`/api/admin/messages/${encodeURIComponent(message.id)}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: status.value }) });
+        const payload = await response.json(); if (!response.ok) throw new Error(payload.error || 'Unable to update message.');
+        await loadMessages();
+      } catch (error) { messagesState.textContent = error.message; } finally { save.disabled = false; }
+    });
+    action.append(save); row.append(from, body, statusCell, action); messagesTable.append(row);
+  }
+}
+
+async function loadMessages() {
+  if (!messagesTable) return;
+  messagesState.textContent = 'Loading messages from PostgreSQL...';
+  try {
+    const response = await fetch('/api/admin/messages', { cache: 'no-store' });
+    if (response.status === 401) { window.location.href = '/admin-login.html'; return; }
+    const payload = await response.json(); if (!response.ok) throw new Error(payload.error || 'Unable to load messages.');
+    allMessages = Array.isArray(payload.messages) ? payload.messages : [];
+    messagesState.textContent = payload.databaseConfigured ? `${allMessages.length} messages loaded from PostgreSQL.` : 'PostgreSQL is not connected in this environment.';
+    renderMessages();
+  } catch (error) { messagesState.textContent = error.message; messagesTable.innerHTML = '<tr><td colspan="4" class="table-empty">Message data could not be loaded.</td></tr>'; }
 }
 
 function statusClass(status) {
@@ -791,6 +841,7 @@ async function loadDashboard() {
   renderInventory(allProducts);
   renderActiveListings(allProducts);
   await loadOrders();
+  await loadMessages();
 }
 
 connectBtn?.addEventListener('click', () => {
@@ -868,6 +919,7 @@ document.querySelectorAll('.seller-bulk-action').forEach((button) => {
 });
 ordersFilter?.addEventListener('change', renderOrders);
 document.getElementById('orders-reload')?.addEventListener('click', loadOrders);
+messagesReload?.addEventListener('click', loadMessages);
 document.querySelectorAll('.admin-tabs-row a, .rail-link, .seller-workbench-actions a').forEach((link) => {
   link.addEventListener('click', () => {
     const target = link.getAttribute('href');
