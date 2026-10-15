@@ -634,7 +634,7 @@ function initProductPurchaseUI(){
       <div class="store-line">
         <div class="store-mark">P</div>
         <div>
-          <strong>PATZCOM</strong> <span>(1220)</span>
+          <strong>PATZCOM</strong>
           <div class="store-note">100% positive · ${escapeHtml(vendor)} parts · message seller</div>
         </div>
       </div>
