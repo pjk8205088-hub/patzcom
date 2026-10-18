@@ -335,7 +335,7 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
-  if (['/admin.html', '/admin-products.html'].includes(pathname) && !adminSession) {
+  if (['/admin.html', '/admin-classic.html', '/admin-products.html'].includes(pathname) && !adminSession) {
     return redirect(res, '/admin-login.html');
   }
 

@@ -1,1028 +1,248 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PATZCOM Seller Hub</title>
-<meta name="description" content="PATZCOM seller hub styled like eBay with catalog, order, payout, and API workflows.">
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Seller Hub | PATZCOM</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-<link rel="stylesheet" href="assets/site.css">
-<script>window.ROOT="";</script>
-</head>
-<body class="admin-dashboard-body">
-<div class="admin-app">
-  <header class="admin-shell-top">
-    <div class="wrap admin-topbar-row">
-      <div class="admin-greeting">Hi, <span id="admin-user-email">seller</span></div>
-      <div class="admin-top-links">
-        <a href="admin-products.html">Create / edit products</a>
-        <a href="#ebay-api">Help &amp; contact</a>
-        <a href="#orders">Selling</a>
-        <a href="#quick-links">My eBay</a>
-      </div>
-    </div>
-  </header>
-
-  <header class="admin-shell-main">
-    <div class="wrap admin-mainbar-row">
-      <a class="admin-brand" href="index.html" aria-label="PATZCOM storefront">
-        <span class="admin-mark">P</span>
-        <span class="admin-brand-copy">
-          <strong>PATZCOM</strong>
-          <small>Seller Hub</small>
-        </span>
-      </a>
-
-      <button class="admin-category-toggle" type="button">
-        <i class="bi bi-grid-3x3-gap"></i>
-        <span>Category</span>
-      </button>
-
-      <div class="admin-search-shell" role="search">
-        <i class="bi bi-search"></i>
-        <input id="admin-search-input" type="search" placeholder="Search products, orders, buyers..." aria-label="Search admin data">
-        <button id="admin-search-btn" type="button">Search</button>
-      </div>
-
-      <div class="admin-main-actions">
-        <a class="admin-btn" href="index.html">Storefront</a>
-        <button class="admin-btn" id="ebay-connect-btn" type="button">Connect account</button>
-        <button class="admin-btn" id="ebay-refresh-btn" type="button">Refresh token</button>
-        <button class="admin-btn" id="admin-logout-btn" type="button">Log out</button>
-      </div>
-    </div>
-  </header>
-
-  <nav class="admin-tabs">
-    <div class="wrap admin-tabs-row">
-      <a class="on" href="#summary">Overview</a>
-      <a href="#orders">Orders</a>
-      <a href="#active-listings">Listings</a>
-      <a href="#marketing">Marketing</a>
-      <a href="#advertising">Advertising</a>
-      <a href="#storefront">Store</a>
-      <a href="#more-tools">More</a>
-    </div>
-  </nav>
-
-  <main class="wrap admin-layout">
-    <aside class="admin-rail">
-      <section class="rail-card rail-profile">
-        <div class="rail-avatar">P</div>
-        <div class="rail-profile-copy">
-          <div class="rail-name">PATZCOM</div>
-          <div class="rail-sub">100% positive feedback style storefront</div>
-          <div class="rail-badges">
-            <span>Direct checkout</span>
-            <span>PayPal first</span>
-          </div>
-        </div>
-      </section>
-
-      <section class="rail-card">
-        <div class="rail-title">Inventory</div>
-        <a class="rail-link on" href="#summary">Overview</a>
-        <a class="rail-link" href="#active-listings">Active</a>
-        <a class="rail-link" href="#inventory">Inactive</a>
-        <a class="rail-link" href="#selling">Drafts</a>
-        <a class="rail-link" href="admin-products.html">Create listing</a>
-        <a class="rail-link" href="#inventory">Inventory</a>
-        <a class="rail-link" href="#orders">Orders</a>
-        <a class="rail-link" href="#messages">Messages</a>
-        <a class="rail-link" href="#returns">Returns</a>
-        <a class="rail-link" href="#payouts">Payments</a>
-        <a class="rail-link" href="#reports">Reports</a>
-      </section>
-
-      <section class="rail-card">
-        <div class="rail-title">Seller tools</div>
-        <a class="rail-link" href="#marketing">Marketing</a>
-        <a class="rail-link" href="#advertising">Advertising</a>
-        <a class="rail-link" href="#ebay-api">API tools</a>
-        <a class="rail-link" href="#settings">Selling preferences</a>
-      </section>
-
-      <section class="rail-card">
-        <div class="rail-title">Categories</div>
-        <a class="rail-link" href="collections/all.html">All Products</a>
-        <a class="rail-link" href="collections/brake-pads.html">Brake Pads</a>
-        <a class="rail-link" href="collections/big-brake-kit.html">Big Brake Kits</a>
-        <a class="rail-link" href="collections/heavy-duty-durability.html">Heavy-Duty Durability</a>
-        <a class="rail-link" href="collections/lift-coilover-suspension-kit.html">Lift Coilover Suspension Kit</a>
-        <a class="rail-link" href="collections/lowering-spring.html">Lowering Springs</a>
-        <a class="rail-link" href="collections/rear-anti-roll-bar.html">Rear Sway Bar</a>
-        <a class="rail-link" href="collections/strut-tower-bar-under-bars.html">Strut Tower Bars</a>
-      </section>
-
-      <section class="rail-card">
-        <div class="rail-title">Quick status</div>
-        <div class="rail-status-list">
-          <div>
-            <strong id="admin-session-badge">Checking session...</strong>
-            <span>Admin authentication</span>
-          </div>
-          <div>
-            <strong id="admin-status-badge">Marketplace readiness</strong>
-            <span>Seller operations</span>
-          </div>
-        </div>
-      </section>
-    </aside>
-
-    <section class="admin-content">
-      <div id="admin-flash" class="flash-banner" hidden></div>
-
-      <section class="seller-banner" id="summary">
-        <div class="seller-banner-copy">
-          <span class="seller-kicker">seller operations preview</span>
-          <h1>PATZCOM Admin Hub</h1>
-          <p>A protected marketplace control room for product curation, buyer support, shipping updates, payout reporting, and eBay API-connected workflows.</p>
-          <div class="seller-mini-stats">
-            <span>US listings only</span>
-            <span>Catalog management</span>
-            <span>Order and shipping desk</span>
-            <span>PayPal-first checkout</span>
-          </div>
-        </div>
-        <div class="seller-banner-actions">
-          <span class="status-chip info" id="store-domain-chip">patzcom.com</span>
-          <span class="status-chip" id="storeflow-chip">Loading marketplace snapshot...</span>
-        </div>
-      </section>
-
-      <section class="summary-grid" aria-label="Dashboard summary">
-        <article class="summary-tile">
-          <strong id="kpi-products">--</strong>
-          <span>Catalog products</span>
-        </article>
-        <article class="summary-tile">
-          <strong id="kpi-stock">--</strong>
-          <span>In stock</span>
-        </article>
-        <article class="summary-tile">
-          <strong id="kpi-brands">--</strong>
-          <span>Brands</span>
-        </article>
-        <article class="summary-tile">
-          <strong id="kpi-categories">--</strong>
-          <span>Categories</span>
-        </article>
-      </section>
-
-      <section class="seller-workbench" id="active-listings">
-        <div class="seller-workbench-head">
-          <div>
-            <span class="seller-workbench-kicker">Listings</span>
-            <h2>Manage active listings (<span id="active-listings-count">--</span>)</h2>
-            <p>Seller Hub style workspace for inventory, offers, and listing performance on PATZCOM.</p>
-          </div>
-          <div class="seller-workbench-actions">
-            <a class="admin-btn" href="#messages">Messages (0)</a>
-            <a class="admin-btn primary" href="admin-products.html">Create listing</a>
-          </div>
-        </div>
-
-        <div class="seller-insights-grid">
-          <article class="seller-insight-card">
-            <div class="seller-insight-icon"><i class="bi bi-bullseye"></i></div>
-            <div>
-              <h3>Adjust ad rates to scale your reach</h3>
-              <p>Help your listings get more impressions by increasing campaign visibility.</p>
-              <a href="#reports">Adjust now</a>
-            </div>
-          </article>
-          <article class="seller-insight-card">
-            <div class="seller-insight-icon"><i class="bi bi-megaphone"></i></div>
-            <div>
-              <h3>Drive more sales with a campaign built for you</h3>
-              <p>Promote listings with priority merchandising and buyer-ready discovery placement.</p>
-              <a href="#marketing">Try it now</a>
-            </div>
-          </article>
-        </div>
-
-        <div class="seller-tools-row">
-          <div class="seller-search-box">
-            <i class="bi bi-search"></i>
-            <input id="seller-search-input" type="search" placeholder="Search by title, SKU, or item number">
-          </div>
-          <div class="seller-tool-pills">
-            <button class="seller-pill on" type="button">All filters (1)</button>
-            <button class="seller-pill" type="button">Clear all</button>
-          </div>
-        </div>
-
-        <div class="seller-results-row">
-          <div class="seller-results-copy">
-            <strong>Results: <span id="seller-result-range">1-200</span></strong>
-            <span>Total catalog value: <span id="seller-total-value">--</span></span>
-            <span>Listings: <span id="seller-total-qty">--</span></span>
-          </div>
-          <div class="seller-results-tools">
-            <a href="#selling">Customize table</a>
-            <a href="#reports">Download</a>
-            <a href="#selling">Upload</a>
-          </div>
-        </div>
-
-        <div class="seller-bulk-row">
-          <button class="admin-btn primary seller-bulk-action" type="button">Edit</button>
-          <button class="admin-btn seller-bulk-action" type="button">Sell similar</button>
-          <button class="admin-btn seller-bulk-action" type="button">Actions</button>
-          <button class="admin-btn seller-bulk-action" type="button">Sell it faster</button>
-        </div>
-
-        <div class="seller-listing-table">
-          <table class="admin-table admin-active-table">
-            <thead>
-              <tr>
-                <th>Listing</th>
-                <th>Status</th>
-                <th>Price</th>
-                <th>Performance</th>
-              </tr>
-            </thead>
-            <tbody id="active-listings-table">
-              <tr><td colspan="4" class="table-empty">Loading active listings...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="admin-workbench">
-        <div class="workbench-main">
-          <article class="panel" id="overview">
-            <div class="panel-head">
-              <div>
-                <h2>Marketplace API workflow map</h2>
-                <p class="panel-note">Official Sell API structure, mapped to PATZCOM operations.</p>
-              </div>
-              <span class="status-chip info">Official workflow</span>
-            </div>
-            <table class="admin-table">
-              <thead>
-                <tr>
-                  <th>API</th>
-                  <th>Purpose</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody id="ebay-api-table">
-                <tr><td colspan="3" class="table-empty">Loading API map...</td></tr>
-              </tbody>
-            </table>
-          </article>
-
-          <article class="panel" id="inventory">
-            <div class="panel-head">
-              <div>
-                <h2>Live inventory snapshot</h2>
-                <p class="panel-note">Products loaded from the PATZCOM catalog feed and filtered in-browser.</p>
-              </div>
-              <span class="panel-note" id="product-count-label">Loading products...</span>
-            </div>
-            <table class="admin-table admin-inventory-table">
-              <thead>
-                <tr>
-                  <th>Product</th>
-                  <th>Vendor</th>
-                  <th>Category</th>
-                  <th>Price</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody id="inventory-table">
-                <tr><td colspan="5" class="table-empty">Loading products...</td></tr>
-              </tbody>
-            </table>
-          </article>
-
-          <article class="panel" id="orders">
-            <div class="panel-head">
-              <div>
-                <h2>Orders and shipping</h2>
-                <p class="panel-note">Paid orders from PATZCOM checkout, with fulfillment status and carrier tracking.</p>
-              </div>
-              <button class="admin-btn" id="orders-reload" type="button">Refresh orders</button>
-            </div>
-            <div class="orders-toolbar">
-              <label for="orders-filter">Order status</label>
-              <select id="orders-filter"><option value="all">All orders</option><option value="paid">Paid</option><option value="awaiting_fulfillment">Awaiting fulfillment</option><option value="shipped">Shipped</option><option value="delivered">Delivered</option><option value="on_hold">On hold</option></select>
-            </div>
-            <p id="orders-state" class="panel-note" role="status" aria-live="polite">Loading orders from PostgreSQL...</p>
-            <div class="admin-table-scroll"><table class="admin-table orders-table"><thead><tr><th>Order</th><th>Date</th><th>Items</th><th>Payment</th><th>Total</th><th>Fulfillment</th><th>Tracking</th><th>Update</th></tr></thead><tbody id="orders-table"><tr><td colspan="8" class="table-empty">Loading orders...</td></tr></tbody></table></div>
-          </article>
-
-          <article class="panel" id="selling">
-            <div class="panel-head">
-              <div>
-                <h2>Catalog import</h2>
-                <p class="panel-note">Paste an eBay export, a normalized JSON payload, or a GitHub raw JSON URL.</p>
-              </div>
-              <span class="status-chip info">Dedupes before rebuild</span>
-            </div>
-            <div class="catalog-tools">
-              <textarea id="catalog-import-json" rows="9" placeholder='{"items":[{"title":"Sample listing","handle":"sample-listing","price":199.99,"images":["https://..."]}]}'></textarea>
-              <div class="catalog-source-row">
-                <span>Source URL</span>
-                <input id="catalog-source-url" type="url" placeholder="https://raw.githubusercontent.com/.../catalog.json">
-              </div>
-              <div class="catalog-button-row">
-                <button class="admin-btn" id="catalog-source-btn" type="button">Import from URL</button>
-                <button class="admin-btn primary" id="catalog-import-btn" type="button">Import pasted JSON</button>
-                <button class="admin-btn" id="catalog-enrich-btn" type="button">Sync all eBay images</button>
-              </div>
-              <div class="catalog-state" id="catalog-import-state">Ready for JSON import or remote source URL. Duplicate items are collapsed automatically.</div>
-              <div class="catalog-sync-note"><strong>Image sync order:</strong> exact eBay item number first, title search only when no trusted media is available. Existing PATZCOM images are preserved when an old listing is unavailable.</div>
-            </div>
-          </article>
-
-          <article class="panel" id="reports">
-            <div class="panel-head">
-              <div>
-                <h2>Catalog performance</h2>
-                <p class="panel-note">Current operational status derived from the marketplace snapshot.</p>
-              </div>
-            </div>
-            <table class="admin-table">
-              <thead>
-                <tr>
-                  <th>Metric</th>
-                  <th>Value</th>
-                  <th>Meaning</th>
-                </tr>
-              </thead>
-              <tbody id="operations-table">
-                <tr><td colspan="3" class="table-empty">Loading dashboard...</td></tr>
-              </tbody>
-            </table>
-          </article>
-        </div>
-
-        <aside class="workbench-side">
-          <article class="panel" id="messages">
-            <div class="panel-head">
-              <div>
-                <h2>Messages</h2>
-                <p class="panel-note">Customer questions from the PATZCOM contact form.</p>
-              </div>
-              <button class="admin-btn" id="messages-reload" type="button">Refresh</button>
-            </div>
-            <p id="messages-state" class="panel-note">Loading messages from PostgreSQL...</p>
-            <div class="admin-table-scroll"><table class="admin-table messages-table"><thead><tr><th>From</th><th>Message</th><th>Status</th><th>Update</th></tr></thead><tbody id="messages-table"><tr><td colspan="4" class="table-empty">Loading messages...</td></tr></tbody></table></div>
-          </article>
-
-          <article class="panel" id="integration-status">
-            <div class="panel-head"><div><h2>Integration status</h2><p class="panel-note">Current readiness across eBay, PayPal, and storefront flows.</p></div></div>
-            <div class="integration-list" id="integration-list"><div class="integration-card"><strong>Marketplace API</strong><span>Checking readiness...</span></div></div>
-          </article>
-
-          <article class="panel" id="ebay-api">
-            <div class="panel-head">
-              <div>
-                <h2>eBay API setup</h2>
-                <p class="panel-note">Finish OAuth and API access with the official eBay Developer Program.</p>
-              </div>
-            </div>
-            <div class="info-card" id="ebay-config-card">
-              <strong>Developer keys readiness</strong>
-              <ul id="ebay-config-checklist">
-                <li>Checking App ID / Cert ID...</li>
-              </ul>
-              <div class="side-copy" id="ebay-config-state">Loading eBay configuration status...</div>
-            </div>
-            <div class="side-stack">
-              <a class="admin-btn" href="https://developer.ebay.com/my/keys" target="_blank" rel="noreferrer">Application Keys</a>
-              <a class="admin-btn" href="https://developer.ebay.com/develop/apis" target="_blank" rel="noreferrer">API Reference</a>
-              <a class="admin-btn" href="https://developer.ebay.com/develop/tools/sandbox" target="_blank" rel="noreferrer">Sandbox / API Explorer</a>
-              <div class="info-card">
-                <strong>Required values</strong>
-                <ul>
-                  <li>EBAY_CLIENT_ID = Production App ID</li>
-                  <li>EBAY_CLIENT_SECRET = Cert ID / Client Secret</li>
-                  <li>EBAY_REDIRECT_URI = OAuth callback URL</li>
-                  <li>EBAY_SCOPES = consent scopes for seller tools</li>
-                  <li>Refresh token stored after consent</li>
-                  <li>Browse API app token powers exact item image sync</li>
-                </ul>
-              </div>
-              <p class="side-copy">When these variables are set, use <strong>Connect account</strong> to complete authorization and store the refresh token.</p>
-            </div>
-          </article>
-
-          <article class="panel">
-            <div class="panel-head">
-              <div>
-                <h2>OAuth control</h2>
-                <p class="panel-note">Connect the account and refresh the token when needed.</p>
-              </div>
-            </div>
-            <div class="side-stack">
-              <a class="admin-btn primary" href="/api/ebay/connect">Connect account</a>
-              <button class="admin-btn" id="ebay-refresh-btn-side" type="button">Refresh token</button>
-              <div class="side-copy" id="token-state">Token state loading...</div>
-            </div>
-          </article>
-
-          <article class="panel" id="quick-links">
-            <div class="panel-head">
-              <div>
-                <h2>Quick links</h2>
-                <p class="panel-note">Fast access to raw feed, JSON, and login preview.</p>
-              </div>
-            </div>
-            <div class="side-stack">
-              <a class="admin-btn" href="/api/products">Product feed</a>
-              <a class="admin-btn" href="/api/admin/dashboard">Admin JSON</a>
-              <a class="admin-btn" href="admin-login.html">Login screen</a>
-            </div>
-          </article>
-        </aside>
-      </section>
-    </section>
-  </main>
-</div>
-
+<style>
+:root{--ink:#191919;--muted:#707070;--line:#e5e5e5;--bg:#f7f7f7;--card:#fff;--blue:#3665f3;--blue-d:#2b50c4;--green:#05823f;--red:#d50b0b;--amber:#c47a00;--radius:16px}
+*{box-sizing:border-box}body{margin:0;font:14px/1.45 "Helvetica Neue",Arial,sans-serif;color:var(--ink);background:var(--bg)}
+a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}
+button,input,select,textarea{font:inherit}
+.top{background:#fff;border-bottom:1px solid var(--line)}
+.top-row{max-width:1440px;margin:0 auto;display:flex;align-items:center;gap:18px;padding:10px 24px;font-size:12px;color:var(--muted)}
+.top-row .sp{flex:1}.top-row a{color:var(--ink)}
+.brand-row{max-width:1440px;margin:0 auto;display:flex;align-items:center;gap:20px;padding:6px 24px 14px}
+.logo{font-size:30px;font-weight:800;letter-spacing:-1.5px;line-height:1}.logo b:nth-child(1){color:#e53238}.logo b:nth-child(2){color:#0064d2}.logo b:nth-child(3){color:#f5af02}.logo b:nth-child(4){color:#86b817}.logo small{display:block;font-size:12px;font-weight:600;letter-spacing:0;color:var(--muted)}
+.search{flex:1;display:flex;border:2px solid var(--ink);border-radius:999px;overflow:hidden;max-width:760px}
+.search input{flex:1;border:0;padding:10px 18px;outline:none}.search button{border:0;background:var(--blue);color:#fff;padding:0 28px;font-weight:700;cursor:pointer}
+.tabs{max-width:1440px;margin:0 auto;display:flex;gap:2px;padding:0 24px;overflow-x:auto}
+.tabs button{border:0;background:none;padding:12px 14px;font-weight:600;color:var(--muted);border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
+.tabs button.on{color:var(--ink);border-color:var(--ink)}.tabs button:hover{color:var(--ink)}
+.page{max-width:1440px;margin:0 auto;padding:22px 24px 60px;display:grid;grid-template-columns:220px 1fr;gap:24px}
+.side h3{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:0 0 8px}
+.side a{display:flex;justify-content:space-between;padding:7px 10px;border-radius:8px;color:var(--ink);cursor:pointer}
+.side a.on{background:#e8eefc;font-weight:700}.side a:hover{background:#efefef;text-decoration:none}
+.side .cnt{color:var(--muted);font-size:12px}
+h1{font-size:26px;margin:0 0 16px;letter-spacing:-.5px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin-bottom:18px}
+.card h2{font-size:17px;margin:0 0 12px;display:flex;justify-content:space-between;align-items:center}
+.grid{display:grid;gap:18px}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.task{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--line);cursor:pointer}.task:first-of-type{border-top:0}
+.task b{font-size:18px}.task:hover span{text-decoration:underline}
+.kpi .v{font-size:28px;font-weight:700;letter-spacing:-.5px}.kpi .l{color:var(--muted);font-size:13px}.kpi .d{font-size:12px;margin-top:4px}
+.up{color:var(--green)}.down{color:var(--red)}
+.chart{height:200px;display:flex;align-items:flex-end;gap:4px;padding-top:10px;border-bottom:1px solid var(--line)}
+.chart div{flex:1;background:var(--blue);border-radius:4px 4px 0 0;min-height:2px;position:relative}
+.chart div:hover::after{content:attr(data-t);position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:#111;color:#fff;font-size:11px;padding:3px 6px;border-radius:4px;white-space:nowrap}
+.axis{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}.seg button{border:0;background:#fff;padding:5px 12px;cursor:pointer;font-size:12px}.seg button.on{background:var(--ink);color:#fff}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.toolbar input,.toolbar select{border:1px solid #c7c7c7;border-radius:8px;padding:8px 10px;background:#fff}
+.toolbar input[type=search]{min-width:260px}
+.btn{border:1px solid var(--blue);color:var(--blue);background:#fff;border-radius:999px;padding:7px 16px;font-weight:700;cursor:pointer}
+.btn:hover{background:#f0f4ff}.btn.pri{background:var(--blue);color:#fff}.btn.pri:hover{background:var(--blue-d)}
+.btn.sm{padding:4px 10px;font-size:12px}.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{border-color:#c7c7c7;color:var(--ink)}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:12px;color:var(--muted);font-weight:600;background:#fafafa;position:sticky;top:0;cursor:default}th.s{cursor:pointer}th.s:hover{color:var(--ink)}
+tr:hover td{background:#fbfbfb}
+.thumb{width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid var(--line);background:#f2f2f2}
+.ttl{font-weight:600;color:var(--ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:520px}
+.sub{color:var(--muted);font-size:12px}
+.pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:#eee}
+.pill.g{background:#e6f4ea;color:var(--green)}.pill.r{background:#fde8e8;color:var(--red)}.pill.a{background:#fff4dc;color:var(--amber)}.pill.b{background:#e8eefc;color:var(--blue)}
+.tscroll{overflow:auto;max-height:70vh;border:1px solid var(--line);border-radius:12px}
+.pager{display:flex;justify-content:space-between;align-items:center;margin-top:10px;color:var(--muted)}
+.bulk{display:none;background:#e8eefc;border-radius:10px;padding:8px 12px;margin-bottom:10px;gap:8px;align-items:center}.bulk.on{display:flex}
+.drawer-bg{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;z-index:50}.drawer-bg.on{display:block}
+.drawer{position:fixed;top:0;right:0;height:100%;width:min(640px,100%);background:#fff;z-index:51;transform:translateX(100%);transition:.2s;display:flex;flex-direction:column}
+.drawer.on{transform:none}.drawer header{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.drawer header h2{margin:0;font-size:19px}.drawer .body{padding:18px 22px;overflow:auto;flex:1}.drawer footer{padding:14px 22px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end}
+.f{display:grid;gap:4px;margin-bottom:12px}.f label{font-size:12px;font-weight:700;color:var(--muted)}
+.f input,.f select,.f textarea{border:1px solid #c7c7c7;border-radius:8px;padding:9px 10px;width:100%}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.imgs{display:flex;flex-wrap:wrap;gap:8px}.imgs div{position:relative}.imgs img{width:84px;height:84px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+.imgs button{position:absolute;top:-6px;right:-6px;border:0;background:#111;color:#fff;border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:11px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:10px 18px;border-radius:999px;z-index:99;display:none}
+.empty{text-align:center;color:var(--muted);padding:40px 10px}
+.x{border:0;background:none;font-size:22px;cursor:pointer}
+.bar{height:8px;background:#eee;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:var(--blue)}
+.meter{display:flex;justify-content:space-between;margin:10px 0 4px}
+.view{display:none}.view.on{display:block}
+@media(max-width:1000px){.page{grid-template-columns:1fr}.side{display:flex;gap:4px;overflow:auto}.side h3{display:none}.g4,.g3{grid-template-columns:repeat(2,1fr)}.g2{grid-template-columns:1fr}}
+</style></head><body>
+<header class="top">
+  <div class="top-row"><span>Hi <b id="who">seller</b>!</span><a href="/" target="_blank">View storefront</a><a href="/admin-classic.html#more-tools">More tools</a><span class="sp"></span><a href="/admin-products.html">Sell an item</a><a href="#" id="logout">Sign out</a></div>
+  <div class="brand-row">
+    <div class="logo"><b>P</b><b>A</b><b>T</b><b>Z</b>COM<small>Seller Hub</small></div>
+    <form class="search" id="gsearch"><input id="gq" placeholder="Search listings, orders, buyers or item numbers"><button>Search</button></form>
+    <button class="btn pri" onclick="openEditor()">+ Create listing</button>
+  </div>
+  <nav class="tabs" id="tabs"></nav>
+</header>
+<main class="page"><aside class="side" id="side"></aside><section id="main"></section></main>
+<div class="drawer-bg" id="dbg"></div>
+<aside class="drawer" id="drawer"><header><h2 id="dtitle">Edit listing</h2><button class="x" onclick="closeDrawer()">&times;</button></header><div class="body" id="dbody"></div><footer id="dfoot"></footer></aside>
+<div class="toast" id="toast"></div>
 <script>
-const sessionBadge = document.getElementById('admin-session-badge');
-const statusBadge = document.getElementById('admin-status-badge');
-const userEmail = document.getElementById('admin-user-email');
-const storeflowChip = document.getElementById('storeflow-chip');
-const flash = document.getElementById('admin-flash');
-const kpiProducts = document.getElementById('kpi-products');
-const kpiStock = document.getElementById('kpi-stock');
-const kpiBrands = document.getElementById('kpi-brands');
-const kpiCategories = document.getElementById('kpi-categories');
-const operationsTable = document.getElementById('operations-table');
-const apiTable = document.getElementById('ebay-api-table');
-const queue = document.getElementById('action-queue');
-const integrationList = document.getElementById('integration-list');
-const tokenState = document.getElementById('token-state');
-const ebayConfigState = document.getElementById('ebay-config-state');
-const ebayConfigChecklist = document.getElementById('ebay-config-checklist');
-const inventoryTable = document.getElementById('inventory-table');
-const activeListingsTable = document.getElementById('active-listings-table');
-const productCountLabel = document.getElementById('product-count-label');
-const activeListingsCount = document.getElementById('active-listings-count');
-const sellerSearchInput = document.getElementById('seller-search-input');
-const searchInput = document.getElementById('admin-search-input');
-const searchBtn = document.getElementById('admin-search-btn');
-const sellerResultRange = document.getElementById('seller-result-range');
-const sellerTotalValue = document.getElementById('seller-total-value');
-const sellerTotalQty = document.getElementById('seller-total-qty');
-const logoutBtn = document.getElementById('admin-logout-btn');
-const connectBtn = document.getElementById('ebay-connect-btn');
-const refreshBtn = document.getElementById('ebay-refresh-btn');
-const refreshBtnSide = document.getElementById('ebay-refresh-btn-side');
-const catalogImportBtn = document.getElementById('catalog-import-btn');
-const catalogSourceBtn = document.getElementById('catalog-source-btn');
-const catalogEnrichBtn = document.getElementById('catalog-enrich-btn');
-const catalogImportState = document.getElementById('catalog-import-state');
-const catalogImportJson = document.getElementById('catalog-import-json');
-const catalogSourceUrl = document.getElementById('catalog-source-url');
-const ordersTable = document.getElementById('orders-table');
-const ordersState = document.getElementById('orders-state');
-const ordersFilter = document.getElementById('orders-filter');
-const messagesTable = document.getElementById('messages-table');
-const messagesState = document.getElementById('messages-state');
-const messagesReload = document.getElementById('messages-reload');
-let allOrders = [];
-let allMessages = [];
-const flashMessages = {
-  connected: 'eBay account connected. Refresh the token when you need updated consent.',
-  invalid-state: 'OAuth state did not match. Open the developer portal again and start a fresh consent flow.',
-  missing-code: 'OAuth callback was missing an authorization code.',
-  'token-exchange-failed': 'Token exchange failed. Check the Client ID, Secret, and Redirect URI.',
-  'api-ready': 'API permissions are ready for catalog and fulfillment workflows.',
+const S={tab:'overview',sub:null,products:[],revision:'',orders:[],messages:[],dash:null,sel:new Set(),page:1,per:50,q:'',sort:'title',dir:1,range:30};
+const $=s=>document.querySelector(s);
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const usd=n=>'$'+Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const day=d=>new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+const toast=m=>{const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',2600)};
+async function api(url,opt={}){const r=await fetch(url,{cache:'no-store',...opt,headers:{'Content-Type':'application/json',...(opt.headers||{})}});if(r.status===401){location.href='/admin-login.html';throw new Error('login')}const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||j.message||('HTTP '+r.status));return j}
+const qty=p=>Number.isInteger(p.quantity)?p.quantity:(p.available?1:0);
+const isActive=p=>p.available&&qty(p)>0;
+const paid=o=>['completed','captured','paid','COMPLETED'].includes(o.status)||o.status==='paid';
+const TABS=[['overview','Overview'],['orders','Orders'],['listings','Listings'],['marketing','Marketing'],['performance','Performance'],['payments','Payments'],['research','Research'],['reports','Reports'],['messages','Messages']];
+const SUBS={
+ orders:[['all','All orders'],['awaiting','Awaiting shipment'],['packing','Packing'],['shipped','Paid and shipped'],['delivered','Delivered'],['hold','On hold'],['unpaid','Awaiting payment']],
+ listings:[['active','Active'],['out','Out of stock'],['unsold','Ended / Unsold'],['drafts','Drafts']],
+ marketing:[['promos','Promotions'],['coupons','Coupons']],
+ performance:[['summary','Summary'],['sales','Sales'],['traffic','Inventory health']],
+ payments:[['summary','Summary'],['tx','All transactions']],
+ research:[['catalog','Catalog insights'],['pricing','Pricing']],
+ reports:[['downloads','Downloads']],
+ messages:[['inbox','Inbox'],['unread','Unread']]};
+function counts(){const o=S.orders,p=S.products;return{all:o.length,awaiting:o.filter(x=>paid(x)&&x.fulfillment_status==='awaiting_fulfillment').length,packing:o.filter(x=>x.fulfillment_status==='packing').length,shipped:o.filter(x=>x.fulfillment_status==='shipped').length,delivered:o.filter(x=>x.fulfillment_status==='delivered').length,hold:o.filter(x=>x.fulfillment_status==='on_hold').length,unpaid:o.filter(x=>!paid(x)).length,active:p.filter(isActive).length,out:p.filter(x=>x.available&&qty(x)===0).length,unsold:p.filter(x=>!x.available).length,drafts:0,inbox:S.messages.length,unread:S.messages.filter(m=>!['read','closed'].includes(m.status)).length}}
+function nav(tab,sub){S.tab=tab;S.sub=sub||(SUBS[tab]?SUBS[tab][0][0]:null);S.page=1;S.sel.clear();location.hash=tab+(S.sub?'/'+S.sub:'');render()}
+function render(){
+ $('#tabs').innerHTML=TABS.map(([k,l])=>`<button class="${S.tab===k?'on':''}" onclick="nav('${k}')">${l}</button>`).join('');
+ const c=counts();const subs=SUBS[S.tab];
+ $('#side').innerHTML=subs?`<h3>${TABS.find(t=>t[0]===S.tab)[1]}</h3>`+subs.map(([k,l])=>`<a class="${S.sub===k?'on':''}" onclick="nav('${S.tab}','${k}')">${l}<span class="cnt">${c[k]??''}</span></a>`).join(''):`<h3>Shortcuts</h3><a onclick="nav('orders','awaiting')">Awaiting shipment<span class="cnt">${c.awaiting}</span></a><a onclick="nav('listings','active')">Active listings<span class="cnt">${c.active}</span></a><a onclick="nav('listings','out')">Out of stock<span class="cnt">${c.out}</span></a><a onclick="nav('messages','unread')">Unread messages<span class="cnt">${c.unread}</span></a><a href="/admin-classic.html#more-tools">eBay sync &amp; import tools</a>`;
+ (V[S.tab]||V.overview)();
+}
+const V={};
+const set=h=>$('#main').innerHTML=h;
+/* ---------- Overview ---------- */
+function salesSeries(days){const now=new Date();now.setHours(0,0,0,0);const arr=[...Array(days)].map((_,i)=>{const d=new Date(now);d.setDate(d.getDate()-(days-1-i));return{d,v:0,n:0}});S.orders.filter(paid).forEach(o=>{const t=new Date(o.created_at);t.setHours(0,0,0,0);const i=Math.round((t-arr[0].d)/864e5);if(i>=0&&i<days){arr[i].v+=Number(o.total);arr[i].n++}});return arr}
+function chart(days){const s=salesSeries(days);const m=Math.max(1,...s.map(x=>x.v));return`<div class="chart">${s.map(x=>`<div style="height:${x.v/m*100}%" data-t="${x.d.toLocaleDateString('en-US',{month:'short',day:'numeric'})}: ${usd(x.v)} (${x.n})"></div>`).join('')}</div><div class="axis"><span>${day(s[0].d)}</span><span>Today</span></div>`}
+V.overview=()=>{const c=counts();const s=salesSeries(S.range);const tot=s.reduce((a,x)=>a+x.v,0),n=s.reduce((a,x)=>a+x.n,0);const prev=salesSeries(S.range*2).slice(0,S.range).reduce((a,x)=>a+x.v,0);const ch=prev?((tot-prev)/prev*100):0;
+ const inv=S.products.filter(isActive).reduce((a,p)=>a+Number(p.price)*qty(p),0);
+ set(`<h1>Overview</h1>
+ <div class="grid g3">
+  <div class="card"><h2>Tasks</h2>
+   <div class="task" onclick="nav('orders','awaiting')"><span>Ship orders</span><b>${c.awaiting}</b></div>
+   <div class="task" onclick="nav('orders','unpaid')"><span>Awaiting payment</span><b>${c.unpaid}</b></div>
+   <div class="task" onclick="nav('messages','unread')"><span>Buyer messages</span><b>${c.unread}</b></div>
+   <div class="task" onclick="nav('listings','out')"><span>Restock out-of-stock listings</span><b>${c.out}</b></div></div>
+  <div class="card" style="grid-column:span 2"><h2>Sales <span class="seg">${[7,30,90].map(d=>`<button class="${S.range===d?'on':''}" onclick="S.range=${d};render()">${d} days</button>`).join('')}</span></h2>
+   <div class="grid g3"><div class="kpi"><div class="l">Sales</div><div class="v">${usd(tot)}</div><div class="d ${ch>=0?'up':'down'}">${prev?(ch>=0?'+':'')+ch.toFixed(1)+'% vs previous':'No previous period data'}</div></div>
+   <div class="kpi"><div class="l">Orders</div><div class="v">${n}</div></div><div class="kpi"><div class="l">Avg. order value</div><div class="v">${usd(n?tot/n:0)}</div></div></div>${chart(S.range)}</div>
+ </div>
+ <div class="grid g4">
+  <div class="card kpi" onclick="nav('listings','active')" style="cursor:pointer"><div class="l">Active listings</div><div class="v">${c.active}</div><div class="d sub">${usd(inv)} listed value</div></div>
+  <div class="card kpi" onclick="nav('listings','unsold')" style="cursor:pointer"><div class="l">Ended / unsold</div><div class="v">${c.unsold}</div></div>
+  <div class="card kpi"><div class="l">Brands</div><div class="v">${S.dash?.catalog?.vendorCount??'--'}</div></div>
+  <div class="card kpi"><div class="l">Categories</div><div class="v">${S.dash?.catalog?.categoryCount??'--'}</div></div>
+ </div>
+ <div class="card"><h2>Recent orders <a onclick="nav('orders')">See all</a></h2>${ordersTable(S.orders.slice(0,5),true)}</div>`)};
+/* ---------- Listings ---------- */
+function listFiltered(){const q=S.q.toLowerCase();let L=S.products.filter(p=>S.sub==='active'?isActive(p):S.sub==='out'?(p.available&&qty(p)===0):S.sub==='unsold'?!p.available:S.sub==='drafts'?false:true);
+ if(q)L=L.filter(p=>[p.title,p.sku,p.id,p.vendor,p.type].join(' ').toLowerCase().includes(q));
+ if(S.cat)L=L.filter(p=>p.type===S.cat);
+ L.sort((a,b)=>{const k=S.sort;let x=k==='price'||k==='quantity'?Number(k==='quantity'?qty(a):a.price):String(a[k]||'').toLowerCase(),y=k==='price'||k==='quantity'?Number(k==='quantity'?qty(b):b.price):String(b[k]||'').toLowerCase();return(x>y?1:x<y?-1:0)*S.dir});return L}
+function sortBy(k){S.dir=S.sort===k?-S.dir:1;S.sort=k;render()}
+V.listings=()=>{const L=listFiltered();const pages=Math.max(1,Math.ceil(L.length/S.per));S.page=Math.min(S.page,pages);const rows=L.slice((S.page-1)*S.per,S.page*S.per);const cats=[...new Set(S.products.map(p=>p.type).filter(Boolean))].sort();const ar=k=>S.sort===k?(S.dir>0?' ▲':' ▼'):'';
+ const title={active:'Manage active listings',out:'Out of stock',unsold:'Ended / unsold listings',drafts:'Drafts'}[S.sub];
+ set(`<h1>${title} (${L.length})</h1><div class="card">
+ <div class="toolbar"><input type="search" id="lq" placeholder="Search by title, SKU, brand or item number" value="${esc(S.q)}"><select id="lcat"><option value="">All categories</option>${cats.map(c=>`<option ${S.cat===c?'selected':''}>${esc(c)}</option>`).join('')}</select><select id="lper">${[25,50,100,200].map(n=>`<option ${S.per===n?'selected':''}>${n}</option>`).join('')}</select><span class="sub">per page</span><span style="flex:1"></span><button class="btn ghost" onclick="exportCSV('listings')"><i class="bi bi-download"></i> Download</button><button class="btn pri" onclick="openEditor()">Create listing</button></div>
+ <div class="bulk ${S.sel.size?'on':''}"><b>${S.sel.size} selected</b><button class="btn sm" onclick="bulkPrice()">Edit price</button><button class="btn sm" onclick="bulkQty()">Edit quantity</button>${S.sub==='unsold'?'<button class="btn sm" onclick="bulkAvail(true)">Relist</button>':'<button class="btn sm" onclick="bulkAvail(false)">End listings</button>'}<button class="btn sm ghost" onclick="S.sel.clear();render()">Clear</button></div>
+ ${rows.length?`<div class="tscroll"><table><thead><tr><th><input type="checkbox" id="lall" ${rows.every(p=>S.sel.has(p.id))?'checked':''}></th><th>Photo</th><th class="s" onclick="sortBy('title')">Title${ar('title')}</th><th class="s" onclick="sortBy('type')">Category${ar('type')}</th><th class="s" onclick="sortBy('price')">Current price${ar('price')}</th><th class="s" onclick="sortBy('quantity')">Available qty${ar('quantity')}</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+ ${rows.map(p=>`<tr><td><input type="checkbox" data-id="${esc(p.id)}" ${S.sel.has(p.id)?'checked':''}></td><td><img class="thumb" loading="lazy" src="${esc(p.images?.[0]||'')}" alt=""></td><td><a class="ttl" href="/products/${esc(p.handle||p.id)}.html" target="_blank">${esc(p.title)}</a><div class="sub">Item ${esc(p.id)}${p.sku?' · SKU '+esc(p.sku):''} · ${esc(p.vendor||'')} · ${p.condition==='used'?'Used':'New'}</div></td><td class="sub">${esc(p.type||'')}</td><td><input type="number" step="0.01" value="${p.price}" data-price="${esc(p.id)}" style="width:100px;border:1px solid #ddd;border-radius:6px;padding:5px"></td><td><input type="number" min="0" value="${qty(p)}" data-qty="${esc(p.id)}" style="width:70px;border:1px solid #ddd;border-radius:6px;padding:5px"></td><td>${isActive(p)?'<span class="pill g">Active</span>':p.available?'<span class="pill a">Out of stock</span>':'<span class="pill">Ended</span>'}</td><td><button class="btn sm" onclick="openEditor('${esc(p.id)}')">Edit</button></td></tr>`).join('')}
+ </tbody></table></div><div class="pager"><span>Results ${(S.page-1)*S.per+1}-${Math.min(S.page*S.per,L.length)} of ${L.length}</span><span><button class="btn sm ghost" ${S.page<=1?'disabled':''} onclick="S.page--;render()">‹ Prev</button> Page ${S.page} / ${pages} <button class="btn sm ghost" ${S.page>=pages?'disabled':''} onclick="S.page++;render()">Next ›</button></span></div>`:`<div class="empty">${S.sub==='drafts'?'No drafts. Use Create listing to start one.':'No listings match.'}</div>`}</div>`);
+ $('#lq').oninput=e=>{S.q=e.target.value;S.page=1;clearTimeout(S._qt);S._qt=setTimeout(()=>{render();const i=$('#lq');i.focus();i.setSelectionRange(i.value.length,i.value.length)},250)};
+ $('#lcat').onchange=e=>{S.cat=e.target.value;S.page=1;render()};$('#lper').onchange=e=>{S.per=+e.target.value;S.page=1;render()};
+ const all=$('#lall');if(all)all.onchange=e=>{rows.forEach(p=>e.target.checked?S.sel.add(p.id):S.sel.delete(p.id));render()};
+ document.querySelectorAll('[data-id]').forEach(b=>b.onchange=e=>{e.target.checked?S.sel.add(b.dataset.id):S.sel.delete(b.dataset.id);render()});
+ document.querySelectorAll('[data-price]').forEach(i=>i.onchange=()=>quickSave(i.dataset.price,{price:Number(i.value)}));
+ document.querySelectorAll('[data-qty]').forEach(i=>i.onchange=()=>{const q=parseInt(i.value,10);quickSave(i.dataset.qty,{quantity:q,available:q>0})});
 };
-let allProducts = [];
-
-function renderOrders() {
-  if (!ordersTable) return;
-  const filter = ordersFilter?.value || 'all';
-  const shown = allOrders.filter((order) => filter === 'all'
-    || (filter === 'paid' ? ['paid', 'completed', 'captured', 'succeeded'].includes(String(order.status).toLowerCase()) : false)
-    || order.fulfillment_status === filter);
-  ordersTable.replaceChildren();
-  if (!shown.length) {
-    const row = document.createElement('tr');
-    const cell = document.createElement('td');
-    cell.colSpan = 8;
-    cell.className = 'table-empty';
-    cell.textContent = allOrders.length ? 'No orders match this filter.' : 'No checkout orders yet. New PayPal and Stripe orders will appear here.';
-    row.append(cell);
-    ordersTable.append(row);
-    return;
-  }
-  for (const order of shown) {
-    const row = document.createElement('tr');
-    const lines = Array.isArray(order.items) ? order.items : [];
-    const itemSummary = lines.map((line) => `${line.title || 'Item'} × ${line.quantity || 1}`).join(', ');
-    const payment = document.createElement('td'); payment.textContent = `${String(order.provider || '').toUpperCase()} · ${order.status}`;
-    const id = document.createElement('td'); id.textContent = order.reference;
-    const date = document.createElement('td'); date.textContent = Number.isNaN(Date.parse(order.created_at)) ? '—' : new Date(order.created_at).toLocaleDateString();
-    const items = document.createElement('td'); items.textContent = itemSummary || '—';
-    const total = document.createElement('td'); total.textContent = new Intl.NumberFormat('en-US', { style: 'currency', currency: order.currency || 'USD' }).format(Number(order.total || 0));
-    const fulfillmentCell = document.createElement('td');
-    const fulfillment = document.createElement('select');
-    for (const [value, label] of [['awaiting_fulfillment','Awaiting fulfillment'],['packing','Packing'],['shipped','Shipped'],['delivered','Delivered'],['on_hold','On hold']]) {
-      const option = document.createElement('option'); option.value = value; option.textContent = label; fulfillment.append(option);
-    }
-    fulfillment.value = order.fulfillment_status || 'awaiting_fulfillment'; fulfillmentCell.append(fulfillment);
-    const trackingCell = document.createElement('td');
-    const tracking = document.createElement('input'); tracking.type = 'text'; tracking.maxLength = 120; tracking.placeholder = 'Tracking number'; tracking.value = order.tracking_number || ''; trackingCell.append(tracking);
-    const actionCell = document.createElement('td');
-    const save = document.createElement('button'); save.type = 'button'; save.className = 'admin-btn'; save.textContent = 'Save';
-    save.addEventListener('click', async () => {
-      save.disabled = true; save.textContent = 'Saving...';
-      try {
-        const response = await fetch(`/api/admin/orders/${encodeURIComponent(order.id)}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fulfillmentStatus: fulfillment.value, trackingNumber: tracking.value }) });
-        const payload = await response.json();
-        if (!response.ok) throw new Error(payload.error || 'Unable to update order.');
-        ordersState.textContent = `Order ${order.reference} updated.`;
-        await loadOrders();
-      } catch (error) { ordersState.textContent = error.message; }
-      finally { save.disabled = false; save.textContent = 'Save'; }
-    });
-    actionCell.append(save);
-    row.append(id, date, items, payment, total, fulfillmentCell, trackingCell, actionCell);
-    ordersTable.append(row);
-  }
-}
-
-async function loadOrders() {
-  if (!ordersTable) return;
-  ordersState.textContent = 'Loading orders from PostgreSQL...';
-  try {
-    const response = await fetch('/api/admin/orders', { cache: 'no-store' });
-    if (response.status === 401) { window.location.href = '/admin-login.html'; return; }
-    const payload = await response.json();
-    if (!response.ok) throw new Error(payload.error || 'Unable to load orders.');
-    allOrders = Array.isArray(payload.orders) ? payload.orders : [];
-    ordersState.textContent = payload.databaseConfigured ? `${allOrders.length} orders loaded from PostgreSQL.` : 'PostgreSQL is not connected in this environment.';
-    renderOrders();
-  } catch (error) {
-    ordersState.textContent = error.message;
-    ordersTable.innerHTML = '<tr><td colspan="8" class="table-empty">Order data could not be loaded.</td></tr>';
-  }
-}
-
-function renderMessages() {
-  if (!messagesTable) return;
-  messagesTable.replaceChildren();
-  if (!allMessages.length) {
-    const row = document.createElement('tr');
-    const cell = document.createElement('td'); cell.colSpan = 4; cell.className = 'table-empty';
-    cell.textContent = 'No customer messages yet.'; row.append(cell); messagesTable.append(row); return;
-  }
-  for (const message of allMessages) {
-    const row = document.createElement('tr');
-    const from = document.createElement('td');
-    from.textContent = `${message.name || 'Customer'}\n${message.email || ''}${message.vehicle ? `\n${message.vehicle}` : ''}`;
-    from.style.whiteSpace = 'pre-line';
-    const body = document.createElement('td'); body.textContent = message.message || '';
-    const statusCell = document.createElement('td');
-    const status = document.createElement('select');
-    for (const value of ['queued', 'sent', 'read', 'closed', 'email_failed']) { const option = document.createElement('option'); option.value = value; option.textContent = value.replace('_', ' '); status.append(option); }
-    status.value = message.status || 'queued'; statusCell.append(status);
-    const action = document.createElement('td'); const save = document.createElement('button'); save.type = 'button'; save.className = 'admin-btn'; save.textContent = 'Save';
-    save.addEventListener('click', async () => {
-      save.disabled = true;
-      try {
-        const response = await fetch(`/api/admin/messages/${encodeURIComponent(message.id)}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: status.value }) });
-        const payload = await response.json(); if (!response.ok) throw new Error(payload.error || 'Unable to update message.');
-        await loadMessages();
-      } catch (error) { messagesState.textContent = error.message; } finally { save.disabled = false; }
-    });
-    action.append(save); row.append(from, body, statusCell, action); messagesTable.append(row);
-  }
-}
-
-async function loadMessages() {
-  if (!messagesTable) return;
-  messagesState.textContent = 'Loading messages from PostgreSQL...';
-  try {
-    const response = await fetch('/api/admin/messages', { cache: 'no-store' });
-    if (response.status === 401) { window.location.href = '/admin-login.html'; return; }
-    const payload = await response.json(); if (!response.ok) throw new Error(payload.error || 'Unable to load messages.');
-    allMessages = Array.isArray(payload.messages) ? payload.messages : [];
-    messagesState.textContent = payload.databaseConfigured ? `${allMessages.length} messages loaded from PostgreSQL.` : 'PostgreSQL is not connected in this environment.';
-    renderMessages();
-  } catch (error) { messagesState.textContent = error.message; messagesTable.innerHTML = '<tr><td colspan="4" class="table-empty">Message data could not be loaded.</td></tr>'; }
-}
-
-function statusClass(status) {
-  const value = String(status || '').toLowerCase();
-  if (value.includes('ready') || value.includes('success') || value.includes('positive')) return 'ok';
-  if (value.includes('await') || value.includes('needs') || value.includes('locked') || value.includes('missing')) return 'warn';
-  return 'info';
-}
-
-function renderQueue(dashboard) {
-  if (!queue) return;
-  queue.innerHTML = `
-    <div class="queue-card">
-      <strong>Map inventory items to offers</strong>
-      <p>Inventory API uses inventory items, locations, and offers before listings are published on eBay marketplaces.</p>
-    </div>
-    <div class="queue-card">
-      <strong>Prepare OAuth consent</strong>
-      <p>Official eBay REST guides require OAuth scopes and user token setup before seller-side workflows can run.</p>
-    </div>
-    <div class="queue-card">
-      <strong>Align PayPal-first checkout</strong>
-      <p>Keep the public buying flow simple while seller-side reporting and fulfillment integrations continue to mature.</p>
-    </div>
-  `;
-}
-
-function renderIntegrations(dashboard) {
-  integrationList.innerHTML = `
-    <div class="integration-card">
-      <strong>eBay OAuth readiness</strong>
-      <span>${dashboard.integrations.ebay.ready ? 'Client credentials detected. Continue with refresh-token authorization.' : 'Awaiting production credentials.'}</span>
-    </div>
-    <div class="integration-card">
-      <strong>eBay image sync</strong>
-      <span>${dashboard.integrations.ebay.browseApiReady ? 'Browse API ready. Exact item-number image lookup is enabled.' : 'Set the Production App ID and Cert ID to enable image sync.'}</span>
-    </div>
-    <div class="integration-card">
-      <strong>PayPal checkout readiness</strong>
-      <span>${dashboard.integrations.paypal.serverReady ? 'Server-side Orders API checkout is ready.' : 'Add PayPal Client ID and Client Secret in Railway.'}</span>
-    </div>
-    <div class="integration-card">
-      <strong>Stripe card checkout</strong>
-      <span>${dashboard.integrations.stripe.ready ? 'Hosted card checkout is ready.' : 'Add STRIPE_SECRET_KEY in Railway to enable card checkout.'}</span>
-    </div>
-    <div class="integration-card">
-      <strong>Public storefront feed</strong>
-      <span>PATZCOM product cards are loaded from the same internal product feed.</span>
-    </div>
-    <div class="integration-card">
-      <strong>Stored token state</strong>
-      <span>${dashboard.integrations.ebay.tokenStorePresent ? `Refresh token stored. Last updated ${dashboard.integrations.ebay.storedTokenUpdatedAt}.` : 'No stored token yet. Use Connect account to complete authorization.'}</span>
-    </div>
-  `;
-}
-
-function renderOperations(dashboard) {
-  operationsTable.innerHTML = `
-    <tr><td>Inventory sync</td><td>${dashboard.operations.inventorySync}</td><td>SKU and offer prep</td></tr>
-    <tr><td>Policy center</td><td>${dashboard.operations.policyCenter}</td><td>Account and business rules</td></tr>
-    <tr><td>Order desk</td><td>${dashboard.operations.orderDesk}</td><td>Fulfillment workflow</td></tr>
-    <tr><td>Shipping desk</td><td>${dashboard.operations.shippingDesk}</td><td>Tracking readiness</td></tr>
-    <tr><td>Payout reporting</td><td>${dashboard.operations.payoutReporting}</td><td>Settlement visibility</td></tr>
-  `;
-}
-
-function renderApiPlan(dashboard) {
-  apiTable.innerHTML = dashboard.ebayApiPlan.map((api) => `
-    <tr>
-      <td class="cell-strong">${api.name}</td>
-      <td class="cell-muted">${api.purpose}</td>
-      <td><span class="status-chip ${statusClass(api.status)}">${api.status}</span></td>
-    </tr>
-  `).join('');
-}
-
-function renderInventory(products) {
-  const query = (searchInput?.value || '').trim().toLowerCase();
-  const filtered = query
-    ? products.filter((item) =>
-        [item.title, item.vendor, item.category, item.handle]
-          .filter(Boolean)
-          .some((value) => String(value).toLowerCase().includes(query)))
-    : products;
-
-  productCountLabel.textContent = `${filtered.length} of ${products.length} products shown`;
-  if (!filtered.length) {
-    inventoryTable.innerHTML = `<tr><td colspan="5" class="table-empty">No matching products found.</td></tr>`;
-    return;
-  }
-
-  inventoryTable.innerHTML = filtered.map((item) => `
-    <tr>
-      <td>
-        <div class="inventory-product">
-          <div class="inventory-thumb">${item.image ? `<img src="${item.image}" alt="">` : 'P'}</div>
-          <div>
-            <strong>${item.title}</strong>
-            <span>${item.handle}</span>
-          </div>
-        </div>
-      </td>
-      <td class="cell-muted">${item.vendor || 'PATZCOM'}</td>
-      <td class="cell-muted">${item.category || 'Uncategorized'}</td>
-      <td class="cell-strong">${item.price ? `$${item.price}` : '—'}${item.compareAt ? `<div class="cell-strike">$${item.compareAt}</div>` : ''}</td>
-      <td><span class="status-chip ${item.available ? 'ok' : 'warn'}">${item.available ? 'In stock' : 'Out of stock'}</span></td>
-    </tr>
-  `).join('');
-}
-
-function renderSellerTotals(products, filteredProducts = products) {
-  const total = products.reduce((sum, item) => sum + Number(item.price || 0), 0);
-  sellerTotalValue.textContent = `$${total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  sellerTotalQty.textContent = products.length.toLocaleString('en-US');
-  sellerResultRange.textContent = filteredProducts.length
-    ? `1-${Math.min(200, filteredProducts.length).toLocaleString('en-US')} of ${filteredProducts.length.toLocaleString('en-US')}`
-    : '0';
-}
-
-function renderActiveListings(products) {
-  const query = (sellerSearchInput?.value || '').trim().toLowerCase();
-  const filtered = query
-    ? products.filter((item) =>
-        [item.title, item.vendor, item.category, item.handle, item.sku, item.id]
-          .filter(Boolean)
-          .some((value) => String(value).toLowerCase().includes(query)))
-    : products;
-
-  activeListingsCount.textContent = filtered.length.toLocaleString();
-  renderSellerTotals(products, filtered);
-  if (!filtered.length) {
-    activeListingsTable.innerHTML = `<tr><td colspan="4" class="table-empty">No active listings found.</td></tr>`;
-    return;
-  }
-
-  activeListingsTable.innerHTML = filtered.slice(0, 8).map((item, index) => `
-    <tr>
-      <td>
-        <div class="active-listing-card">
-          <div class="active-listing-thumb">${item.image ? `<img src="${item.image}" alt="">` : 'P'}</div>
-          <div>
-            <strong>${item.title}</strong>
-            <span>${item.handle || item.sku || `Listing ${index + 1}`}</span>
-          </div>
-        </div>
-      </td>
-      <td><span class="status-chip ${item.available ? 'ok' : 'warn'}">${item.available ? 'Active' : 'Draft'}</span></td>
-      <td class="cell-strong">${item.price ? `$${item.price}` : '—'}</td>
-      <td class="cell-muted">${item.available ? 'Views, watchers, and conversion tracking enabled' : 'Pending image or publish review'}</td>
-    </tr>
-  `).join('');
-}
-
-function flashFromQuery() {
-  const params = new URLSearchParams(window.location.search);
-  const ebay = params.get('ebay');
-  const message = params.get('message');
-  if (!ebay && !message) return;
-  const base = flashMessages[ebay] || 'Marketplace notice';
-  flash.textContent = message ? `${base} ${message}` : base;
-  flash.hidden = false;
-  flash.className = `flash-banner ${statusClass(ebay || 'info')}`;
-}
-
-async function loadDashboard() {
-  const fetchWithTimeout = (url, options = {}) => Promise.race([
-    fetch(url, options),
-    new Promise((_, reject) => setTimeout(() => reject(new Error(`Request timed out: ${url}`)), 12000)),
-  ]);
-  const sessionResponse = await fetch('/api/admin/session');
-  const session = await sessionResponse.json();
-  if (!session.authenticated) {
-    window.location.href = '/admin-login.html';
-    return;
-  }
-
-  userEmail.textContent = session.user.email;
-  sessionBadge.textContent = `Signed in as ${session.user.email}`;
-
-  const [dashboardResponse, productsResponse, ebayConfigResponse] = await Promise.all([
-    fetchWithTimeout('/api/admin/dashboard'),
-    fetchWithTimeout('/api/products'),
-    fetchWithTimeout('/api/ebay/config'),
-  ]);
-
-  if (!dashboardResponse.ok) {
-    window.location.href = '/admin-login.html';
-    return;
-  }
-
-  const dashboard = await dashboardResponse.json();
-  const productsPayload = await productsResponse.json().catch(() => ({ items: [] }));
-  const ebayConfig = await ebayConfigResponse.json().catch(() => ({}));
-  allProducts = Array.isArray(productsPayload.items) ? productsPayload.items : [];
-
-  kpiProducts.textContent = dashboard.catalog.productCount;
-  kpiStock.textContent = dashboard.catalog.inStockCount;
-  kpiBrands.textContent = dashboard.catalog.vendorCount;
-  kpiCategories.textContent = dashboard.catalog.categoryCount;
-
-  statusBadge.textContent = dashboard.integrations.ebay.browseApiReady ? 'eBay images ready' : 'eBay setup needed';
-  statusBadge.className = `status-chip ${dashboard.integrations.ebay.browseApiReady ? 'ok' : 'warn'}`;
-  storeflowChip.textContent = `${dashboard.integrations.paypal.serverReady ? 'PayPal ready' : 'PayPal setup pending'} · ${dashboard.integrations.stripe.ready ? 'Stripe ready' : 'Stripe setup pending'}`;
-  storeflowChip.className = `status-chip ${dashboard.integrations.paypal.serverReady ? 'ok' : 'warn'}`;
-  tokenState.textContent = dashboard.integrations.ebay.tokenStorePresent
-    ? `Stored token updated ${dashboard.integrations.ebay.storedTokenUpdatedAt}`
-    : 'No stored eBay token yet.';
-
-  if (ebayConfigChecklist) {
-    const items = [
-      { label: 'Production App ID', ready: Boolean(ebayConfig.consentReady) },
-      { label: 'Cert ID / Client Secret', ready: Boolean(ebayConfig.consentReady) },
-      { label: 'Redirect URI approved', ready: Boolean(ebayConfig.redirectUri) },
-      { label: 'OAuth consent + refresh token', ready: Boolean(ebayConfig.tokenStorePresent) },
-      { label: 'Browse API image sync', ready: Boolean(ebayConfig.browseApiReady) },
-    ];
-    ebayConfigChecklist.innerHTML = items.map((item) => `
-      <li class="${item.ready ? 'ok' : 'warn'}">${item.label}${item.ready ? ' · ready' : ' · needs setup'}</li>
-    `).join('');
-  }
-  if (ebayConfigState) {
-    ebayConfigState.textContent = ebayConfig.consentReady
-      ? `Ready for OAuth consent on ${ebayConfig.environment}. Redirect URI: ${ebayConfig.redirectUri || 'not set'}`
-      : 'Set EBAY_CLIENT_ID, EBAY_CLIENT_SECRET, EBAY_REDIRECT_URI, and EBAY_SCOPES in Railway variables first.';
-  }
-
-  renderOperations(dashboard);
-  renderApiPlan(dashboard);
-  renderIntegrations(dashboard);
-  renderInventory(allProducts);
-  renderActiveListings(allProducts);
-  await loadOrders();
-  await loadMessages();
-}
-
-connectBtn?.addEventListener('click', () => {
-  window.location.href = '/api/ebay/connect';
-});
-
-async function refreshToken() {
-  const response = await fetch('/api/admin/ebay/refresh', { method: 'POST' });
-  const payload = await response.json();
-  if (!response.ok) {
-    throw new Error(payload.message || 'Unable to refresh the eBay token.');
-  }
-  await loadDashboard();
-}
-
-logoutBtn.addEventListener('click', async () => {
-  await fetch('/api/admin/logout', { method: 'POST' });
-  window.location.href = '/admin-login.html';
-});
-
-function setBusyState(button, busyLabel, idleLabel) {
-  button.disabled = true;
-  button.textContent = busyLabel;
-  return () => {
-    button.disabled = false;
-    button.textContent = idleLabel;
-  };
-}
-
-refreshBtn.addEventListener('click', async () => {
-  const restore = setBusyState(refreshBtn, 'Refreshing...', 'Refresh token');
-  try {
-    await refreshToken();
-  } catch (error) {
-    alert(error.message);
-  } finally {
-    restore();
-  }
-});
-
-refreshBtnSide.addEventListener('click', async () => {
-  const restore = setBusyState(refreshBtnSide, 'Refreshing...', 'Refresh token');
-  try {
-    await refreshToken();
-  } catch (error) {
-    alert(error.message);
-  } finally {
-    restore();
-  }
-});
-
-searchBtn.addEventListener('click', () => renderInventory(allProducts));
-searchInput.addEventListener('input', () => { renderInventory(allProducts); renderActiveListings(allProducts); });
-sellerSearchInput.addEventListener('input', () => renderActiveListings(allProducts));
-
-document.querySelector('.seller-tool-pills button:last-child')?.addEventListener('click', () => {
-  sellerSearchInput.value = '';
-  renderActiveListings(allProducts);
-});
-document.querySelectorAll('.seller-bulk-action').forEach((button) => {
-  button.addEventListener('click', () => {
-    const action = button.textContent.trim();
-    if (action === 'Edit' || action === 'Sell similar') {
-      window.location.href = `admin-products.html${action === 'Sell similar' ? '?mode=duplicate' : ''}`;
-      return;
-    }
-    if (action === 'Actions') {
-      window.location.href = 'admin-products.html';
-      return;
-    }
-    flash.textContent = 'Promoted listings are not configured yet. Set up an advertising integration before launching campaigns.';
-    flash.hidden = false;
-    flash.className = 'flash-banner warn';
-  });
-});
-ordersFilter?.addEventListener('change', renderOrders);
-document.getElementById('orders-reload')?.addEventListener('click', loadOrders);
-messagesReload?.addEventListener('click', loadMessages);
-document.querySelectorAll('.admin-tabs-row a, .rail-link, .seller-workbench-actions a').forEach((link) => {
-  link.addEventListener('click', () => {
-    const target = link.getAttribute('href');
-    if(!target?.startsWith('#')) return;
-    document.querySelectorAll('.admin-tabs-row a').forEach((item) => item.classList.toggle('on', item.getAttribute('href') === target));
-  });
-});
-
-catalogImportBtn?.addEventListener('click', async () => {
-  let payload;
-  try {
-    payload = JSON.parse(catalogImportJson.value || '{}');
-  } catch (error) {
-    alert(`Invalid JSON: ${error.message}`);
-    return;
-  }
-
-  const restore = setBusyState(catalogImportBtn, 'Importing...', 'Import pasted JSON');
-  catalogImportState.textContent = 'Uploading catalog payload...';
-  try {
-    const response = await fetch('/api/admin/catalog/import', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    const result = await response.json();
-    if (!response.ok) {
-      throw new Error(result.message || 'Import failed.');
-    }
-    catalogImportState.textContent = `Imported ${result.count} products and rebuilt detail pages.`;
-    await loadDashboard();
-  } catch (error) {
-    catalogImportState.textContent = error.message;
-  } finally {
-    restore();
-  }
-});
-
-catalogSourceBtn?.addEventListener('click', async () => {
-  const sourceUrl = catalogSourceUrl.value.trim();
-  if (!sourceUrl) {
-    catalogImportState.textContent = 'Please enter a GitHub raw URL or eBay API URL first.';
-    return;
-  }
-  const restore = setBusyState(catalogSourceBtn, 'Importing URL...', 'Import from URL');
-  catalogImportState.textContent = 'Fetching remote source...';
-  try {
-    const response = await fetch('/api/admin/catalog/import-source', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sourceUrl }),
-    });
-    const result = await response.json();
-    if (!response.ok) {
-      throw new Error(result.message || 'Remote import failed.');
-    }
-    catalogImportState.textContent = `Imported ${result.count} products from ${result.sourceHost}.`;
-    await loadDashboard();
-  } catch (error) {
-    catalogImportState.textContent = error.message;
-  } finally {
-    restore();
-  }
-});
-
-catalogEnrichBtn?.addEventListener('click', async () => {
-  const restore = setBusyState(catalogEnrichBtn, 'Syncing...', 'Sync all eBay images');
-  catalogImportState.textContent = 'Reading exact eBay item numbers and refreshing the product galleries...';
-  try {
-    const response = await fetch('/api/admin/catalog/enrich-images', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ force: true }),
-    });
-    const result = await response.json();
-    if (!response.ok) {
-      throw new Error(result.message || 'Image enrichment failed.');
-    }
-    catalogImportState.textContent = result.updated
-      ? `Synced ${result.updated} galleries: ${result.directMatches || 0} exact item matches, ${result.searchMatches || 0} title fallbacks. ${result.preserved || 0} existing galleries preserved.`
-      : result.message || 'No new images were found.';
-    await loadDashboard();
-  } catch (error) {
-    catalogImportState.textContent = error.message;
-  } finally {
-    restore();
-  }
-});
-
-flashFromQuery();
-loadDashboard().catch((error) => {
-  console.error(error);
-  document.querySelectorAll('[id*="loading"], [id$="-state"]').forEach((element) => {
-    if (element.textContent.includes('Loading') || element.textContent.includes('Checking')) {
-      element.textContent = 'Unable to load this panel. Check the server connection and reload.';
-    }
-  });
-  if (flash) {
-    flash.textContent = error.message;
-    flash.hidden = false;
-    flash.className = 'flash-banner error';
-  }
-});
-</script>
-</body>
-</html>
+function payloadFrom(p,over={}){const m={...p,...over};return{title:m.title||'',sku:m.sku||'',vendor:m.vendor||'',type:m.type||'',price:Number(m.price),condition:m.condition||'new',quantity:Number.isInteger(m.quantity)?m.quantity:qty(p),available:!!m.available,images:m.images||[],desc_text:m.desc_text??p.desc_text??''}}
+async function saveProduct(id,product){const r=await api('/api/admin/products',{method:'POST',body:JSON.stringify({revision:S.revision,id:id||undefined,product})});S.revision=r.revision;const i=S.products.findIndex(x=>x.id===r.product.id);if(i<0)S.products.push(r.product);else S.products[i]=r.product;return r.product}
+async function quickSave(id,over){const p=S.products.find(x=>x.id===id);try{await saveProduct(id,payloadFrom(p,over));toast('Listing updated');render()}catch(e){toast(e.message);await loadProducts();render()}}
+async function bulk(fn,label){const ids=[...S.sel];let ok=0;for(const id of ids){const p=S.products.find(x=>x.id===id);try{await saveProduct(id,payloadFrom(p,fn(p)));ok++}catch(e){toast(e.message);break}}S.sel.clear();toast(`${label}: ${ok}/${ids.length} updated`);render()}
+function bulkPrice(){const v=prompt('New price in USD, or a percent change like +10% / -5%');if(!v)return;const m=v.trim().match(/^([+-]?\d+(?:\.\d+)?)%$/);bulk(p=>({price:m?Math.round(Number(p.price)*(1+Number(m[1])/100)*100)/100:Number(v)}),'Price')}
+function bulkQty(){const v=parseInt(prompt('New available quantity'),10);if(!Number.isInteger(v)||v<0)return;bulk(()=>({quantity:v,available:v>0}),'Quantity')}
+function bulkAvail(on){if(!on&&!confirm(`End ${S.sel.size} listing(s)? They will be hidden from the storefront.`))return;bulk(p=>({available:on,quantity:on?Math.max(1,qty(p)):qty(p)}),on?'Relisted':'Ended')}
+/* ---------- Listing editor ---------- */
+function openDrawer(t,b,f){$('#dtitle').textContent=t;$('#dbody').innerHTML=b;$('#dfoot').innerHTML=f;$('#drawer').classList.add('on');$('#dbg').classList.add('on')}
+function closeDrawer(){$('#drawer').classList.remove('on');$('#dbg').classList.remove('on')}
+$('#dbg').onclick=closeDrawer;
+let ED=null;
+function openEditor(id){const p=id?S.products.find(x=>x.id===id):{title:'',sku:'',vendor:'',type:'',price:'',condition:'new',quantity:1,available:true,images:[],desc_text:''};ED={id,images:[...(p.images||[])]};const cats=[...new Set(S.products.map(x=>x.type).filter(Boolean))].sort();
+ openDrawer(id?'Edit listing':'Create listing',`
+ <div class="f"><label>Photos (${ED.images.length}/30)</label><div class="imgs" id="eimgs"></div><div class="toolbar" style="margin-top:8px"><input id="eurl" placeholder="https://... image URL" style="flex:1"><button class="btn sm" onclick="addUrl()">Add URL</button><label class="btn sm">Upload<input type="file" accept="image/jpeg,image/png,image/webp" id="efile" hidden multiple></label></div></div>
+ <div class="f"><label>Title</label><input id="et" maxlength="300" value="${esc(p.title)}"></div>
+ <div class="frow"><div class="f"><label>Category</label><input id="ec" list="ecats" value="${esc(p.type)}"><datalist id="ecats">${cats.map(c=>`<option>${esc(c)}</option>`).join('')}</datalist></div><div class="f"><label>Brand</label><input id="ev" value="${esc(p.vendor)}"></div></div>
+ <div class="frow"><div class="f"><label>Custom label (SKU)</label><input id="es" value="${esc(p.sku)}"></div><div class="f"><label>Condition</label><select id="eco"><option value="new">New</option><option value="used" ${p.condition==='used'?'selected':''}>Used</option></select></div></div>
+ <div class="frow"><div class="f"><label>Price (USD)</label><input id="ep" type="number" step="0.01" min="0.01" value="${p.price}"></div><div class="f"><label>Quantity</label><input id="eq" type="number" min="0" value="${id?qty(p):1}"></div></div>
+ <div class="f"><label><input type="checkbox" id="ea" ${p.available?'checked':''}> Listing is active on storefront</label></div>
+ <div class="f"><label>Description</label><textarea id="ed" rows="10">${esc(p.desc_text||'')}</textarea></div>
+ ${id?`<p class="sub">Item number ${esc(id)} · <a href="/products/${esc(p.handle||id)}.html" target="_blank">View on storefront</a></p>`:''}`,
+ `<button class="btn ghost" onclick="closeDrawer()">Cancel</button><button class="btn pri" id="esave">${id?'Save changes':'List it'}</button>`);
+ drawImgs();$('#efile').onchange=uploadFiles;$('#esave').onclick=submitEditor}
+function drawImgs(){$('#eimgs').innerHTML=ED.images.map((u,i)=>`<div><img src="${esc(u.startsWith('http')?u:'/'+u)}"><button onclick="ED.images.splice(${i},1);drawImgs()">×</button></div>`).join('')||'<span class="sub">No photos yet</span>'}
+function addUrl(){const u=$('#eurl').value.trim();if(u){ED.images.push(u);$('#eurl').value='';drawImgs()}}
+async function uploadFiles(e){for(const f of e.target.files){const b64=await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(String(fr.result).split(',')[1]);fr.readAsDataURL(f)});try{const r=await api('/api/admin/product-image',{method:'POST',body:JSON.stringify({base64:b64})});ED.images.push(r.url);drawImgs()}catch(err){toast(err.message)}}}
+async function submitEditor(){const b=$('#esave');b.disabled=true;const q=parseInt($('#eq').value,10);const product={title:$('#et').value,type:$('#ec').value,vendor:$('#ev').value,sku:$('#es').value,condition:$('#eco').value,price:Number($('#ep').value),quantity:q,available:$('#ea').checked,images:ED.images,desc_text:$('#ed').value};
+ try{await saveProduct(ED.id,product);toast(ED.id?'Listing saved':'Listing created');closeDrawer();render()}catch(e){toast(e.message);b.disabled=false}}
+/* ---------- Orders ---------- */
+const FS={awaiting_fulfillment:['Awaiting shipment','a'],packing:['Packing','b'],shipped:['Shipped','g'],delivered:['Delivered','g'],on_hold:['On hold','r']};
+function ordersTable(list,compact){if(!list.length)return'<div class="empty">No orders yet.</div>';return`<div class="tscroll"><table><thead><tr><th>Order</th><th>Date</th><th>Item</th><th>Total</th><th>Payment</th><th>Shipping</th>${compact?'':'<th>Tracking</th><th>Actions</th>'}</tr></thead><tbody>${list.map(o=>{const it=o.items?.[0]||{};const f=FS[o.fulfillment_status]||[o.fulfillment_status,''];return`<tr><td><b>${esc(o.reference)}</b><div class="sub">${esc(o.provider)} ${esc(o.provider_order_id||'')}</div></td><td class="sub">${day(o.created_at)}</td><td style="display:flex;gap:10px;align-items:center"><img class="thumb" src="${esc(it.image||'')}" alt=""><div><div class="ttl" style="max-width:320px">${esc(it.title||'')}</div><div class="sub">Qty ${it.quantity||1}${o.items.length>1?` · +${o.items.length-1} more`:''}</div></div></td><td><b>${usd(o.total)}</b></td><td>${paid(o)?'<span class="pill g">Paid</span>':`<span class="pill a">${esc(o.status)}</span>`}</td><td><span class="pill ${f[1]}">${esc(f[0])}</span></td>${compact?'':`<td>${o.tracking_number?esc(o.tracking_number):'<span class="sub">--</span>'}</td><td><button class="btn sm" onclick="openOrder('${o.id}')">${o.fulfillment_status==='awaiting_fulfillment'&&paid(o)?'Add tracking':'Manage'}</button></td>`}</tr>`}).join('')}</tbody></table></div>`}
+V.orders=()=>{const q=S.q.toLowerCase();let L=S.orders.filter(o=>({all:1,awaiting:paid(o)&&o.fulfillment_status==='awaiting_fulfillment',packing:o.fulfillment_status==='packing',shipped:o.fulfillment_status==='shipped',delivered:o.fulfillment_status==='delivered',hold:o.fulfillment_status==='on_hold',unpaid:!paid(o)})[S.sub]);
+ if(q)L=L.filter(o=>JSON.stringify(o).toLowerCase().includes(q));
+ set(`<h1>${SUBS.orders.find(s=>s[0]===S.sub)[1]} (${L.length})</h1><div class="card"><div class="toolbar"><input type="search" id="oq" placeholder="Search order, item, PayPal ID" value="${esc(S.q)}"><span style="flex:1"></span><button class="btn ghost" onclick="loadOrders().then(render)"><i class="bi bi-arrow-clockwise"></i> Refresh</button><button class="btn ghost" onclick="exportCSV('orders')"><i class="bi bi-download"></i> Download</button></div>${ordersTable(L)}</div>`);
+ $('#oq').onchange=e=>{S.q=e.target.value;render()}};
+function openOrder(id){const o=S.orders.find(x=>x.id===id);openDrawer('Order '+o.reference,`
+ <div class="card"><div class="frow"><div><div class="sub">Order date</div><b>${new Date(o.created_at).toLocaleString()}</b></div><div><div class="sub">Payment</div><b>${esc(o.provider)} · ${esc(o.status)}</b><div class="sub">${esc(o.provider_order_id||'')}</div></div></div></div>
+ ${o.items.map(it=>`<div style="display:flex;gap:12px;align-items:center;margin-bottom:10px"><img class="thumb" src="${esc(it.image||'')}"><div style="flex:1"><div class="ttl">${esc(it.title)}</div><div class="sub">Item ${esc(it.id)} · Qty ${it.quantity} × ${usd(it.unitAmount)}</div></div></div>`).join('')}
+ <div class="card"><div class="meter"><span>Subtotal</span><b>${usd(o.subtotal)}</b></div><div class="meter"><span>Shipping</span><b>${usd(o.shipping)}</b></div><div class="meter"><span>Order total</span><b>${usd(o.total)}</b></div></div>
+ <div class="f"><label>Shipping status</label><select id="ofs">${Object.entries(FS).map(([k,v])=>`<option value="${k}" ${o.fulfillment_status===k?'selected':''}>${v[0]}</option>`).join('')}</select></div>
+ <div class="f"><label>Tracking number</label><input id="otr" value="${esc(o.tracking_number||'')}" placeholder="Required when marking as shipped"></div>`,
+ `<button class="btn ghost" onclick="closeDrawer()">Close</button><button class="btn pri" id="osave">Save</button>`);
+ $('#osave').onclick=async()=>{try{const r=await api('/api/admin/orders/'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify({fulfillmentStatus:$('#ofs').value,trackingNumber:$('#otr').value})});Object.assign(o,r.order);toast('Order updated');closeDrawer();render()}catch(e){toast(e.message)}}}
+/* ---------- Marketing ---------- */
+V.marketing=()=>{const top=[...S.products].filter(isActive).sort((a,b)=>b.price-a.price).slice(0,8);set(`<h1>${S.sub==='coupons'?'Coupons':'Promotions'}</h1>
+ <div class="grid g3"><div class="card kpi"><div class="l">Active promotions</div><div class="v">0</div></div><div class="card kpi"><div class="l">Promoted listings</div><div class="v">0</div></div><div class="card kpi"><div class="l">Eligible listings</div><div class="v">${counts().active}</div></div></div>
+ <div class="card"><h2>Suggested listings to promote</h2><p class="sub">Highest value active listings. Use bulk price edits in Listings to run a sale (for example select items and enter -10%).</p><table><tbody>${top.map(p=>`<tr><td><img class="thumb" src="${esc(p.images?.[0]||'')}"></td><td><div class="ttl">${esc(p.title)}</div><div class="sub">${esc(p.vendor||'')}</div></td><td><b>${usd(p.price)}</b></td><td><button class="btn sm" onclick="openEditor('${esc(p.id)}')">Edit</button></td></tr>`).join('')}</tbody></table></div>`)};
+/* ---------- Performance ---------- */
+V.performance=()=>{const c=counts();const tot=S.products.length||1;const withImg=S.products.filter(p=>(p.images||[]).length>=3).length;const withSku=S.products.filter(p=>p.sku).length;const desc=S.products.filter(p=>(p.desc_text||'').length>100).length;const shipped=S.orders.filter(o=>['shipped','delivered'].includes(o.fulfillment_status));const tracked=shipped.filter(o=>o.tracking_number).length;
+ const m=(l,v,t)=>`<div class="meter"><span>${l}</span><b>${v}/${t} (${Math.round(v/Math.max(t,1)*100)}%)</b></div><div class="bar"><i style="width:${v/Math.max(t,1)*100}%"></i></div>`;
+ if(S.sub==='sales'){set(`<h1>Sales</h1><div class="card"><h2>Last 90 days</h2>${chart(90)}</div><div class="card"><h2>Top selling items</h2>${topItems()}</div>`);return}
+ set(`<h1>${S.sub==='traffic'?'Inventory health':'Seller performance'}</h1><div class="grid g4"><div class="card kpi"><div class="l">Seller level</div><div class="v" style="color:var(--green)">${shipped.length&&tracked===shipped.length?'Top rated':'Above standard'}</div></div><div class="card kpi"><div class="l">Orders shipped</div><div class="v">${shipped.length}</div></div><div class="card kpi"><div class="l">Awaiting shipment</div><div class="v">${c.awaiting}</div></div><div class="card kpi"><div class="l">Messages to answer</div><div class="v">${c.unread}</div></div></div>
+ <div class="grid g2"><div class="card"><h2>Service metrics</h2>${m('Shipped orders with tracking',tracked,shipped.length)}${m('Listings in stock',c.active,tot)}</div><div class="card"><h2>Listing quality</h2>${m('3+ photos',withImg,tot)}${m('Has SKU / custom label',withSku,tot)}${m('Detailed description',desc,tot)}</div></div>`)};
+function topItems(){const m={};S.orders.filter(paid).forEach(o=>o.items.forEach(i=>{m[i.id]=m[i.id]||{...i,q:0,v:0};m[i.id].q+=i.quantity;m[i.id].v+=i.quantity*i.unitAmount}));const L=Object.values(m).sort((a,b)=>b.v-a.v).slice(0,10);return L.length?`<table><thead><tr><th></th><th>Item</th><th>Sold</th><th>Sales</th></tr></thead><tbody>${L.map(i=>`<tr><td><img class="thumb" src="${esc(i.image||'')}"></td><td class="ttl">${esc(i.title)}</td><td>${i.q}</td><td>${usd(i.v)}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No paid orders yet.</div>'}
+/* ---------- Payments ---------- */
+V.payments=()=>{const P=S.orders.filter(paid);const tot=P.reduce((a,o)=>a+Number(o.total),0);const by=k=>P.filter(o=>o.provider===k).reduce((a,o)=>a+Number(o.total),0);
+ if(S.sub==='tx'){set(`<h1>All transactions</h1><div class="card"><div class="toolbar"><span style="flex:1"></span><button class="btn ghost" onclick="exportCSV('orders')">Download</button></div>${S.orders.length?`<div class="tscroll"><table><thead><tr><th>Date</th><th>Type</th><th>Order</th><th>Provider</th><th>Status</th><th>Amount</th></tr></thead><tbody>${S.orders.map(o=>`<tr><td class="sub">${day(o.created_at)}</td><td>Order</td><td>${esc(o.reference)}</td><td>${esc(o.provider)}</td><td>${paid(o)?'<span class="pill g">Paid</span>':`<span class="pill a">${esc(o.status)}</span>`}</td><td><b>${usd(o.total)}</b></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">No transactions.</div>'}</div>`);return}
+ set(`<h1>Payments</h1><div class="grid g4"><div class="card kpi"><div class="l">Total collected</div><div class="v">${usd(tot)}</div></div><div class="card kpi"><div class="l">PayPal</div><div class="v">${usd(by('paypal'))}</div></div><div class="card kpi"><div class="l">Stripe</div><div class="v">${usd(by('stripe'))}</div></div><div class="card kpi"><div class="l">Pending / unpaid</div><div class="v">${usd(S.orders.filter(o=>!paid(o)).reduce((a,o)=>a+Number(o.total),0))}</div></div></div>
+ <div class="card"><h2>Payout method</h2><p>Funds are paid directly to your PayPal / Stripe account. ${S.dash?.integrations?.paypal?'':''}Manage payouts in the provider dashboards: <a href="https://www.paypal.com/myaccount/summary" target="_blank">PayPal</a> · <a href="https://dashboard.stripe.com/payments" target="_blank">Stripe</a></p></div>`)};
+/* ---------- Research ---------- */
+V.research=()=>{const g={};S.products.forEach(p=>{const k=p.type||'Other';g[k]=g[k]||{n:0,s:0,a:0,min:1e12,max:0};g[k].n++;g[k].s+=Number(p.price);if(isActive(p))g[k].a++;g[k].min=Math.min(g[k].min,p.price);g[k].max=Math.max(g[k].max,p.price)});const L=Object.entries(g).sort((a,b)=>b[1].n-a[1].n);
+ const b={};S.products.forEach(p=>{const k=p.vendor||'Other';b[k]=(b[k]||0)+1});const B=Object.entries(b).sort((x,y)=>y[1]-x[1]).slice(0,12);
+ set(`<h1>${S.sub==='pricing'?'Pricing':'Catalog insights'}</h1><div class="card"><h2>By category</h2><div class="tscroll"><table><thead><tr><th>Category</th><th>Listings</th><th>Active</th><th>Avg. price</th><th>Price range</th></tr></thead><tbody>${L.map(([k,v])=>`<tr><td><a onclick="S.cat='${esc(k).replace(/'/g,"\\'")}';nav('listings','active')">${esc(k)}</a></td><td>${v.n}</td><td>${v.a}</td><td>${usd(v.s/v.n)}</td><td class="sub">${usd(v.min)} - ${usd(v.max)}</td></tr>`).join('')}</tbody></table></div></div>${S.sub==='pricing'?'':`<div class="card"><h2>Top brands</h2>${B.map(([k,n])=>`<div class="meter"><span>${esc(k)}</span><b>${n}</b></div><div class="bar"><i style="width:${n/B[0][1]*100}%"></i></div>`).join('')}</div>`}`)};
+/* ---------- Reports ---------- */
+V.reports=()=>set(`<h1>Reports</h1><div class="card"><h2>Download reports</h2><table><tbody>
+ <tr><td><b>Active listings</b><div class="sub">All listings with price, quantity and status (CSV)</div></td><td><button class="btn" onclick="exportCSV('listings')">Download</button></td></tr>
+ <tr><td><b>Orders</b><div class="sub">All orders with payment and shipping status (CSV)</div></td><td><button class="btn" onclick="exportCSV('orders')">Download</button></td></tr>
+ <tr><td><b>Buyer messages</b><div class="sub">Contact form messages (CSV)</div></td><td><button class="btn" onclick="exportCSV('messages')">Download</button></td></tr></tbody></table></div>`);
+function exportCSV(kind){const rows=kind==='listings'?[['item_id','title','sku','brand','category','condition','price','quantity','status','url'],...listFiltered().map(p=>[p.id,p.title,p.sku,p.vendor,p.type,p.condition||'new',p.price,qty(p),isActive(p)?'active':p.available?'out_of_stock':'ended',location.origin+'/products/'+(p.handle||p.id)+'.html'])]:kind==='orders'?[['reference','date','provider','provider_order_id','payment_status','fulfillment','tracking','subtotal','shipping','total','items'],...S.orders.map(o=>[o.reference,o.created_at,o.provider,o.provider_order_id,o.status,o.fulfillment_status,o.tracking_number,o.subtotal,o.shipping,o.total,o.items.map(i=>i.quantity+'x '+i.title).join(' | ')])]:[['date','name','email','vehicle','status','message'],...S.messages.map(m=>[m.created_at,m.name,m.email,m.vehicle,m.status,m.message])];
+ const csv='\ufeff'+rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=`patzcom-${kind}-${new Date().toISOString().slice(0,10)}.csv`;a.click()}
+/* ---------- Messages ---------- */
+V.messages=()=>{const L=S.messages.filter(m=>S.sub==='unread'?!['read','closed'].includes(m.status):true);set(`<h1>Messages (${L.length})</h1><div class="card"><div class="toolbar"><span style="flex:1"></span><button class="btn ghost" onclick="loadMessages().then(render)">Refresh</button></div>${L.length?`<table><tbody>${L.map(m=>`<tr style="cursor:pointer" onclick="openMsg('${m.id}')"><td>${['read','closed'].includes(m.status)?'':'<b>●</b>'}</td><td><b>${esc(m.name)}</b><div class="sub">${esc(m.email)}</div></td><td><div class="ttl">${esc(m.message)}</div>${m.vehicle?`<div class="sub">Vehicle: ${esc(m.vehicle)}</div>`:''}</td><td class="sub">${day(m.created_at)}</td><td><span class="pill ${m.status==='closed'?'':m.status==='read'?'b':'a'}">${esc(m.status)}</span></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No messages.</div>'}</div>`)};
+async function setMsg(id,status){const m=S.messages.find(x=>x.id===id);try{const r=await api('/api/admin/messages/'+id,{method:'PATCH',body:JSON.stringify({status})});Object.assign(m,r.message||{status})}catch(e){toast(e.message)}}
+async function openMsg(id){const m=S.messages.find(x=>x.id===id);if(!['read','closed'].includes(m.status))await setMsg(id,'read');openDrawer('Message from '+m.name,`<p class="sub">${esc(m.email)} · ${new Date(m.created_at).toLocaleString()}</p>${m.vehicle?`<p><b>Vehicle:</b> ${esc(m.vehicle)}</p>`:''}<div class="card" style="white-space:pre-wrap">${esc(m.message)}</div>`,`<button class="btn ghost" onclick="setMsg('${id}','closed').then(()=>{closeDrawer();render()})">Mark closed</button><a class="btn pri" href="mailto:${esc(m.email)}?subject=${encodeURIComponent('Re: your PATZCOM inquiry')}">Reply by email</a>`);render()}
+/* ---------- Search / load ---------- */
+$('#gsearch').onsubmit=e=>{e.preventDefault();const q=$('#gq').value.trim();S.q=q;if(/^PATZCOM-|^[A-Z0-9]{17}$/i.test(q)&&S.orders.some(o=>JSON.stringify(o).toLowerCase().includes(q.toLowerCase())))nav('orders','all');else{S.tab='listings';S.sub='active';S.page=1;S.q=q;if(!listFiltered().length)S.sub='unsold';render()}S.q=q};
+$('#logout').onclick=async e=>{e.preventDefault();await fetch('/api/admin/logout',{method:'POST'});location.href='/admin-login.html'};
+async function loadProducts(){const r=await api('/api/admin/products');S.products=r.items||[];S.revision=r.revision}
+async function loadOrders(){const r=await api('/api/admin/orders');S.orders=r.orders||[]}
+async function loadMessages(){const r=await api('/api/admin/messages');S.messages=r.messages||[]}
+(async()=>{set('<div class="empty">Loading Seller Hub...</div>');try{const s=await api('/api/admin/session');$('#who').textContent=s.user?.email||'seller'}catch{return}
+ await Promise.allSettled([loadProducts(),loadOrders(),loadMessages(),api('/api/admin/dashboard').then(d=>S.dash=d)]);
+ const [t,sb]=location.hash.slice(1).split('/');if(t==='more-tools'){location.href='/admin-classic.html#more-tools';return}
+ if(TABS.some(x=>x[0]===t)){S.tab=t;S.sub=sb||(SUBS[t]?SUBS[t][0][0]:null)}render()})();
+</script></body></html>
