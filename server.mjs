@@ -37,7 +37,8 @@ import {
   retrieveStripeCheckoutSession,
 } from './lib/payment-api.mjs';
 import { sendOrderConfirmation, sendShippedNotice, sendSellerNewOrder, orderMailConfigured } from './lib/order-mail.mjs';
-import { setOrderBuyer, claimOrderEmail, releaseOrderEmail, getOrderById } from './lib/postgres.mjs';
+import { setOrderBuyer, claimOrderEmail, releaseOrderEmail, getOrderById, setOrderSettlement, addOrderRefund } from './lib/postgres.mjs';
+import { fetchSettlement, refundPayment } from './lib/payment-api.mjs';
 import { databaseConfigured, initializeDatabase, listOrders, listContactMessages, updateContactMessageStatus, recordOrder, saveCatalogSnapshotToDatabase, updateOrderFulfillment, updateOrderStatus, readState, writeState, deleteState, readImage, createContactMessage, markContactMessage } from './lib/postgres.mjs';
 import { sendContactMessage } from './lib/contact-mail.mjs';
 
@@ -329,6 +330,7 @@ const server = http.createServer(async (req, res) => {
       const order = await capturePayPalOrder(paypalCaptureMatch[1]);
       let row = await updateOrderStatus({ providerOrderId: paypalCaptureMatch[1], status: order.status === 'COMPLETED' ? 'paid' : 'capture_pending' });
       if (row) row = (await setOrderBuyer(row.id, order.buyer)) || row;
+      if (row?.status === 'paid') row = (await setOrderSettlement(row.id, await fetchSettlement(row).catch(() => ({})))) || row;
       notifyOrder(row, 'paid');
       delete order.buyer;
       return json(res, 200, order);
@@ -354,6 +356,7 @@ const server = http.createServer(async (req, res) => {
       const session = await retrieveStripeCheckoutSession(stripeSessionMatch[1]);
       let row = await updateOrderStatus({ reference: session.reference, providerOrderId: session.id, status: session.status === 'paid' ? 'paid' : session.status });
       if (row) row = (await setOrderBuyer(row.id, session.buyer)) || row;
+      if (row?.status === 'paid' && !row.capture_id) row = (await setOrderSettlement(row.id, await fetchSettlement(row).catch(() => ({})))) || row;
       notifyOrder(row, 'paid');
       delete session.buyer;
       return json(res, 200, session);
@@ -542,6 +545,28 @@ const server = http.createServer(async (req, res) => {
   }
 
   const adminOrderMatch = pathname.match(/^\/api\/admin\/orders\/([^/]+)$/);
+  const adminOrderMoneyMatch = pathname.match(/^\/api\/admin\/orders\/([^/]+)\/(settlement|refund)$/);
+  if (adminOrderMoneyMatch && req.method === 'POST') {
+    if (!adminSession) return json(res, 401, { error: 'Admin login required' });
+    if (req.headers['sec-fetch-site'] === 'cross-site' || (req.headers.origin && new URL(req.headers.origin).host !== req.headers.host)) return json(res, 403, { error: 'Cross-site request rejected' });
+    try {
+      let order = await getOrderById(adminOrderMoneyMatch[1]);
+      if (!order) return json(res, 404, { error: 'Order not found.' });
+      if (!['paid', 'partially_refunded', 'refunded'].includes(order.status)) return json(res, 400, { error: 'Order is not paid.' });
+      if (adminOrderMoneyMatch[2] === 'settlement') {
+        order = await setOrderSettlement(order.id, await fetchSettlement(order));
+        return json(res, 200, { ok: true, order });
+      }
+      const body = JSON.parse(await readBody(req) || '{}');
+      if (!order.capture_id) order = (await setOrderSettlement(order.id, await fetchSettlement(order))) || order;
+      const refund = await refundPayment(order, body.amount, body.reason);
+      order = await addOrderRefund(order.id, { ...refund, reason: String(body.reason || '').slice(0, 500), at: new Date().toISOString(), by: adminSession.email });
+      return json(res, 200, { ok: true, order, refund });
+    } catch (error) {
+      return json(res, 400, { error: error.message });
+    }
+  }
+
   const adminOrderEmailMatch = pathname.match(/^\/api\/admin\/orders\/([^/]+)\/email$/);
   if ((adminOrderEmailMatch || pathname === '/api/admin/mail-test') && req.method === 'POST') {
     if (!adminSession) return json(res, 401, { error: 'Admin login required' });
