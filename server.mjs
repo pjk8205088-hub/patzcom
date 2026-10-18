@@ -38,7 +38,7 @@ import {
 } from './lib/payment-api.mjs';
 import { sendOrderConfirmation, sendShippedNotice, sendSellerNewOrder, orderMailConfigured } from './lib/order-mail.mjs';
 import { setOrderBuyer, claimOrderEmail, releaseOrderEmail, getOrderById, setOrderSettlement, addOrderRefund } from './lib/postgres.mjs';
-import { fetchSettlement, refundPayment } from './lib/payment-api.mjs';
+import { fetchSettlement, refundPayment, retrieveBuyerDetails } from './lib/payment-api.mjs';
 import { databaseConfigured, initializeDatabase, listOrders, listContactMessages, updateContactMessageStatus, recordOrder, saveCatalogSnapshotToDatabase, updateOrderFulfillment, updateOrderStatus, readState, writeState, deleteState, readImage, createContactMessage, markContactMessage } from './lib/postgres.mjs';
 import { sendContactMessage } from './lib/contact-mail.mjs';
 
@@ -545,6 +545,21 @@ const server = http.createServer(async (req, res) => {
   }
 
   const adminOrderMatch = pathname.match(/^\/api\/admin\/orders\/([^/]+)$/);
+  const adminOrderBuyerMatch = pathname.match(/^\/api\/admin\/orders\/([^/]+)\/buyer$/);
+  if (adminOrderBuyerMatch && req.method === 'POST') {
+    if (!adminSession) return json(res, 401, { error: 'Admin login required' });
+    if (req.headers['sec-fetch-site'] === 'cross-site' || (req.headers.origin && new URL(req.headers.origin).host !== req.headers.host)) return json(res, 403, { error: 'Cross-site request rejected' });
+    try {
+      const order = await getOrderById(adminOrderBuyerMatch[1]);
+      if (!order) return json(res, 404, { error: 'Order not found.' });
+      const buyer = await retrieveBuyerDetails(order);
+      const updated = await setOrderBuyer(order.id, buyer);
+      return json(res, 200, { ok: true, order: updated });
+    } catch (error) {
+      return json(res, 400, { error: error.message });
+    }
+  }
+
   const adminOrderMoneyMatch = pathname.match(/^\/api\/admin\/orders\/([^/]+)\/(settlement|refund)$/);
   if (adminOrderMoneyMatch && req.method === 'POST') {
     if (!adminSession) return json(res, 401, { error: 'Admin login required' });
