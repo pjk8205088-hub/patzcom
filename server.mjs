@@ -36,6 +36,8 @@ import {
   getPaymentConfig,
   retrieveStripeCheckoutSession,
 } from './lib/payment-api.mjs';
+import { sendOrderConfirmation, sendShippedNotice, sendSellerNewOrder, orderMailConfigured } from './lib/order-mail.mjs';
+import { setOrderBuyer, claimOrderEmail, releaseOrderEmail, getOrderById } from './lib/postgres.mjs';
 import { databaseConfigured, initializeDatabase, listOrders, listContactMessages, updateContactMessageStatus, recordOrder, saveCatalogSnapshotToDatabase, updateOrderFulfillment, updateOrderStatus, readState, writeState, deleteState, readImage, createContactMessage, markContactMessage } from './lib/postgres.mjs';
 import { sendContactMessage } from './lib/contact-mail.mjs';
 
@@ -122,6 +124,25 @@ async function verifyAdminLogin(email, password) {
   const { hash } = hashAdminPassword(password, account.salt);
   const ok = crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(account.hash, 'hex'));
   return ok ? account : null;
+}
+
+async function notifyOrder(order, kind) {
+  if (!order?.id || !orderMailConfigured()) return;
+  if (kind === 'paid' && order.status !== 'paid') return;
+  if (kind === 'shipped' && (order.fulfillment_status !== 'shipped' || !order.tracking_number)) return;
+  const claimed = await claimOrderEmail(order.id, kind).catch(() => null);
+  if (!claimed) return;
+  try {
+    if (kind === 'paid') {
+      await sendSellerNewOrder(claimed).catch((e) => console.error('seller order mail failed', e.message));
+      if (claimed.buyer_email) await sendOrderConfirmation(claimed);
+    } else if (claimed.buyer_email) {
+      await sendShippedNotice(claimed);
+    }
+  } catch (error) {
+    console.error(`order ${kind} mail failed`, error.message);
+    await releaseOrderEmail(order.id, kind, error.message).catch(() => {});
+  }
 }
 
 async function getAdminSession(req) {
@@ -306,7 +327,10 @@ const server = http.createServer(async (req, res) => {
   if (paypalCaptureMatch && req.method === 'POST') {
     try {
       const order = await capturePayPalOrder(paypalCaptureMatch[1]);
-      await updateOrderStatus({ providerOrderId: paypalCaptureMatch[1], status: order.status === 'COMPLETED' ? 'paid' : 'capture_pending' });
+      let row = await updateOrderStatus({ providerOrderId: paypalCaptureMatch[1], status: order.status === 'COMPLETED' ? 'paid' : 'capture_pending' });
+      if (row) row = (await setOrderBuyer(row.id, order.buyer)) || row;
+      notifyOrder(row, 'paid');
+      delete order.buyer;
       return json(res, 200, order);
     } catch (error) {
       return json(res, 400, { ok: false, message: error.message });
@@ -328,7 +352,10 @@ const server = http.createServer(async (req, res) => {
   if (stripeSessionMatch && req.method === 'GET') {
     try {
       const session = await retrieveStripeCheckoutSession(stripeSessionMatch[1]);
-      await updateOrderStatus({ reference: session.reference, providerOrderId: session.id, status: session.status === 'paid' ? 'paid' : session.status });
+      let row = await updateOrderStatus({ reference: session.reference, providerOrderId: session.id, status: session.status === 'paid' ? 'paid' : session.status });
+      if (row) row = (await setOrderBuyer(row.id, session.buyer)) || row;
+      notifyOrder(row, 'paid');
+      delete session.buyer;
       return json(res, 200, session);
     } catch (error) {
       return json(res, 400, { ok: false, message: error.message });
@@ -515,12 +542,38 @@ const server = http.createServer(async (req, res) => {
   }
 
   const adminOrderMatch = pathname.match(/^\/api\/admin\/orders\/([^/]+)$/);
+  const adminOrderEmailMatch = pathname.match(/^\/api\/admin\/orders\/([^/]+)\/email$/);
+  if ((adminOrderEmailMatch || pathname === '/api/admin/mail-test') && req.method === 'POST') {
+    if (!adminSession) return json(res, 401, { error: 'Admin login required' });
+    if (req.headers['sec-fetch-site'] === 'cross-site' || (req.headers.origin && new URL(req.headers.origin).host !== req.headers.host)) return json(res, 403, { error: 'Cross-site request rejected' });
+    if (!orderMailConfigured()) return json(res, 503, { error: 'SMTP_PASS is not set in Railway. Add a Gmail app password first.' });
+    try {
+      const body = JSON.parse(await readBody(req) || '{}');
+      if (!adminOrderEmailMatch) {
+        await sendSellerNewOrder({ reference: 'TEST-MAIL', provider: 'test', total: 0, items: [], buyer_email: '', buyer_name: 'SMTP test' });
+        return json(res, 200, { ok: true, message: 'Test email sent to the seller inbox.' });
+      }
+      const kind = body.kind === 'shipped' ? 'shipped' : 'paid';
+      const order = await getOrderById(adminOrderEmailMatch[1]);
+      if (!order) return json(res, 404, { error: 'Order not found.' });
+      if (!order.buyer_email) return json(res, 400, { error: 'This order has no buyer email.' });
+      if (kind === 'paid' && order.status !== 'paid') return json(res, 400, { error: 'Order is not paid yet.' });
+      if (kind === 'shipped' && order.fulfillment_status !== 'shipped') return json(res, 400, { error: 'Mark the order as shipped with tracking first.' });
+      if (kind === 'paid') await sendOrderConfirmation(order); else await sendShippedNotice(order);
+      await claimOrderEmail(order.id, kind).catch(() => {});
+      return json(res, 200, { ok: true, order: await getOrderById(order.id) });
+    } catch (error) {
+      return json(res, 400, { error: error.message });
+    }
+  }
+
   if (adminOrderMatch && req.method === 'PATCH') {
     if (!adminSession) return json(res, 401, { error: 'Admin login required' });
     if (req.headers['sec-fetch-site'] === 'cross-site' || (req.headers.origin && new URL(req.headers.origin).host !== req.headers.host)) return json(res, 403, { error: 'Cross-site request rejected' });
     try {
       const body = JSON.parse(await readBody(req) || '{}');
       const order = await updateOrderFulfillment(adminOrderMatch[1], body.fulfillmentStatus, body.trackingNumber);
+      if (order.fulfillment_status === 'shipped') await notifyOrder(order, 'shipped');
       return json(res, 200, { ok: true, order });
     } catch (error) {
       return json(res, 400, { error: error.message });
