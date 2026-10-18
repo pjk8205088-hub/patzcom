@@ -464,7 +464,7 @@ img{max-width:100%;display:block}
 .meta{list-style:none;padding:0;margin:24px 0 0;color:var(--mut);font-size:14px;border-top:1px solid var(--line);padding-top:16px}
 .meta li{padding:3px 0}
 .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
-.tag{background:#1e232a;color:var(--mut);font-size:12px;padding:4px 10px;border-radius:20px}
+.tag{background:#1e232a;color:#fff;font-size:12px;padding:4px 10px;border-radius:20px}
 .desc{background:#fff;color:#222;border-radius:12px;padding:10px;overflow-x:auto}
 .desc a{color:#0a58ca}
 .desc img{margin:10px auto}
@@ -512,7 +512,8 @@ img{max-width:100%;display:block}
 .qa-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:18px}
 .qa-grid label,.qa-question{display:flex;flex-direction:column;gap:8px}
 .qa-grid span,.qa-question span{font-size:13px;color:#aab6c6;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
-.qa-panel select,.qa-panel textarea{width:100%;border-radius:14px;border:1px solid #2f3945;background:#0b0f14;color:#eef4fb;padding:14px 16px;font:inherit}
+.qa-panel select,.qa-panel textarea{width:100%;border-radius:14px;border:1px solid #2f3945;background:#0b0f14;color:#fff;padding:14px 16px;font:inherit}
+.qa-panel select option{background:#0b0f14;color:#fff}
 .qa-question{margin-top:14px}
 .qa-actions{margin-top:14px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
 .qa-actions .muted{color:#91a1b5;margin:0}

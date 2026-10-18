@@ -97,9 +97,8 @@ const imgFallback = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
   </g>
 </svg>`);
 
-fetch(R+'assets/products.json').then(r=>r.json()).then(p=>{ PRODUCTS=p; document.querySelectorAll('#store-catalog-count').forEach((node)=>node.textContent=PRODUCTS.length.toLocaleString('en-US')); initSearch(); initMarketplaceHome(); initAboutStorePage(); renderCart(); });
+fetch(R+'assets/products.json').then(r=>r.json()).then(p=>{ PRODUCTS=p; document.querySelectorAll('#store-catalog-count').forEach((node)=>node.textContent=PRODUCTS.length.toLocaleString('en-US')); initSearch(); initMarketplaceHome(); initAboutStorePage(); renderCart(); initQandA(); });
 paintCount();
-initQandA();
 installImageFallbacks();
 initProductPurchaseUI();
 initVideoPlaceholders();
