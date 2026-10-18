@@ -102,6 +102,28 @@ function parseCookies(req) {
   );
 }
 
+function hashAdminPassword(password, salt = crypto.randomBytes(16).toString('hex')) {
+  return { salt, hash: crypto.scryptSync(String(password), salt, 64).toString('hex') };
+}
+
+async function getAdminAccount() {
+  let account = await readState('admin-account', 'primary');
+  if (!account) {
+    const { salt, hash } = hashAdminPassword(adminPassword);
+    account = { email: adminEmail.toLowerCase(), salt, hash, createdAt: new Date().toISOString() };
+    await writeState('admin-account', 'primary', account);
+  }
+  return account;
+}
+
+async function verifyAdminLogin(email, password) {
+  const account = await getAdminAccount();
+  if (email !== String(account.email).toLowerCase()) return null;
+  const { hash } = hashAdminPassword(password, account.salt);
+  const ok = crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(account.hash, 'hex'));
+  return ok ? account : null;
+}
+
 async function getAdminSession(req) {
   const cookies = parseCookies(req);
   const token = cookies.patzcom_admin_session;
@@ -402,7 +424,8 @@ const server = http.createServer(async (req, res) => {
       const email = String(body.email || '').trim().toLowerCase();
       const password = String(body.password || '');
 
-      if (email !== adminEmail.toLowerCase() || password !== adminPassword) {
+      const account = await verifyAdminLogin(email, password);
+      if (!account) {
         return json(res, 401, { ok: false, message: 'Invalid admin email or password.' });
       }
 
@@ -412,7 +435,7 @@ const server = http.createServer(async (req, res) => {
         expiresAt: Date.now() + 12 * 60 * 60 * 1000,
       }, Date.now() + 12 * 60 * 60 * 1000);
       setSessionCookie(res, token);
-      return json(res, 200, { ok: true, email: adminEmail });
+      return json(res, 200, { ok: true, email: account.email });
     } catch (error) {
       return json(res, 400, { ok: false, message: 'Unable to process login request.', detail: error.message });
     }
