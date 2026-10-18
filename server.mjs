@@ -430,7 +430,7 @@ const server = http.createServer(async (req, res) => {
     try {
       if (req.method === 'GET' && pathname === '/api/admin/products') return json(res, 200, await readEditorCatalog());
       if (req.method !== 'POST') return json(res, 405, { error: 'Method not allowed' });
-      if (!process.env.PATZCOM_ADMIN_PASSWORD || process.env.PATZCOM_ADMIN_PASSWORD.length < 12) {
+      if (!adminPassword) {
         return json(res, 503, { error: 'Set PATZCOM_ADMIN_PASSWORD to a unique password of at least 12 characters before enabling product editing.' });
       }
       if (req.headers['sec-fetch-site'] === 'cross-site' || (req.headers.origin && new URL(req.headers.origin).host !== req.headers.host)) return json(res, 403, { error: 'Cross-site request rejected' });
