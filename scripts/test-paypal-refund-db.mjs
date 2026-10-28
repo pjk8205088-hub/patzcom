@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import pg from 'pg';
 import { PGlite } from '@electric-sql/pglite';
+import { normalizeSandboxPaymentReport, sandboxReportNamespace, sandboxReportKey } from '../lib/sandbox-payment-report.mjs';
 
 // Real PostgreSQL SQL engine in memory; PayPal HTTP is replaced with fixtures.
 // No production database or payment account is used by this suite.
@@ -98,6 +99,19 @@ test('PayPal refund persistence and recovery', async (t) => {
       await assert.rejects(processRefund(order.id, { amount: 50 }, 'admin@test'), /exceeds/);
       const result = await processRefund(order.id, { amount: 40 }, 'admin@test');
       assert.equal(Number(result.order.refunded_amount), 100); assert.equal(result.order.status, 'refunded'); assert.equal(calls, 2);
+    });
+    await t.test('Sandbox result import is persisted separately from operational orders', async () => {
+      const before = await store.listOrders();
+      const row = { captured: true, orderId: 'ORDER12345', reference: 'PATZCOM-TEST123', captureId: 'CAPTURE123', refundId: 'REFUND123', total: 57, paymentStatus: 'COMPLETED', refundStatus: 'COMPLETED', adminPaidStatus: 'paid', adminRefundStatus: 'refunded' };
+      const input = { environment: 'sandbox', realMoneyTransferred: false, transactions: [row], independentPayPalVerification: { refundsCompleted: 1, capturesRefunded: 1, verifiedAt: '2026-10-28T10:22:29Z' } };
+      const report = normalizeSandboxPaymentReport(input, 'admin@test');
+      await store.writeState(sandboxReportNamespace, sandboxReportKey, report);
+      const saved = await store.readState(sandboxReportNamespace, sandboxReportKey);
+      assert.equal(saved.payments, 1); assert.equal(saved.refunds, 1); assert.equal(saved.totalPaidUSD, 57);
+      assert.deepEqual(await store.listOrders(), before);
+      assert.throws(() => normalizeSandboxPaymentReport({ ...input, environment: 'live' }, 'admin@test'), /Sandbox report/);
+      assert.throws(() => normalizeSandboxPaymentReport({ ...input, independentPayPalVerification: null }, 'admin@test'), /evidence/);
+      assert.throws(() => normalizeSandboxPaymentReport({ ...input, transactions: [row, row], independentPayPalVerification: { ...input.independentPayPalVerification, refundsCompleted: 2, capturesRefunded: 2 } }, 'admin@test'), /duplicate/);
     });
   } finally {
     pg.Pool = previous.Pool; pg.Client = previous.Client;

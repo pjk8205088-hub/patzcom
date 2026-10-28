@@ -39,6 +39,7 @@ import {
 import { sendOrderConfirmation, sendShippedNotice, sendSellerNewOrder, orderMailConfigured } from './lib/order-mail.mjs';
 import { setOrderBuyer, claimOrderEmail, releaseOrderEmail, getOrderById, setOrderSettlement, addOrderRefund } from './lib/postgres.mjs';
 import { processPayPalRefund } from './lib/paypal-refunds.mjs';
+import { normalizeSandboxPaymentReport, sandboxReportNamespace, sandboxReportKey } from './lib/sandbox-payment-report.mjs';
 import { fetchSettlement, refundPayment, retrieveBuyerDetails } from './lib/payment-api.mjs';
 import { databaseConfigured, initializeDatabase, listOrders, listContactMessages, updateContactMessageStatus, recordOrder, saveCatalogSnapshotToDatabase, updateOrderFulfillment, updateOrderStatus, readState, writeState, deleteState, readImage, createContactMessage, markContactMessage } from './lib/postgres.mjs';
 import { sendContactMessage } from './lib/contact-mail.mjs';
@@ -511,6 +512,22 @@ const server = http.createServer(async (req, res) => {
     } catch (error) {
       return json(res, 500, { error: 'Unable to build admin snapshot', detail: error.message });
     }
+  }
+
+  if (pathname === '/api/admin/sandbox-payments') {
+    if (!adminSession) return json(res, 401, { error: 'Admin login required' });
+    res.setHeader('Cache-Control', 'no-store');
+    try {
+      if (req.method === 'GET') return json(res, 200, { report: await readState(sandboxReportNamespace, sandboxReportKey) });
+      if (req.method !== 'POST') return json(res, 405, { error: 'Method not allowed.' });
+      let origin;
+      try { origin = new URL(req.headers.origin); } catch { return json(res, 403, { error: 'Same-origin request required.' }); }
+      if (origin.host !== req.headers.host || req.headers['sec-fetch-site'] === 'cross-site') return json(res, 403, { error: 'Cross-site request rejected.' });
+      if (!String(req.headers['content-type'] || '').startsWith('application/json')) return json(res, 415, { error: 'JSON required.' });
+      const report = normalizeSandboxPaymentReport(JSON.parse(await readBody(req, 100000) || '{}'), adminSession.email);
+      await writeState(sandboxReportNamespace, sandboxReportKey, report);
+      return json(res, 200, { ok: true, report });
+    } catch (error) { return json(res, 400, { error: error.message }); }
   }
 
   if (pathname === '/api/admin/orders' && req.method === 'GET') {
