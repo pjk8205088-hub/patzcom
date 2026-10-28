@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
+    "test:refunds": "node --test scripts/test-paypal-refund-db.mjs scripts/test-paypal-refund-safety.mjs scripts/test-persistence.mjs scripts/test-product-editor.mjs",
     "dev": "node server.mjs",
     "build": "node -e \"console.log('Static patzcom storefront ready')\"",
     "preview": "node server.mjs",
@@ -20,5 +21,8 @@
     "nodemailer": "^10.0.14",
     "pg": "^8.23.1",
     "playwright-core": "^1.62.1"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.12"
   }
 }

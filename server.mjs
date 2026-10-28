@@ -38,6 +38,7 @@ import {
 } from './lib/payment-api.mjs';
 import { sendOrderConfirmation, sendShippedNotice, sendSellerNewOrder, orderMailConfigured } from './lib/order-mail.mjs';
 import { setOrderBuyer, claimOrderEmail, releaseOrderEmail, getOrderById, setOrderSettlement, addOrderRefund } from './lib/postgres.mjs';
+import { processPayPalRefund } from './lib/paypal-refunds.mjs';
 import { fetchSettlement, refundPayment, retrieveBuyerDetails } from './lib/payment-api.mjs';
 import { databaseConfigured, initializeDatabase, listOrders, listContactMessages, updateContactMessageStatus, recordOrder, saveCatalogSnapshotToDatabase, updateOrderFulfillment, updateOrderStatus, readState, writeState, deleteState, readImage, createContactMessage, markContactMessage } from './lib/postgres.mjs';
 import { sendContactMessage } from './lib/contact-mail.mjs';
@@ -560,13 +561,24 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
-  const adminOrderMoneyMatch = pathname.match(/^\/api\/admin\/orders\/([^/]+)\/(settlement|refund)$/);
+  const adminOrderMoneyMatch = pathname.match(/^\/api\/admin\/orders\/([^/]+)\/(settlement|refund|refund-status)$/);
   if (adminOrderMoneyMatch && req.method === 'POST') {
     if (!adminSession) return json(res, 401, { error: 'Admin login required' });
-    if (req.headers['sec-fetch-site'] === 'cross-site' || (req.headers.origin && new URL(req.headers.origin).host !== req.headers.host)) return json(res, 403, { error: 'Cross-site request rejected' });
+    let requestOrigin;
+    try { requestOrigin = req.headers.origin ? new URL(req.headers.origin) : null; }
+    catch { return json(res, 403, { error: 'Invalid request origin.' }); }
+    if (req.headers['sec-fetch-site'] === 'cross-site' || (requestOrigin && requestOrigin.host !== req.headers.host)) return json(res, 403, { error: 'Cross-site request rejected' });
     try {
+      if (adminOrderMoneyMatch[2] !== 'settlement') {
+        if (!requestOrigin || requestOrigin.host !== req.headers.host) return json(res, 403, { error: 'Same-origin request required.' });
+        if (!String(req.headers['content-type'] || '').toLowerCase().startsWith('application/json')) return json(res, 415, { error: 'JSON required.' });
+      }
       let order = await getOrderById(adminOrderMoneyMatch[1]);
       if (!order) return json(res, 404, { error: 'Order not found.' });
+      if (order.provider === 'paypal' && adminOrderMoneyMatch[2] !== 'settlement') {
+        const body = JSON.parse(await readBody(req, 4000) || '{}');
+        return json(res, 200, { ok: true, ...await processPayPalRefund(order.id, body, adminSession.email, adminOrderMoneyMatch[2] === 'refund-status') });
+      }
       if (!['paid', 'partially_refunded', 'refunded'].includes(order.status)) return json(res, 400, { error: 'Order is not paid.' });
       if (adminOrderMoneyMatch[2] === 'settlement') {
         order = await setOrderSettlement(order.id, await fetchSettlement(order));
