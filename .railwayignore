@@ -6,3 +6,5 @@ outputs/
 output/
 tmp/
 scripts/
+work/
+lib/
