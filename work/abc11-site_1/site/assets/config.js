@@ -6,5 +6,5 @@ window.PATZCOM_CONFIG = {
   stripePublishableKey: "",
   paymentPriority: ["paypal", "stripe"],
   shippingFlat: 0,          // flat shipping fee added at checkout (USD)
-  contactEmail: "support@patzcom.com"
+  contactEmail: "sales@patzcom.com"
 };
