@@ -209,7 +209,7 @@ function injectSharedLanguageLayer(body) {
   const text = body.toString('utf8');
   if (text.includes('/assets/i18n.js')) return body;
   const root = text.includes('href="../assets/') ? '../' : '';
-  const script = `<script defer src="${root}assets/i18n.js?v=patz-i18n-v1"></script>`;
+  const script = `<script defer src="${root}assets/i18n.js?v=patz-i18n-v2"></script>`;
   return Buffer.from(text.replace('</head>', `${script}</head>`), 'utf8');
 }
 
