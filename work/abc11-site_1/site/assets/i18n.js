@@ -22,6 +22,10 @@
     'View all products →': '모든 상품 보기 →',
     'Explore all products →': '모든 상품 둘러보기 →',
     'parts in the catalog': '개 카탈로그 상품',
+    'items': '개 상품',
+    'available - ready to ship': '개 재고 있음 - 바로 배송 가능',
+    'Shipping shown separately': '배송비 별도',
+    'Imported from eBay': 'eBay에서 가져온 상품',
     'All products': '모든 상품',
     'results': '개 결과',
     'Search all products': '모든 상품 검색',
@@ -148,7 +152,7 @@
       localStorage.setItem(STORAGE_KEY, target.dataset.lang);
       location.reload();
     });
-    const anchor = document.querySelector('.hdr-top .right, .hdr-top, header, body');
+    const anchor = document.querySelector('.top-links.right, .hdr-top, header, body');
     anchor?.append(button);
     applyTranslations();
   }
