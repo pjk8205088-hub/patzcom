@@ -1,6 +1,47 @@
 (() => {
   const STORAGE_KEY = 'patzcom-language';
   const translations = {
+    'Product details': '상품 상세정보',
+    'This product was imported from an eBay active listings report and remapped into the PATZCOM storefront format.': '이 상품은 eBay 판매 중인 상품 보고서를 바탕으로 PATZCOM에 등록되었습니다.',
+    'Images were not included in the Seller Hub active listings CSV export, so this product uses the PATZCOM image fallback until richer image data is provided.': '판매 보고서에 이미지가 포함되지 않아 추가 이미지 정보가 제공될 때까지 기본 이미지가 표시됩니다.',
+    'imported from eBay Seller Hub active listings report.': '은 eBay 판매 중인 상품 보고서에서 가져왔습니다.',
+    'Item number:': '상품번호:', 'Available quantity:': '구매 가능 수량:',
+    'Vendor:': '판매사:', 'Type:': '분류:', 'Weight:': '무게:',
+    'SKU:': '상품코드:', 'Shipping': '배송', 'Returns': '반품',
+    'Installation: 1:1 replacement': '설치: 1:1 교체',
+    'Explore all products': '모든 상품 둘러보기',
+    'Category': '카테고리',
+    'A sales-focused storefront for automotive parts and performance upgrades.': '자동차 부품과 성능 업그레이드 제품을 판매하는 전문 쇼핑몰입니다.',
+    'Checkout: PayPal first · Stripe cards planned': '결제: PayPal 우선 · 카드 결제 준비 중',
+    'Info': '안내',
+    'Mon–Fri 09:00–18:00 (ET)': '월~금 09:00~18:00 (미국 동부 시간)',
+    'All rights reserved.': '모든 권리 보유.',
+    'Body Moldings & Trims': '차체 몰딩 및 장식',
+    'Brake Calipers & Brackets': '브레이크 캘리퍼 및 브래킷',
+    'Brake Disc Rotors': '브레이크 디스크 로터',
+    'Brake Hoses, Lines & Fittings': '브레이크 호스·라인·피팅',
+    'Brake Pads': '브레이크 패드',
+    'Door Handles': '도어 핸들',
+    'ECUs & Computer Modules': 'ECU 및 컴퓨터 모듈',
+    'Exhaust Pipes & Tips': '배기 파이프 및 팁',
+    'Exhaust System Kits': '배기 시스템 키트',
+    'Fuel Doors & Components': '연료 주입구 커버 및 부품',
+    'Leaf & Coil Springs': '판스프링 및 코일스프링',
+    'Lift Coilover Suspension Kit': '리프트 코일오버 서스펜션 키트',
+    'Lowering Springs': '다운 스프링',
+    'Manifolds & Headers': '매니폴드 및 헤더',
+    'Other Brake Parts': '기타 브레이크 부품',
+    'Other Exterior Parts & Accessories': '기타 외장 부품 및 액세서리',
+    'Shift Knobs': '변속 손잡이',
+    'Shock & Strut Mounts': '쇼크 및 스트럿 마운트',
+    'Shocks, Struts & Assemblies': '쇼크·스트럿 및 어셈블리',
+    'Sway Bars, Links & Bushings': '스태빌라이저 바·링크·부싱',
+    'Switches & Controls': '스위치 및 제어 장치',
+    'Big Brake Kits': '대형 브레이크 키트',
+    'Heavy-Duty Durability': '고강도 내구성 부품',
+    'Rear Sway Bar': '후방 스태빌라이저 바',
+    'Strut Tower Bars': '스트럿 타워 바',
+    'Other': '기타',
     'Welcome to PATZCOM': 'PATZCOM에 오신 것을 환영합니다',
     'Featured parts': '추천 부품',
     'Help & Contact': '도움말 및 문의',
@@ -40,10 +81,10 @@
     'No products match these filters.': '조건에 맞는 상품이 없습니다.',
     'Clear filters': '필터 지우기',
     'Home': '홈',
-    'About': '회사 소개',
     'About Us': '회사 소개',
-    'Contact': '문의',
     'Contact Us': '문의하기',
+    'About': '회사 소개',
+    'Contact': '문의',
     'Shop': '쇼핑',
     'Sale': '세일',
     'Feedback': '피드백',
@@ -97,6 +138,36 @@
     'Save changes': '변경사항 저장',
   };
 
+  const vehicleTerms = {
+    'MERCEDES-BENZ': '메르세데스-벤츠', 'VOLKSWAGEN': '폭스바겐',
+    'CHEVROLET': '쉐보레', 'HYUNDAI': '현대', 'GENESIS': '제네시스',
+    'SSANGYONG': '쌍용', 'RENAULT': '르노', 'TOYOTA': '토요타',
+    'KIA': '기아', 'HONDA': '혼다', 'JAGUAR': '재규어',
+    'TESLA': '테슬라', 'BMW': 'BMW', 'AUDI': '아우디',
+    'FORD': '포드', 'JEEP': '지프', 'NISSAN': '닛산',
+    'INFINITI': '인피니티', 'PORSCHE': '포르쉐', 'LEXUS': '렉서스',
+    'MINI': '미니', 'VOLVO': '볼보',
+  };
+  const productTerms = {
+    'REAR-SECTION': '후방 배기구간', 'AXLE-BACK': '액슬백', 'CAT-BACK': '캣백',
+    'EXHAUST': '배기 시스템', 'MUFFLER': '머플러', 'DUAL': '듀얼',
+    'FRONT': '전방', 'REAR': '후방', 'LEFT': '왼쪽', 'RIGHT': '오른쪽',
+    'BRAKE': '브레이크', 'CALIPER': '캘리퍼', 'ROTOR': '로터',
+    'SPRING': '스프링', 'LIFTING': '리프트', 'LOWERING': '다운',
+    'COILOVER': '코일오버', 'SUSPENSION': '서스펜션',
+    'STRUT': '스트럿', 'TOWER': '타워', 'BAR': '바', 'BRACE': '보강바',
+    'CARBON FIBER': '카본 파이버', 'CARBON': '카본',
+    'COVER': '커버', 'HANDLE': '핸들', 'KIT': '키트',
+    'PERFORMANCE': '퍼포먼스', 'RACING': '레이싱',
+    'REPLACEMENT': '교체용', 'GENUINE': '정품', 'NEW': '신품',
+    'FOR': '용', 'WITH': '포함', 'PAIR': '한 쌍',
+    'SHIP TODAY': '오늘 발송', 'MADE IN KOREA': '한국산',
+    'OPTIMA': '옵티마', 'ELANTRA': '엘란트라', 'TUCSON': '투싼',
+    'STINGER': '스팅어', 'SORENTO': '쏘렌토', 'SPORTAGE': '스포티지',
+    'CARNIVAL': '카니발', 'PALISADE': '팰리세이드', 'SANTA FE': '싼타페',
+    'SONATA': '쏘나타', 'VELOSTER': '벨로스터', 'ODYSSEY': '오딧세이',
+  };
+
   const languageNames = { ko: '한국어', en: 'English' };
   // Keep the existing English storefront as the first-visit default. The user's
   // choice is persisted so every later page, including product detail pages,
@@ -105,10 +176,14 @@
 
   function translateString(value) {
     if (!value.trim()) return value;
-    return Object.entries(translations).reduce((result, [english, korean]) => {
+    const exact = translations[value.trim()];
+    if (exact) return value.replace(value.trim(), exact);
+    let result = Object.entries({...vehicleTerms,...productTerms}).sort((a,b)=>b[0].length-a[0].length).reduce((text, [english, korean]) =>
+      text.replace(new RegExp(`\\b${english}\\b`, 'gi'), korean), value);
+    return Object.entries(translations).filter(([english]) => english.length > 7).sort((a,b) => b[0].length-a[0].length).reduce((result, [english, korean]) => {
       if (!result.includes(english)) return result;
       return result.split(english).join(korean);
-    }, value);
+    }, result);
   }
 
   function applyTranslations() {
@@ -132,6 +207,14 @@
         const next = translateString(node.nodeValue || '');
         if (next !== node.nodeValue) node.nodeValue = next;
       });
+      document.querySelectorAll('img[alt], input[placeholder], textarea[placeholder], [aria-label], meta[name="description"]').forEach((node) => {
+        const attributes = node.matches('meta') ? ['content'] : ['alt','placeholder','aria-label'];
+        attributes.forEach((attribute) => {
+          const original = node.getAttribute(attribute);
+          if (original) node.setAttribute(attribute, translateString(original));
+        });
+      });
+      document.title = translateString(document.title);
     }
     const button = document.querySelector('.language-switcher');
     if (button) {
