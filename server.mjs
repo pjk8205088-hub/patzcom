@@ -204,6 +204,15 @@ async function readJsonResponse(response, label) {
   }
 }
 
+function injectSharedLanguageLayer(body) {
+  if (!body.toString().includes('</head>')) return body;
+  const text = body.toString('utf8');
+  if (text.includes('/assets/i18n.js')) return body;
+  const root = text.includes('href="../assets/') ? '../' : '';
+  const script = `<script defer src="${root}assets/i18n.js?v=patz-i18n-v1"></script>`;
+  return Buffer.from(text.replace('</head>', `${script}</head>`), 'utf8');
+}
+
 async function loadRemoteCatalogPayload(sourceUrl) {
   const url = new URL(sourceUrl);
   if (!isAllowedRemoteSource(url)) {
@@ -791,6 +800,10 @@ const server = http.createServer(async (req, res) => {
     res.setHeader('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
   } else {
     res.setHeader('Cache-Control', 'no-cache');
+  }
+  if (path.extname(filePath).toLowerCase() === '.html') {
+    const html = await readFile(filePath);
+    return res.end(injectSharedLanguageLayer(html));
   }
   createReadStream(filePath)
     .on('error', () => {
