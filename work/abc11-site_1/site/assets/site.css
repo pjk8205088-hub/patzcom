@@ -881,10 +881,14 @@ body.about-white-page .ftr{background:#fff;color:#191919;border-top:1px solid #d
 @media(max-width:680px){.store-cover{min-height:90px}.store-cover h1{font-size:23px}.store-shop-toolbar{gap:12px;flex-wrap:wrap;padding-top:8px;padding-bottom:8px}.store-shop-tabs{gap:14px;min-height:36px}.store-inline-search{order:3;width:100%;margin-left:0}.store-discovery-grid{grid-template-columns:1fr;gap:14px}.vehicle-nav{border-right:0;border-bottom:1px solid #e5e7eb;padding:0 0 10px}.vehicle-nav #store-vehicle-makes{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:18px}.vehicle-nav #store-vehicle-makes button{min-height:30px;font-size:12px}.featured-category-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 /* Shared English/Korean language switcher */
 .language-switcher {
+  position: fixed;
+  top: 10px;
+  right: 20px;
+  z-index: 1200;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-left: 16px;
+  margin-left: 0;
   padding: 6px 10px;
   border: 1px solid #cbd5e1;
   border-radius: 999px;
@@ -900,3 +904,8 @@ body.about-white-page .ftr{background:#fff;color:#191919;border-top:1px solid #d
 .language-option { color: #64748b; }
 .language-option.active { color: #1d4ed8; font-weight: 700; }
 .language-divider { color: #cbd5e1; }
+@media(max-width:720px){.language-switcher{top:8px;right:10px;padding:7px 10px;font-size:12px}}
+.nicepay-checkout-btn{width:100%;min-height:52px;border:0;border-radius:10px;background:#1f64d6;color:#fff;font:inherit;font-weight:800;cursor:pointer;padding:0 20px}
+.nicepay-checkout-btn:hover{background:#174ea6}
+.payverse-checkout-btn{width:100%;min-height:52px;border:0;border-radius:10px;background:#111827;color:#fff;font:inherit;font-weight:800;cursor:pointer;padding:0 20px}.payverse-checkout-btn:hover{background:#000}
+.payment-provider-note{display:block;margin-top:8px;color:#64748b;text-align:center;font-size:12px}

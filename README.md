@@ -52,6 +52,44 @@ PATZCOM_SHIPPING_FLAT=0
 Until the credentials are present, the cart shows a clear setup message instead
 of pretending that a payment was completed.
 
+### Payverse (English/U.S. checkout)
+
+When the storefront is in English, a configured Payverse checkout is shown as
+the primary payment window. It sends the catalog total in USD and uses the
+production Payverse SDK by default; set `PAYVERSE_ENV=sandbox` for testing.
+The server creates the order, signs the request with SHA-512, and accepts the
+Payverse return/Webhook result before writing the paid order to PostgreSQL.
+
+```text
+PAYVERSE_ENV=production
+PAYVERSE_MID
+PAYVERSE_CLIENT_KEY
+PAYVERSE_SECRET_KEY
+```
+
+The Payverse merchant account must be enabled for USD and the HTTPS return and
+Webhook URLs must be registered in the Payverse merchant console. Payverse
+requires HTTPS/TLS 1.2 or newer for production communication.
+
+### NICE Pay (Korean storefront only)
+
+When the storefront language is set to 한국어, the cart uses the NICE Pay
+payment window and does not render the PayPal or Stripe checkout controls. The
+English storefront keeps the existing PayPal/Stripe behavior. Configure these
+Railway variables with the values issued for the NICE Pay merchant account:
+
+```text
+NICEPAY_MID
+NICEPAY_MERCHANT_KEY
+NICEPAY_KRW_RATE=your-usd-to-krw-rate
+```
+
+`NICEPAY_KRW_RATE` is required because the catalog is stored/displayed in USD
+while NICE Pay receives a KRW amount. The server rebuilds the cart from the
+catalog, signs the request, validates the callback, and performs server-side
+approval before writing the paid order to PostgreSQL. Test credentials and a
+production merchant approval are required before real payments can be accepted.
+
 ## eBay image sync
 
 Set the Production App ID and Cert ID in Railway variables only. Never commit the

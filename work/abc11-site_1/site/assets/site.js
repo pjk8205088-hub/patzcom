@@ -403,6 +403,80 @@ function loadPayPalSdk(clientId, currency){
   return window.__paypalSdkPromise;
 }
 
+function loadNicePaySdk(){
+  if(window.goPay) return Promise.resolve();
+  if(window.__nicePaySdkPromise) return window.__nicePaySdkPromise;
+  window.__nicePaySdkPromise = new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'https://pg-web.nicepay.co.kr/v3/common/js/nicepay-pgweb.js';
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error('나이스페이 결제창을 불러오지 못했습니다.'));
+    document.head.appendChild(script);
+  });
+  return window.__nicePaySdkPromise;
+}
+
+function loadPayverseSdk(src){
+  if(window.payVerse) return Promise.resolve(window.payVerse);
+  if(window.__payverseSdkPromise) return window.__payverseSdkPromise;
+  window.__payverseSdkPromise = new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = src;
+    script.onload = () => window.payVerse ? resolve(window.payVerse) : reject(new Error('Payverse SDK did not load.'));
+    script.onerror = () => reject(new Error('Payverse checkout could not be loaded.'));
+    document.head.appendChild(script);
+  });
+  return window.__payverseSdkPromise;
+}
+
+async function mountPayverse(paypalEl, stripeEl, items, config){
+  paypalEl.innerHTML = '<div class="payment-loading">Loading secure Payverse checkout…</div>';
+  stripeEl.innerHTML = '';
+  if(!config.payverse?.enabled){
+    paypalEl.innerHTML = '<div class="payment-unavailable"><strong>Payverse checkout is not configured yet.</strong><span>Add the Payverse merchant credentials in Railway to enable U.S. checkout.</span></div>';
+    return;
+  }
+  const response = await fetch(`${R}api/payverse/request`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ items }) });
+  const payload = await response.json();
+  if(!response.ok || !payload.orderId) throw new Error(payload.message || 'Payverse payment request could not be created.');
+  const payVerse = await loadPayverseSdk(payload.sdk);
+  paypalEl.innerHTML = '<button type="button" class="payverse-checkout-btn">Pay with Payverse</button><small class="payment-provider-note">U.S. checkout · USD</small>';
+  paypalEl.querySelector('button').addEventListener('click', () => {
+    payVerse.requestUI({
+      mid: payload.mid, clientKey: payload.clientKey, reqDate: payload.reqDate, orderId: payload.orderId,
+      productName: payload.productName, requestCurrency: payload.requestCurrency, requestAmount: payload.requestAmount,
+      returnUrl: payload.returnUrl, webhookUrl: payload.webhookUrl, sign: payload.sign, customerId: '', mallReserved: '', billkeyReq: 'N',
+    }, (result) => {
+      if(String(result?.resultStatus || '').toUpperCase() === 'SUCCESS') location.href = `${R}payment-success.html?provider=payverse&order_id=${encodeURIComponent(result.orderId || payload.orderId)}`;
+      else setPaymentStatus(result?.resultMessage || 'Payverse checkout was not completed.', 'error');
+    });
+  });
+}
+
+async function mountNicePay(paypalEl, stripeEl, items, config){
+  paypalEl.innerHTML = '<div class="payment-loading">안전한 나이스페이 결제를 준비하는 중…</div>';
+  stripeEl.innerHTML = '';
+  if(!config.nicepay?.enabled){
+    paypalEl.innerHTML = '<div class="payment-unavailable"><strong>나이스페이 결제가 아직 준비되지 않았습니다.</strong><span>가맹점 MID와 키 등록 후 한국어 홈페이지에서 결제창이 표시됩니다.</span></div>';
+    return;
+  }
+  const response = await fetch(`${R}api/nicepay/request`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ items }) });
+  const payload = await response.json();
+  if(!response.ok || !payload.moid) throw new Error(payload.message || '나이스페이 결제 요청을 만들 수 없습니다.');
+  await loadNicePaySdk();
+  paypalEl.innerHTML = `<button type="button" class="nicepay-checkout-btn">나이스페이로 결제하기</button><small class="payment-provider-note">한국어 홈페이지 전용 결제</small>`;
+  paypalEl.querySelector('button').addEventListener('click', () => {
+    const form = document.createElement('form');
+    form.name = 'nicePayForm'; form.method = 'post'; form.action = payload.returnUrl; form.acceptCharset = 'UTF-8'; form.style.display = 'none';
+    const fields = { GoodsName: payload.goodsName, Amt: payload.amount, MID: payload.mid, EdiDate: payload.ediDate, Moid: payload.moid, SignData: payload.signData, PayMethod: 'CARD', ReturnURL: payload.returnUrl, CharSet: 'utf-8', BuyerEmail: '', GoodsCl: '1' };
+    Object.entries(fields).forEach(([name, value]) => { const input = document.createElement('input'); input.type='hidden'; input.name=name; input.value=String(value ?? ''); form.appendChild(input); });
+    document.body.appendChild(form);
+    window.nicepaySubmit = () => form.submit();
+    window.nicepayClose = () => setPaymentStatus('나이스페이 결제가 취소되었습니다. 장바구니는 유지됩니다.');
+    window.goPay(form);
+  });
+}
+
 async function mountPayments(total){
   const paypalEl = document.getElementById('paypal-button-container');
   const stripeEl = document.getElementById('stripe-checkout-container');
@@ -412,6 +486,13 @@ async function mountPayments(total){
   try {
     const config = await loadPaymentConfig();
     const items = paymentItems();
+    const koreanCheckout = window.PATZCOM_I18N?.getLanguage?.() === 'ko' || localStorage.getItem('patzcom-language') === 'ko';
+    if(koreanCheckout){
+      return await mountNicePay(paypalEl, stripeEl, items, config);
+    }
+    if(config.payverse?.enabled){
+      return await mountPayverse(paypalEl, stripeEl, items, config);
+    }
     if(config.paypal?.enabled && config.paypal.clientId){
       const paypal = await loadPayPalSdk(config.paypal.clientId, config.currency);
       paypalEl.innerHTML = '';

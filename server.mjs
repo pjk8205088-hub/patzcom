@@ -43,6 +43,8 @@ import { normalizeSandboxPaymentReport, sandboxReportNamespace, sandboxReportKey
 import { fetchSettlement, refundPayment, retrieveBuyerDetails } from './lib/payment-api.mjs';
 import { databaseConfigured, initializeDatabase, listOrders, listContactMessages, updateContactMessageStatus, recordOrder, saveCatalogSnapshotToDatabase, updateOrderFulfillment, updateOrderStatus, readState, writeState, deleteState, readImage, createContactMessage, markContactMessage } from './lib/postgres.mjs';
 import { sendContactMessage } from './lib/contact-mail.mjs';
+import { approveNicePay, createNicePayRequest, getNicePayConfig } from './lib/nicepay.mjs';
+import { createPayverseRequest, getPayverseConfig, recordPayverseResult } from './lib/payverse.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const siteRoot = path.join(__dirname, 'work', 'abc11-site_1', 'site');
@@ -91,6 +93,10 @@ function readBody(req, limit = 1_000_000) {
     req.on('end', () => resolve(data));
     req.on('error', reject);
   });
+}
+
+function parseFormBody(raw) {
+  return Object.fromEntries(new URLSearchParams(raw || '').entries());
 }
 
 function parseCookies(req) {
@@ -315,7 +321,56 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (pathname === '/api/payments/config' && req.method === 'GET') {
-    return json(res, 200, getPaymentConfig());
+    return json(res, 200, { ...getPaymentConfig(), nicepay: getNicePayConfig(), payverse: getPayverseConfig() });
+  }
+
+  if (pathname === '/api/payverse/request' && req.method === 'POST') {
+    try {
+      const body = JSON.parse(await readBody(req, 30000) || '{}');
+      return json(res, 201, await createPayverseRequest(body.items));
+    } catch (error) {
+      return json(res, 400, { ok: false, message: error.message });
+    }
+  }
+
+  if (pathname === '/api/payverse/return' && (req.method === 'POST' || req.method === 'GET')) {
+    try {
+      const raw = req.method === 'POST' ? await readBody(req, 30000) : new URL(req.url, `http://${req.headers.host}`).search;
+      const result = await recordPayverseResult(req.method === 'POST' ? parseFormBody(raw) : Object.fromEntries(new URLSearchParams(raw)));
+      return redirect(res, `/payment-success.html?provider=payverse&order_id=${encodeURIComponent(result.orderId)}`);
+    } catch (error) {
+      return redirect(res, `/cart.html?payment=failed&message=${encodeURIComponent(error.message)}`);
+    }
+  }
+
+  if (pathname === '/api/payverse/webhook' && req.method === 'POST') {
+    try {
+      const raw = await readBody(req, 30000);
+      const contentType = String(req.headers['content-type'] || '');
+      const payload = contentType.includes('application/x-www-form-urlencoded') ? parseFormBody(raw) : JSON.parse(raw || '{}');
+      await recordPayverseResult(payload);
+      return json(res, 200, { ok: true });
+    } catch (error) {
+      return json(res, 400, { ok: false, message: error.message });
+    }
+  }
+
+  if (pathname === '/api/nicepay/request' && req.method === 'POST') {
+    try {
+      const body = JSON.parse(await readBody(req, 30000) || '{}');
+      return json(res, 201, await createNicePayRequest(body.items));
+    } catch (error) {
+      return json(res, 400, { ok: false, message: error.message });
+    }
+  }
+
+  if (pathname === '/api/nicepay/return' && req.method === 'POST') {
+    try {
+      const result = await approveNicePay(parseFormBody(await readBody(req, 30000)));
+      return redirect(res, `/payment-success.html?provider=nicepay&order_id=${encodeURIComponent(result.orderId)}`);
+    } catch (error) {
+      return redirect(res, `/cart.html?payment=failed&message=${encodeURIComponent(error.message)}`);
+    }
   }
 
   if (pathname === '/assets/paypal-loader.js' && req.method === 'GET') {
