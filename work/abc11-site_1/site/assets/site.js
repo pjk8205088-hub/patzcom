@@ -429,19 +429,18 @@ function loadPayverseSdk(src){
   return window.__payverseSdkPromise;
 }
 
-async function mountPayverse(paypalEl, stripeEl, items, config){
-  paypalEl.innerHTML = '<div class="payment-loading">Loading secure Payverse checkout…</div>';
-  stripeEl.innerHTML = '';
+async function mountPayverse(container, items, config){
+  container.innerHTML = '<div class="payment-loading">Loading secure Payverse checkout…</div>';
   if(!config.payverse?.enabled){
-    paypalEl.innerHTML = '<div class="payment-unavailable"><strong>Payverse checkout is not configured yet.</strong><span>Add the Payverse merchant credentials in Railway to enable U.S. checkout.</span></div>';
+    container.innerHTML = '<div class="payment-unavailable"><strong>Payverse checkout is not configured yet.</strong><span>Add the Payverse merchant credentials in Railway to enable U.S. checkout.</span></div>';
     return;
   }
   const response = await fetch(`${R}api/payverse/request`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ items }) });
   const payload = await response.json();
   if(!response.ok || !payload.orderId) throw new Error(payload.message || 'Payverse payment request could not be created.');
   const payVerse = await loadPayverseSdk(payload.sdk);
-  paypalEl.innerHTML = '<button type="button" class="payverse-checkout-btn">Pay with Payverse</button><small class="payment-provider-note">U.S. checkout · USD</small>';
-  paypalEl.querySelector('button').addEventListener('click', () => {
+  container.innerHTML = '<button type="button" class="payverse-checkout-btn">Pay with Payverse</button><small class="payment-provider-note">U.S. checkout · USD</small>';
+  container.querySelector('button').addEventListener('click', () => {
     payVerse.requestUI({
       mid: payload.mid, clientKey: payload.clientKey, reqDate: payload.reqDate, orderId: payload.orderId,
       productName: payload.productName, requestCurrency: payload.requestCurrency, requestAmount: payload.requestAmount,
@@ -479,20 +478,23 @@ async function mountNicePay(paypalEl, stripeEl, items, config){
 
 async function mountPayments(total){
   const paypalEl = document.getElementById('paypal-button-container');
+  const payverseEl = document.getElementById('payverse-button-container');
   const stripeEl = document.getElementById('stripe-checkout-container');
   if(!paypalEl || !stripeEl) return;
   paypalEl.innerHTML = '<div class="payment-loading">Loading secure PayPal checkout…</div>';
+  if(payverseEl) payverseEl.innerHTML = '';
   stripeEl.innerHTML = '';
   try {
     const config = await loadPaymentConfig();
     const items = paymentItems();
     const koreanCheckout = window.PATZCOM_I18N?.getLanguage?.() === 'ko' || localStorage.getItem('patzcom-language') === 'ko';
     if(koreanCheckout){
+      if(payverseEl) payverseEl.innerHTML = '';
       return await mountNicePay(paypalEl, stripeEl, items, config);
     }
-    if(config.payverse?.enabled){
-      return await mountPayverse(paypalEl, stripeEl, items, config);
-    }
+    if(payverseEl) await mountPayverse(payverseEl, items, config).catch((error) => {
+      payverseEl.innerHTML = `<div class="payment-unavailable"><strong>Payverse checkout is temporarily unavailable.</strong><span>${String(error.message || 'Please try again shortly.').replace(/[&<>\"]/g, (value) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[value]))}</span></div>`;
+    });
     if(config.paypal?.enabled && config.paypal.clientId){
       const paypal = await loadPayPalSdk(config.paypal.clientId, config.currency);
       paypalEl.innerHTML = '';

@@ -485,6 +485,7 @@ img{max-width:100%;display:block}
 .checkout{margin-top:26px;max-width:420px}
 .totals{display:flex;justify-content:space-between;font-size:22px;font-weight:800;margin-bottom:18px}
 .checkout-methods{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px;background:var(--card)}
+.payment-button-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:start}.payment-button-row>div{min-width:0}
 .checkout-method-heading{display:flex;justify-content:space-between;gap:12px;font-size:14px}.checkout-method-heading span{color:var(--mut);font-size:12px}
 .payment-status{min-height:20px;margin-top:8px;color:var(--mut);font-size:13px}.payment-status.success{color:#16844a}.payment-status.error{color:#c53b2c}
 .payment-loading,.payment-unavailable{border:1px dashed var(--line);border-radius:10px;padding:14px;color:var(--mut);font-size:13px;display:grid;gap:4px}.payment-unavailable strong{color:var(--txt);font-size:14px}
@@ -908,4 +909,5 @@ body.about-white-page .ftr{background:#fff;color:#191919;border-top:1px solid #d
 .nicepay-checkout-btn{width:100%;min-height:52px;border:0;border-radius:10px;background:#1f64d6;color:#fff;font:inherit;font-weight:800;cursor:pointer;padding:0 20px}
 .nicepay-checkout-btn:hover{background:#174ea6}
 .payverse-checkout-btn{width:100%;min-height:52px;border:0;border-radius:10px;background:#111827;color:#fff;font:inherit;font-weight:800;cursor:pointer;padding:0 20px}.payverse-checkout-btn:hover{background:#000}
+@media(max-width:640px){.payment-button-row{grid-template-columns:1fr}}
 .payment-provider-note{display:block;margin-top:8px;color:#64748b;text-align:center;font-size:12px}
