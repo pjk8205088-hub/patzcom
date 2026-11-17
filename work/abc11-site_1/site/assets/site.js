@@ -1,4 +1,13 @@
 const R = window.ROOT || '';
+// Product and collection pages share this bundle, so load the language layer
+// here as well as on the storefront shell. This keeps detail-page text in sync
+// with the language selected on the previous page.
+if (!document.querySelector('script[data-patzcom-i18n]')) {
+  const i18nScript = document.createElement('script');
+  i18nScript.dataset.patzcomI18n = 'true';
+  i18nScript.src = `${R}assets/i18n.js`;
+  document.head.appendChild(i18nScript);
+}
 let PRODUCTS = [];
 const CART_KEY = 'patzcom_cart';
 const cart = () => JSON.parse(localStorage.getItem(CART_KEY) || '{}');

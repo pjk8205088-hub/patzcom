@@ -340,7 +340,8 @@
   }
 
   window.PATZCOM_I18N = { apply: applyTranslations, setLanguage: (lang) => { localStorage.setItem(STORAGE_KEY, lang); location.reload(); }, getLanguage };
-  document.addEventListener('DOMContentLoaded', mountSwitcher);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountSwitcher);
+  else mountSwitcher();
   let scheduled = false;
   new MutationObserver(() => {
     if (scheduled) return;
