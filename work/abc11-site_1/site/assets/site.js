@@ -85,6 +85,12 @@ function enhanceGallery(){
   select(0);
 }
 document.addEventListener('DOMContentLoaded', () => { enhanceGallery(); initContactForm(); });
+document.addEventListener('click', (event) => {
+  const link = event.target.closest('.mainnav a[href$="index.html"], .logo[href$="index.html"]');
+  if (!link) return;
+  event.preventDefault();
+  window.location.assign(`${window.location.origin}/index.html`);
+});
 const money = n => '$'+n.toLocaleString('en-US',{minimumFractionDigits:2});
 const qaKey = id => `patzcom_qa_${id}`;
 const imgFallback = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
