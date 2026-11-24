@@ -447,7 +447,9 @@ function loadPayverseSdk(src){
 async function mountPayverse(container, items, config){
   container.innerHTML = '<div class="payment-loading">Loading secure Payverse checkout…</div>';
   if(!config.payverse?.enabled){
-    container.innerHTML = '<div class="payment-unavailable"><strong>Payverse checkout is not configured yet.</strong><span>Add the Payverse merchant credentials in Railway to enable U.S. checkout.</span></div>';
+    const korean = document.documentElement.lang.startsWith('ko');
+    container.innerHTML = `<button type="button" class="payverse-checkout-btn" aria-disabled="true">${korean ? 'Payverse로 결제' : 'Pay with Payverse'}</button><small class="payment-provider-note">${korean ? '결제 서비스 준비 중' : 'Payment service coming soon'}</small>`;
+    container.querySelector('button').addEventListener('click', () => setPaymentStatus(korean ? 'Payverse 결제 서비스 준비 중입니다. 다른 결제 수단을 이용해 주세요.' : 'Payverse checkout is coming soon. Please use another payment method.', 'error'));
     return;
   }
   const response = await fetch(`${R}api/payverse/request`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ items }) });
