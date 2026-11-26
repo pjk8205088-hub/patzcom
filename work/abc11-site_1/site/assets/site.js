@@ -295,6 +295,21 @@ function initMarketplaceHome(){
     if(headerCategory)headerCategory.value=state.category;
     render();
   }
+  // Both category controls open the actual product categories, including on mobile.
+  const categoryPanel = document.createElement('dialog');
+  categoryPanel.style.cssText = 'max-width:560px;width:calc(100% - 32px);max-height:80vh;border:1px solid #ddd;border-radius:16px;padding:20px;background:white;color:#111;';
+  categoryPanel.innerHTML = '<button type="button" data-close style="float:right;padding:10px" aria-label="Close">×</button><h2>Categories / 제품군</h2>' + categories.map(category => `<button type="button" data-category="${escapeHtml(category)}" style="display:block;width:100%;padding:14px;text-align:left;background:white;color:#111;border:0;border-bottom:1px solid #eee">${escapeHtml(category)}</button>`).join('');
+  document.body.append(categoryPanel);
+  document.querySelectorAll('.cat-toggle,.store-category-trigger').forEach(button => {
+    button.removeAttribute('onclick');
+    button.addEventListener('click', () => categoryPanel.showModal());
+  });
+  categoryPanel.addEventListener('click', event => {
+    const button = event.target.closest('[data-category]');
+    if(button){ selectCategory(button.dataset.category); categoryPanel.close(); document.getElementById('all-items')?.scrollIntoView({block:'start'}); }
+    else if(event.target.closest('[data-close]') || event.target === categoryPanel) categoryPanel.close();
+  });
+  headerCategory?.addEventListener('change', () => { selectCategory(headerCategory.value); document.getElementById('all-items')?.scrollIntoView({block:'start'}); });
   categoryList.addEventListener('click', (event) => {
     const button = event.target.closest('.category-link');
     if(button) selectCategory(button.dataset.category||'');
