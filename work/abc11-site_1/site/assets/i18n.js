@@ -1,5 +1,6 @@
 (() => {
   const STORAGE_KEY = 'patzcom-language';
+  const COUNTRY_LANGUAGE_KEY = 'patzcom-country-language-initialized';
   const translations = {
     'Seller Hub': '판매자 관리', 'View storefront': '쇼핑몰 보기', 'More tools': '추가 도구', 'Sell an item': '상품 등록', 'Sign out': '로그아웃',
     'Overview': '개요', 'Marketing': '마케팅', 'Performance': '성과', 'Research': '상품 분석', 'Shortcuts': '바로가기',
@@ -271,7 +272,17 @@
   // Keep the existing English storefront as the first-visit default. The user's
   // choice is persisted so every later page, including product detail pages,
   // opens in the selected language.
-  const getLanguage = () => localStorage.getItem(STORAGE_KEY) || 'en';
+  function getLanguage() {
+    let selected = localStorage.getItem(STORAGE_KEY);
+    if (!selected && !sessionStorage.getItem(COUNTRY_LANGUAGE_KEY)) {
+      const koreanRegion = /(^|[-_])(KR|KP)([-_]|$)/i.test(navigator.language || '') ||
+        Intl.DateTimeFormat().resolvedOptions().timeZone === 'Asia/Seoul';
+      selected = koreanRegion ? 'ko' : 'en';
+      localStorage.setItem(STORAGE_KEY, selected);
+      sessionStorage.setItem(COUNTRY_LANGUAGE_KEY, '1');
+    }
+    return selected || 'en';
+  }
 
   function translateString(value) {
     if (!value.trim()) return value;
