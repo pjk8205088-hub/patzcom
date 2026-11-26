@@ -354,9 +354,12 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountSwitcher);
   else mountSwitcher();
   let scheduled = false;
-  new MutationObserver(() => {
+  new MutationObserver((records) => {
+    // Ignore our own text and attribute translations. React/catalog insertions
+    // still get translated, without rescanning the entire page on every edit.
+    if (!records.some(record => record.type === 'childList' && record.addedNodes.length)) return;
     if (scheduled) return;
     scheduled = true;
     queueMicrotask(() => { scheduled = false; applyTranslations(); });
-  }).observe(document.documentElement, { childList: true, subtree: true });
+  }).observe(document.body || document.documentElement, { childList: true, subtree: true });
 })();
